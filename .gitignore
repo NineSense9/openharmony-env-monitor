@@ -1,0 +1,37 @@
+# ===== 北向:DevEco Studio / ArkTS =====
+app/build/
+app/.preview/
+app/.hvigor/
+app/.cxx/
+app/oh_modules/
+app/local.properties
+app/.idea/
+*.hap
+*.hsp
+*.har
+
+# ===== 南向:嵌入式编译产物 =====
+device/**/build/
+device/**/out/
+device/**/obj/
+*.o
+*.ko
+*.a
+*.elf
+*.map
+
+# ===== 通用 IDE / 编辑器 =====
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ===== Python 工具脚本 =====
+__pycache__/
+*.pyc
+
+# ===== 日志 / 系统文件 =====
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
