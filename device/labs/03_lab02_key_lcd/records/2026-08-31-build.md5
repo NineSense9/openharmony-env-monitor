@@ -12,7 +12,7 @@
 - 构建命令：`hb build`
 - 构建结果：`853/853`，`lockzhiner-rk2206 build success`，`BUILD_RC=0`
 
-## 构建产物
+## 初始构建产物
 
 | 文件 | Ubuntu 路径 | 大小 | MD5 |
 | --- | --- | ---: | --- |
@@ -22,7 +22,25 @@
 | `rk2206_db_loader.bin` | `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831\rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
 
 Windows 侧已重新计算 `Firmware.img` 和 `rk2206_db_loader.bin` 的 MD5，结果与
-Ubuntu 产物一致。4.5 的镜像目录未被覆盖。
+Ubuntu 产物一致。4.5 的镜像目录未被覆盖。该包作为初始构建历史基线保留，
+不再用于当前 K3 验收。
+
+## K3 读取失败修复后的重试构建
+
+- 构建时间：2026-08-31 21:16（Ubuntu）；
+- 构建命令：`hb build -f`；
+- 构建结果：`853/853`，`lockzhiner-rk2206 build success`，`BUILD_RC=0`；
+- Ubuntu 工程：`/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831`；
+- 完整构建日志：`device/labs/03_lab02_key_lcd/records/2026-08-31-build-k3-retry.log`；
+- Windows 产物目录：`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831`。
+
+| 文件 | 大小 | MD5 |
+| --- | ---: | --- |
+| `Firmware.img` | 2,097,152 bytes | `df7f5e3fbb3926bcbc08e3d657453a59` |
+| `rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
+
+新镜像内部已检索到 `K3: READ ERR`、`initial K3 read failed(%u)` 和
+`lab02_key_lcd: K3 read failed(%u)`，说明本次修复代码已进入最终镜像。
 
 ## 集成证据
 

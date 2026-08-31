@@ -50,3 +50,27 @@ missing and no known rule to make it
 3. 用 `hb env` 核对 root/product/device 三条路径；
 4. 传输源码时保持 `include/`、`src/` 目录结构；
 5. 构建前检查新库对象，构建后检查最终链接库名和产物时间。
+
+## 问题 3：非交互 SSH 的 PATH 不完整
+
+通过非交互 SSH 直接执行构建时，`hb` 未在默认 PATH 中；补充
+`/home/lzdz/.local/bin` 后又发现系统交叉编译器实际位于 `/usr/bin`。因此后续
+远端构建必须显式设置完整 PATH：
+
+```bash
+export PATH="/home/lzdz/.local/bin:/usr/bin:$PATH"
+command -v hb
+command -v arm-none-eabi-gcc
+```
+
+本次第一次构建因缺少 `hb` 只完成到打包前，第二次因缺少交叉编译器未开始；补齐
+PATH 后重新执行 `hb build -f`，最终 `853/853`、返回码 0。完整日志保存在
+`2026-08-31-build-k3-retry.log`。
+
+## 问题 4：K3 首次 GPIO 读取失败会使任务过早退出
+
+初始实现遇到 `tx_key_is_pressed()` 读取错误时直接 `return`，因此 LCD 欢迎文字
+仍可显示，但状态行不显示，后续 K3 轮询也不会运行，表现为“K3 没反应”。修复后
+首次读取失败会显示 `K3: READ ERR`，任务保留并每 100 ms 重试；读取恢复后再
+输出并显示 `K3=PRESSED` 或 `K3=RELEASED`。同时按 SDK GPIO 示例将上拉配置改为
+`PULL_KEEP`。

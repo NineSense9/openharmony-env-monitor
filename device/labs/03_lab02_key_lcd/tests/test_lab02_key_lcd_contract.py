@@ -25,6 +25,7 @@ def test_key_driver_uses_pdf_k3_gpio_contract():
     assert "LZGPIO_DIR_IN" in driver
     assert "LzGpioGetVal" in driver
     assert "LZGPIO_LEVEL_LOW" in driver
+    assert "PULL_KEEP" in driver
     assert "pressed" in driver
     assert "GPIO0_PC6" not in driver
     assert "LzSaradcReadValue" not in driver
@@ -45,6 +46,15 @@ def test_key_lcd_task_reports_only_changed_k3_state():
     assert "lcd_fill(10, 90, 300, 120, LCD_WHITE);" in source
     assert "LOS_Msleep(30);" in source
     assert "APP_FEATURE_INIT(lab02_key_lcd_example)" in source
+
+
+def test_key_read_failure_is_visible_and_retried():
+    source = SOURCE.read_text(encoding="utf-8")
+
+    assert '"K3: READ ERR"' in source
+    assert "initial K3 read failed" in source
+    assert "last_pressed = 2U" in source
+    assert "LOS_Msleep(100);" in source
 
 
 def test_key_lcd_has_independent_build_and_integration_contract():

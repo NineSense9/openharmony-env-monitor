@@ -465,3 +465,21 @@ RESET/MASKROM，电机 PWM6=`GPIO0_PC6` 不被访问。
 `out/`、重新执行 `hb set -root .`/`hb set -p`，并恢复远端目录结构后构建成功。
 当前只完成源码、测试和构建，尚未进行 K3 实物烧录验收；实际 UART、LCD 状态和
 电机状态待用户烧录后补录。详细说明见 `device/labs/03_lab02_key_lcd/README.md`。
+
+## 4.6 K3 读取失败修复重试（21:16）
+
+初始包目录 `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831` 的
+`Firmware.img` MD5 为 `5ed8e34a6069dee30ebd8bd83bf90919`，继续使用它无法验证
+本次源码修复。用户消息中带有分层下划线的路径在 Windows 上不存在，实际烧录路径
+必须以 Windows 文件系统中的目录为准。
+
+根因复核：K3 首次 GPIO 读取失败后，任务直接返回，LCD 欢迎文字仍能显示，但 K3
+状态行和轮询循环永远不会执行。修复为 `PULL_KEEP`、错误显示 `K3: READ ERR`、
+读取失败每 100 ms 重试，恢复后继续按 30 ms 轮询。
+
+修复后在 `/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831` 使用完整 PATH 执行
+`hb build -f`，结果为 `853/853`、`BUILD_RC=0`。新包目录为
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831`，
+`Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。新镜像内含 `K3: READ ERR` 和失败重试日志，
+待烧录后补录实际 UART/LCD/K3 结果。

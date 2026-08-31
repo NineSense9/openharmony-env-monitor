@@ -33,20 +33,27 @@ static void lab02_key_lcd_task(void *arg)
 
     ret = tx_key_is_pressed(&pressed);
     if (ret != LZ_HARDWARE_SUCCESS) {
+        /* Keep the task alive so a transient GPIO read failure is observable. */
+        last_pressed = 2U;
+        lcd_show_string(10, 96, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
         printf("lab02_key_lcd: initial K3 read failed(%u)\r\n", ret);
-        return;
+    } else {
+        last_pressed = pressed;
+        lcd_show_string(10, 96, pressed ? "K3: PRESSED" : "K3: RELEASED",
+                        LCD_BLUE, LCD_WHITE, 16, 0);
+        printf("lab02_key_lcd: K3=%s\r\n", pressed ? "PRESSED" : "RELEASED");
     }
-
-    last_pressed = pressed;
-    lcd_show_string(10, 96, pressed ? "K3: PRESSED" : "K3: RELEASED",
-                    LCD_BLUE, LCD_WHITE, 16, 0);
-    printf("lab02_key_lcd: K3=%s\r\n", pressed ? "PRESSED" : "RELEASED");
 
     while (1) {
         ret = tx_key_is_pressed(&pressed);
         if (ret != LZ_HARDWARE_SUCCESS) {
+            if (last_pressed != 2U) {
+                lcd_fill(10, 90, 300, 120, LCD_WHITE);
+                lcd_show_string(10, 96, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
+                last_pressed = 2U;
+            }
             printf("lab02_key_lcd: K3 read failed(%u)\r\n", ret);
-            LOS_Msleep(30);
+            LOS_Msleep(100);
             continue;
         }
 

@@ -2,7 +2,7 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前镜像会继承
+已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前重试镜像会继承
 4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
 LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。
 
@@ -39,7 +39,7 @@ PDF 规定的核心流程：
 - `include/lcd.h`、`include/lcd_font.h`、`src/lcd.c`：从 4.5 原样继承的 LCD 基线；
 - `BUILD.gn`：`lab02_key_lcd` 独立静态库；
 - `patches/README.md`：Ubuntu 工程复制、集成和构建说明；
-- `tests/test_lab02_key_lcd_contract.py`：4 项自动化契约测试；
+- `tests/test_lab02_key_lcd_contract.py`：5 项自动化契约测试；
 - `records/`：TDD、构建、烧录和 UART 记录。
 
 ## 业务行为
@@ -63,7 +63,8 @@ lab02_key_lcd: K3=RELEASED
 ```
 
 程序每 30 ms 轮询一次，但只有状态变化才擦除 `(10,90)-(300,120)` 并重画状态行，
-避免持续整屏刷新。GPIO 初始化、方向设置或读取失败时打印错误并停止错误路径，
+避免持续整屏刷新。GPIO 初始化或方向设置失败时打印错误并退出初始化；GPIO 读取
+失败时显示 `K3: READ ERR`、打印错误并每 100 ms 重试，读取恢复后继续处理按键，
 不会把读取失败误报成按下。
 
 ## 自动化验证
@@ -74,7 +75,7 @@ lab02_key_lcd: K3=RELEASED
 cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests -q
 ```
 
-当前源码契约测试结果：`4 passed`。
+当前源码契约测试结果：`5 passed`。
 
 ## 构建记录
 
@@ -102,15 +103,26 @@ hb build
 校验值见 [2026-08-31-build.md5](records/2026-08-31-build.md5)，构建排错见
 [2026-08-31-build-troubleshooting.md](records/2026-08-31-build-troubleshooting.md)。
 
-镜像和 Loader 已复制到独立目录：
+初始构建的镜像和 Loader 已复制到独立目录，作为历史基线保留：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-烧录前核对 `2026-08-31-build.md5`。本目录中的 `Firmware.img` MD5 为
+该初始包的 `Firmware.img` MD5 为
 `5ed8e34a6069dee30ebd8bd83bf90919`，Loader MD5 为
 `5f2ea974b0e1df5564a8e1ee910627bb`。
+
+本次 K3 读取失败修复后的当前烧录包单独保存到：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831
+```
+
+当前只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`。新包的
+`Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，Loader MD5 仍为
+`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对该 MD5，不能继续使用上面
+初始包目录中的 `Firmware.img`。
 
 ## 独立构建和烧录
 
@@ -138,19 +150,21 @@ hb build
 - `main.c` 不手动调用任何实验入口，唯一入口是
   `APP_FEATURE_INIT(lab02_key_lcd_example)`。
 
-烧录文件单独保存到：
+初始烧录文件单独保存到：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-烧录时只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
+当前重试包烧录时只使用
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831` 中的
+`rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
 UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的 MD5。
 
 ## 验收清单
 
-- [ ] UART 出现 LCD 初始化成功和初始 `K3=RELEASED`；
+- [ ] UART 出现 LCD 初始化成功和初始 `K3=RELEASED`，或明确出现 `K3: READ ERR`；
 - [ ] 按住 K3 后 UART 和 LCD 显示 `K3=PRESSED`；
 - [ ] 松开 K3 后 UART 和 LCD 恢复 `K3=RELEASED`；
 - [ ] 电机保持静止，没有重复启动或异常抖动；
