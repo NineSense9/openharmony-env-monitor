@@ -317,3 +317,62 @@ soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远�
 该版本尚未完成物理验收。烧录后应记录 UART 的 `lab01_lcd: LCD OK`，确认文字
 方向正常、全屏刷屏速度提升且电机保持静止。烧录仍按 PDF：`K2=MASKROM`，烧录
 完成退出下载模式后用 `K1=RESET` 重启。
+
+### 4.5 lab01_lcd 竖屏 180° 方向修正版（2026-08-31）
+
+用户反馈上一版 `USE_HORIZONTAL=0` 镜像已实际烧录，显示内容与硬件 SPI 运行
+正常，电机也没有重新抖动，但文字起始位置仍在 LCD 右下角。该反馈排除了
+“没有切换到硬件 SPI”的可能，说明 LCD 控制器的物理原点相对普通竖屏方向反向。
+
+本次只调整方向参数：
+
+- `USE_HORIZONTAL` 从 `0` 改为 `1`；
+- 现有方向分支由此发送 `MADCTL=0xC0`，即竖屏 180° 旋转；
+- 硬件 SPI、`SPI_MODE_0`、PA4 DC、SPI0 M1 和逐行批量刷屏保持不变。
+
+本地方向契约测试先在旧值 `0` 上失败，改为 `1` 后 `5 passed`。Ubuntu 独立工程
+预检确认使用 `USE_HORIZONTAL=1` 后构建成功，输出
+`lockzhiner-rk2206 build success`，`liblab01_lcd.a` 参与链接。
+
+新镜像独立保存：
+
+- 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_reverse_hwspi_20260831`；
+- `Firmware.img`：2,097,152 bytes，MD5：`a0035dd02c5af006199a483883e7c5be`；
+- `rk2206_db_loader.bin`：35,093 bytes，MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-portrait-reverse.log`；
+- 详细记录：`device/labs/02_lab01_lcd/records/2026-08-31-build-portrait-reverse.md5`。
+
+当前等待该版本的实物验收，重点确认文字是否从 LCD 左上角开始、方向是否正常，
+同时确认刷屏速度和电机状态保持正确。烧录仍按 PDF 使用 `K2=MASKROM`，完成后
+退出下载模式并用 `K1=RESET` 重启。
+
+### 4.5 lab01_lcd 横屏方向 3 修正版（2026-08-31）
+
+用户实际烧录 `USE_HORIZONTAL=1` 的镜像后反馈显示仍在屏幕右下角且方向反了，
+并提供了板上原厂程序截图作为正确显示位置参照。重新对照授课 PDF 第 4.4.2、
+4.5 节后确认：SMART-R 这块 LCD 的课程公共坐标是横屏 `320x240`，前面将问题
+误判为竖屏 180°，因此 `USE_HORIZONTAL=0/1` 均不是正确的适配方向。
+
+本次修复：
+
+- `include/lcd.h` 恢复横屏 `LCD_W=320`、`LCD_H=240`，设置 `USE_HORIZONTAL=3`；
+- 现有 `lcd_init()` 方向分支因此发送横屏 `MADCTL=0xA0`，与此前方向 2 的
+  `MADCTL=0x70` 成对切换；
+- DC=`GPIO0_PA4`、SPI0 M1、`SPI_MODE_0`、逐行批量刷屏和不触碰电机 PWM6 的
+  修复全部保持不变。
+
+本地契约测试结果：`5 passed`。Ubuntu 独立工程
+`/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 增量构建成功，输出
+`lockzhiner-rk2206 build success`，并确认 `liblab01_lcd.a` 重新参与链接。
+
+新镜像单独保存：
+
+- 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_20260831`；
+- `Firmware.img`：2,097,152 bytes，MD5：`e658972f997d43bb16d056fc6eb329c1`；
+- `rk2206_db_loader.bin`：35,093 bytes，MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-landscape-orientation3.log`；
+- 详细记录：`device/labs/02_lab01_lcd/records/2026-08-31-build-landscape-orientation3.md5`。
+
+当前仍待实物验收，不能在用户烧录确认前标记 LCD 方向已修复。验收时按 PDF 使用
+`K2=MASKROM`，烧录结束退出下载模式后用 `K1=RESET` 重启，并按板子正常正向摆放
+确认文字是否从 LCD 左上角开始。

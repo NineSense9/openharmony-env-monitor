@@ -3,8 +3,9 @@
 ## 状态
 
 已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
-用户已确认电机不再抖动，LCD 能显示三行文字；本次又修正了画面方向并切换到
-硬件 SPI，新的镜像等待实物确认方向和刷新速度。
+用户已确认电机不再抖动，LCD 能显示三行文字，硬件 SPI 已完成切换。此前的
+竖屏 `USE_HORIZONTAL=0/1` 尝试仍从右下角开始且方向不对；本次依据 PDF 和
+原厂程序截图恢复横屏坐标，改用横屏方向 `USE_HORIZONTAL=3`，新镜像等待实物确认。
 
 ## 课程依据
 
@@ -88,6 +89,26 @@
   [2026-08-31-build-portrait-hwspi.log](records/2026-08-31-build-portrait-hwspi.log)
 - SMART-R 竖屏 + 硬件 SPI 修正版构建与反馈记录：
   [2026-08-31-build-portrait-hwspi.md5](records/2026-08-31-build-portrait-hwspi.md5)
+- SMART-R 竖屏 180° + 硬件 SPI 修正版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_reverse_hwspi_20260831`
+- SMART-R 竖屏 180° + 硬件 SPI 修正版 `Firmware.img`：2,097,152 bytes，MD5：
+  `a0035dd02c5af006199a483883e7c5be`
+- SMART-R 竖屏 180° + 硬件 SPI 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R 竖屏 180° + 硬件 SPI 修正版构建日志：
+  [2026-08-31-build-portrait-reverse.log](records/2026-08-31-build-portrait-reverse.log)
+- SMART-R 竖屏 180° + 硬件 SPI 修正版构建与反馈记录：
+  [2026-08-31-build-portrait-reverse.md5](records/2026-08-31-build-portrait-reverse.md5)
+- SMART-R 横屏方向 3 + 硬件 SPI 修正版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_20260831`
+- SMART-R 横屏方向 3 + 硬件 SPI 修正版 `Firmware.img`：2,097,152 bytes，MD5：
+  `e658972f997d43bb16d056fc6eb329c1`
+- SMART-R 横屏方向 3 + 硬件 SPI 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R 横屏方向 3 + 硬件 SPI 修正版构建日志：
+  [2026-08-31-build-landscape-orientation3.log](records/2026-08-31-build-landscape-orientation3.log)
+- SMART-R 横屏方向 3 + 硬件 SPI 修正版构建与反馈记录：
+  [2026-08-31-build-landscape-orientation3.md5](records/2026-08-31-build-landscape-orientation3.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -109,20 +130,34 @@ SPI/LCD 刷新，表现为设备异常抖动、反复启动或 LCD 黑屏。
 SMART-R 的电机使用 `PWM6 = GPIO0_PC6`，因此 LCD 驱动禁止使用 `GPIO0_PC6`。
 在修正版烧录前，旧镜像仍可能使电机持续抖动，应先断开 USB/电源。
 
-## 方向与速度修复记录
+## 方向与速度修复记录（含失败尝试）
 
 用户已确认上一版 `SMART-R A4 DC` 镜像能正常显示三行文字且电机停止，但实物
-画面方向反了、全屏刷屏速度较慢。经核对授课文档和现有驱动实现：
+画面方向反了、全屏刷屏速度较慢。上一版切换到 `USE_HORIZONTAL=0` 并启用硬件
+SPI 后，用户再次确认文字仍从右下角开始；随后 `USE_HORIZONTAL=1` 的竖屏 180°
+尝试仍未解决。
 
-- `USE_HORIZONTAL=2` 会发送横屏 `MADCTL=0x70`，与 SMART-R LCD 的安装方向
-  不一致；已改为竖屏 `USE_HORIZONTAL=0`，恢复 PDF 约定的左上角坐标 API。
+- PDF 第 4.4.2 节明确公共 LCD 坐标为横屏 `LCD_W=320`、`LCD_H=240`，第 4.5
+  节要求 `lcd_show_string(10,40,...)` 从字左上角开始；用户提供的原厂程序截图
+  也证明板上 LCD 的验收方向是横屏左上角。
+- 因此前面把问题改成竖屏 `USE_HORIZONTAL=0/1` 属于方向判断错误。当前恢复横屏
+  尺寸并将 `USE_HORIZONTAL` 设为 `3`，现有方向分支会发送 `MADCTL=0xA0`，用于
+  修正原 `USE_HORIZONTAL=2` (`MADCTL=0x70`) 的反向显示。
 - 旧版 `LCD_ENABLE_SPI=0`，`lcd_fill()` 每个 RGB565 字节都通过 GPIO 模拟，
   全屏共发送约 153,600 个字节并产生大量 GPIO 调用；已切换到 SDK 的 SPI0 M1
   硬件接口，速度设置保持 50 MHz，SPI 时序使用与模拟实现一致的 `SPI_MODE_0`。
 - `lcd_fill()` 现在每行批量发送 RGB565 缓冲区，局部区域仍按实际宽度发送，
   不改变后续实验需要的局部擦除行为。
 
-本地契约测试为 `5 passed`，但新方向和速度尚未由用户重新烧录实物确认。
+本地契约测试为 `5 passed`，Ubuntu 增量构建输出 `lockzhiner-rk2206 build success`。
+`USE_HORIZONTAL=3` 新镜像尚未由用户重新烧录实物确认。
+
+## 当前待验收
+
+只使用 `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_20260831`
+中的 `rk2206_db_loader.bin` 和 `Firmware.img`。按 PDF 进入 `K2=MASKROM` 烧录，
+完成后退出下载模式并按 `K1=RESET`；确认板子按正常正向摆放后，验收文字从 LCD 左上角
+开始、方向正常、刷屏速度较快且电机保持静止。
 
 ## SMART-R 引脚修复记录
 

@@ -1,0 +1,68 @@
+实验：4.5 lab01_lcd（SMART-R 横屏方向 3 + 硬件 SPI 修正版）
+日期：2026-08-31
+
+## 反馈与根因修正
+
+用户实际烧录上一版 `USE_HORIZONTAL=1` 镜像后确认：LCD 仍从右下角开始且方向反了。
+用户提供的板上原厂程序截图显示，正确验收方向应从 LCD 左上角开始；授课文档第
+4.4.2 节同时明确公共坐标为横屏 `LCD_W=320`、`LCD_H=240`。
+
+此前将问题改成竖屏 `USE_HORIZONTAL=0/1` 属于方向判断错误。本次恢复横屏坐标，
+使用方向 3 的 `MADCTL=0xA0`，与原方向 2 的 `MADCTL=0x70` 配对验证。
+
+## 修改内容
+
+- `include/lcd.h`：`USE_HORIZONTAL=3`，`LCD_W=320`，`LCD_H=240`；
+- 保持 `LCD_ENABLE_SPI=1`、SPI0 M1、`SPI_MODE_0` 和 50 MHz 配置；
+- 保持 `DC=GPIO0_PA4`，不使用 `GPIO0_PC6/PWM6`，避免电机抖动；
+- 保持全屏与局部填充的逐行批量发送实现。
+
+## 自动化验证
+
+本地命令：
+
+```text
+cloud_ecs\\.venv\\Scripts\\python.exe -m pytest device\\labs\\02_lab01_lcd\\tests -q
+```
+
+结果：`5 passed`。
+
+## Ubuntu 构建
+
+独立工程：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+
+构建前确认：
+
+```text
+USE_HORIZONTAL=3
+LCD_W=320
+LCD_H=240
+LCD_ENABLE_SPI=1
+SPI_MODE_0
+LCD_PIN_DC=GPIO0_PA4
+```
+
+构建命令使用显式 PATH：
+
+```text
+export PATH=/home/lzdz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+hb build
+```
+
+结果：`lockzhiner-rk2206 build success`，`liblab01_lcd.a` 重新编译并参与链接。
+
+构建日志：`2026-08-31-build-landscape-orientation3.log`。
+
+## 烧录产物
+
+- Windows 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_20260831`
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`e658972f997d43bb16d056fc6eb329c1`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+
+## 待验收
+
+仅使用上述目录中的 Loader 和 Firmware。按 PDF 使用 `K2=MASKROM` 进入烧录模式，
+烧录结束退出下载模式后按 `K1=RESET` 重启。板子按正常正向摆放后，确认文字从 LCD
+左上角开始、方向正常、刷屏速度较快且电机不抖动；当前尚未完成这一步实物验收。

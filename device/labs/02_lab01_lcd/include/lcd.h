@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 
-/* SMART-R LCD 竖直安装；0或1为竖屏，2或3为横屏 */
-#define USE_HORIZONTAL      0
+/* SMART-R LCD 横屏安装；方向3保留320x240坐标并修正板上显示方向 */
+#define USE_HORIZONTAL      3
 
 /* 根据LCD是横屏或者竖屏，设置LCD的宽度和高度 */
 #if ((USE_HORIZONTAL==0) || (USE_HORIZONTAL==1))

@@ -1,0 +1,60 @@
+实验：4.5 lab01_lcd（SMART-R 竖屏 180° + 硬件 SPI 修正版）
+日期：2026-08-31
+
+## 上一版实物反馈
+
+- 用户确认上一版 `USE_HORIZONTAL=0` 的镜像已经烧录，电机保持不抖动，LCD
+  仍能显示实验文字。
+- 但文字起始位置仍在 LCD 右下角，没有落在预期的左上角；说明普通竖屏
+  `MADCTL=0x00` 不是该 LCD 的物理安装方向。
+
+## 本次修改
+
+- `include/lcd.h` 将 `USE_HORIZONTAL` 从 `0` 改为 `1`。
+- 现有 `lcd_init()` 的方向分支会因此发送 `MADCTL=0xC0`，对竖屏 LCD 做
+  180° 旋转，使逻辑坐标 `(0,0)` 映射到物理左上角。
+- 硬件 SPI、`SPI_MODE_0`、逐行批量发送、`DC=GPIO0_PA4` 及其余已验证引脚
+  均保持不变。
+
+## 自动化验证
+
+本地命令：
+
+```text
+cloud_ecs\\.venv\\Scripts\\python.exe -m pytest device\\labs\\02_lab01_lcd\\tests -q
+```
+
+结果：`5 passed`。方向回归测试先在旧值 `0` 上失败，再在改为 `1` 后通过。
+
+## Ubuntu 构建
+
+独立工程：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+
+构建前已确认远端源文件为：
+
+```text
+USE_HORIZONTAL=1
+LCD_ENABLE_SPI=1
+SPI_MODE_0
+LCD_PIN_DC=GPIO0_PA4
+```
+
+构建结果：`lockzhiner-rk2206 build success`；`liblab01_lcd.a` 参与链接。
+
+产物：
+
+- Windows 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_reverse_hwspi_20260831`
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`a0035dd02c5af006199a483883e7c5be`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+- 完整构建日志：[2026-08-31-build-portrait-reverse.log](2026-08-31-build-portrait-reverse.log)
+
+## 烧录与待验收
+
+本版只使用上述新目录中的两个文件。RKDevTool 中 Loader 选择
+`rk2206_db_loader.bin`，Firmware 选择 `Firmware.img`；按授课文档使用
+`K2=MASKROM` 进入烧录模式，烧录结束退出下载模式后按 `K1=RESET` 重启。
+
+本版仍待实物确认。验收标准是文字从 LCD 左上角开始、方向正常、刷屏速度保持
+较快、UART 出现 `lab01_lcd: LCD OK`，并且电机不抖动。
