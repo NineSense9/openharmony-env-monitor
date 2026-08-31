@@ -43,7 +43,7 @@ Ubuntu 产物一致。4.5 的镜像目录未被覆盖。该包作为初始构建
 `lab02_key_lcd: K3 read failed(%u)`。但该版本的 `PULL_KEEP` 配置在实物上于
 `PinctrlSet` 阶段失败，UART 输出 `K3 pinctrl failed ret=1`，因此不能继续使用。
 
-## K3 pinctrl 修正构建（PULL_UP，当前验收包）
+## K3 pinctrl 修正构建（PULL_UP，作废）
 
 - 构建时间：2026-08-31（Ubuntu）；
 - 构建命令：`hb build -f`；
@@ -57,8 +57,28 @@ Ubuntu 产物一致。4.5 的镜像目录未被覆盖。该包作为初始构建
 | `Firmware.img` | 2,097,152 bytes | `5d5360c5bcea67ec33f0c30924e27f4a` |
 | `rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
 
-Ubuntu 工程源码和 Windows 侧产物已分别核对为 `PULL_UP` 版本；该包尚未完成实物
-烧录，因此 K3 的最终硬件验收仍待用户反馈。
+Ubuntu 工程源码和 Windows 侧产物已分别核对为 `PULL_UP` 版本；用户实物烧录后仍
+收到 `K3 pinctrl failed ret=1`，因此该包已作废，仅保留用于排错记录。
+
+## K3 无额外 pinctrl 构建（当前待验收包）
+
+- 构建时间：2026-08-31 23:12（Ubuntu）；
+- 构建命令：`hb build -f`；
+- 构建结果：`853/853`，`lockzhiner-rk2206 build success`，`BUILD_RC=0`；
+- Ubuntu 工程：`/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831`；
+- 完整构建日志：`device/labs/03_lab02_key_lcd/records/2026-08-31-build-k3-no-pinctrl.log`；
+- Windows 产物目录：`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831`。
+
+| 文件 | Ubuntu/Windows 路径 | 大小 | MD5 |
+| --- | --- | ---: | --- |
+| `liteos.elf` | Ubuntu `out/rk2206/lockzhiner-rk2206/liteos.elf` | 1,498,132 bytes | `4028aa5084015a61370f517255a17511` |
+| `liblab02_key_lcd.a` | Ubuntu `out/rk2206/lockzhiner-rk2206/libs/liblab02_key_lcd.a` | 34,196 bytes | `27ae1692d1e9cca781a6b0318a08949a` |
+| `Firmware.img` | Windows `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831\Firmware.img` | 2,097,152 bytes | `4bcd54b6926794a78620fd7c30f64abf` |
+| `rk2206_db_loader.bin` | Windows `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831\rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
+
+本版本依据 PDF 4.6，仅执行 `LzGpioInit(GPIO0_PC7)` 和
+`LzGpioSetDir(GPIO0_PC7, LZGPIO_DIR_IN)`；源码、ELF 和固件中均未发现
+`PinctrlSet` 或 `K3 pinctrl failed`。上板后补录实际 UART、LCD、K3 和电机状态。
 
 ## 集成证据
 
@@ -70,6 +90,6 @@ Ubuntu 工程源码和 Windows 侧产物已分别核对为 `PULL_UP` 版本；�
 
 ## 烧录状态
 
-尚未进行实物验收。烧录时只使用本记录对应目录中的 Loader 和 Firmware，完成后
+当前待验收版本为 `no_pinctrl`。烧录时只使用本记录对应目录中的 Loader 和 Firmware，完成后
 按 PDF 退出 MASKROM，再用 K1=RESET 重启；UART 使用 `115200 8N1`。待用户按下
 并松开 K3 后补充实际 UART、LCD 和电机状态。

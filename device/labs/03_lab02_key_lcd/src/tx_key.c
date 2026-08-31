@@ -14,12 +14,6 @@ unsigned int tx_key_init(void)
         return ret;
     }
 
-    ret = PinctrlSet(TX_KEY_K3, MUX_FUNC0, PULL_UP, DRIVE_LEVEL0);
-    if (ret != LZ_HARDWARE_SUCCESS) {
-        printf("lab02_key_lcd: K3 pinctrl failed ret=%u\r\n", ret);
-        return ret;
-    }
-
     ret = LzGpioSetDir(TX_KEY_K3, LZGPIO_DIR_IN);
     if (ret != LZ_HARDWARE_SUCCESS) {
         printf("lab02_key_lcd: K3 input failed ret=%u\r\n", ret);

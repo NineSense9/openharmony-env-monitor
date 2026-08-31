@@ -1,5 +1,5 @@
 实验：4.6 lab02_key_lcd
-状态：旧 PULL_KEEP 包实物失败；PULL_UP 包待烧录验收
+状态：PULL_KEEP 和 PULL_UP 包实物失败；no_pinctrl 包待烧录验收
 串口配置：115200 8N1
 
 本次用户截图中的实际 UART（对应已作废的 `lab03_lab02_key_lcd_retry_20260831`
@@ -15,11 +15,20 @@ lab02_key_lcd: tx_key_init failed(1)
 产生状态日志。该包的 `Firmware.img` MD5 为
 `df7f5e3fbb3926bcbc08e3d657453a59`，不能作为当前验收包。
 
-当前待验收包：
+此前待验收但已作废的 PULL_UP 包：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831\Firmware.img
 MD5: 5d5360c5bcea67ec33f0c30924e27f4a
+```
+
+该包实物烧录后仍输出 `K3 pinctrl failed ret=1`，现已作废。
+
+当前待验收包：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831\Firmware.img
+MD5: 4bcd54b6926794a78620fd7c30f64abf
 ```
 
 预期启动与操作序列：
@@ -30,5 +39,5 @@ lab02_key_lcd: K3=PRESSED
 松开 K3
 lab02_key_lcd: K3=RELEASED
 
-说明：以上为待上板验收的预期序列，不是实际硬件日志。用户完成烧录并提供
+说明：以上为 no_pinctrl 包待上板验收的预期序列，不是实际硬件日志。用户完成烧录并提供
 UART 输出后，用实际日志替换本文件内容，再记录 LCD 状态和电机状态。

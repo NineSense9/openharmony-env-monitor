@@ -96,3 +96,29 @@ lab02_key_lcd: tx_key_init failed(1)
 `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831`。
 
 烧录前必须先核对目录和 MD5；在实物反馈前，不把 K3 修复标记为已验收。
+
+## 问题 6：GPIO0_PC7 不支持额外 PinctrlSet
+
+用户烧录 `PULL_UP` 包后仍收到同一组 UART：
+
+```text
+lab02_key_lcd: K3 pinctrl failed ret=1
+lab02_key_lcd: tx_key_init failed(1)
+```
+
+因此 `PULL_UP` 与此前的 `PULL_KEEP` 都不能作为修复。结合 PDF 4.6 的明确要求
+（K3=`GPIO0_PC7` 设为输入）以及 `LzGpioInit(GPIO0_PC7)` 已成功，失败边界确定
+在额外的 `PinctrlSet` 调用，而非烧录目录或按键轮询逻辑。
+
+处理：新增契约断言，要求 `src/tx_key.c` 不调用 `PinctrlSet`；先确认旧源码得到
+`1 failed, 4 passed`，再删除该调用及其错误分支，只保留 GPIO 初始化和输入方向
+设置。修正后本地测试 `5 passed`，Ubuntu 全量构建 `853/853`、`BUILD_RC=0`；
+新 ELF 和固件中均不存在 `K3 pinctrl failed` 字符串。
+
+新包：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
+Firmware.img MD5: 4bcd54b6926794a78620fd7c30f64abf
+Loader MD5: 5f2ea974b0e1df5564a8e1ee910627bb
+```

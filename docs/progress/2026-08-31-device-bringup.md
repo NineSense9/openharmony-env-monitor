@@ -499,7 +499,7 @@ lab02_key_lcd: tx_key_init failed(1)
 旧重试包 `Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，现标记
 作废。
 
-源码和契约测试已将 K3 pinctrl 改为 `PULL_UP`，保留读取失败显示和重试逻辑。远端
+当时源码和契约测试已将 K3 pinctrl 改为 `PULL_UP`，保留读取失败显示和重试逻辑。远端
 Ubuntu 工程 `/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831` 重新执行
 `hb build -f`，完成 `853/853`，返回码 0。当前烧录包为：
 
@@ -510,5 +510,24 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831\rk2206_db_loader
 MD5: 5f2ea974b0e1df5564a8e1ee910627bb
 ```
 
-该版本尚未完成实物烧录验收。烧录前不要再使用初始包或 `retry` 包；完成烧录后
-记录 UART、K3 按下/松开、LCD 显示和电机状态。
+该版本后来经实物烧录仍在 pinctrl 阶段失败，已作废；当前待验收版本见下方 4.7
+节。上述目录和校验值仅用于历史追溯。
+
+## 4.7 K3 无额外 pinctrl 构建（2026-08-31）
+
+用户烧录 `PULL_UP` 包后仍输出 `K3 pinctrl failed ret=1` 和
+`tx_key_init failed(1)`。结合 PDF 4.6 和 `LzGpioInit(GPIO0_PC7)` 成功的 UART
+证据，确定失败发生在额外的 `PinctrlSet(GPIO0_PC7, ...)`，不是烧录目录或按键
+轮询逻辑。
+
+新增契约测试后先得到 `1 failed, 4 passed`，再删除 K3 驱动中的 `PinctrlSet` 及
+错误分支，仅保留 GPIO 初始化、输入方向设置和读取。修复后本地测试 `5 passed`。
+Ubuntu 独立工程执行 `hb build -f` 完成 `853/853`，`BUILD_RC=0`；新固件目录为：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
+```
+
+`Firmware.img` MD5 为 `4bcd54b6926794a78620fd7c30f64abf`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。新 ELF 与固件均无
+`K3 pinctrl failed` 字符串，待上板后补录实际 UART、LCD、K3 和电机结果。

@@ -2,10 +2,10 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前 `PULL_UP` 镜像会
+已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前镜像会
 继承 4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
-LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。此前的 `PULL_KEEP`
-重试包已确认会在 pinctrl 初始化阶段失败，不能继续烧录。
+LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。此前的 `PULL_KEEP` 和
+`PULL_UP` 包都已确认会在 K3 的额外 pinctrl 配置阶段失败，不能继续烧录。
 
 ## 课程依据
 
@@ -90,7 +90,7 @@ Ubuntu 独立工程：
 
 ```bash
 cd /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831
-export PATH="/home/lzdz/.local/bin:$PATH"
+export PATH="/home/lzdz/.local/bin:/usr/bin:$PATH"
 command -v hb
 hb --help | head
 hb env
@@ -130,10 +130,22 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831
 ```
 
+该包在实物上仍输出 `K3 pinctrl failed ret=1`，现标记为作废，仅保留用于排错记录。
+
+当前唯一可用于本次验收的烧录包单独保存到：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
+```
+
 只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`。当前包的
-`Firmware.img` MD5 为 `5d5360c5bcea67ec33f0c30924e27f4a`，Loader MD5 为
-`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对这两个值，不能使用初始包或
-上面的作废重试包。
+`Firmware.img` MD5 为 `4bcd54b6926794a78620fd7c30f64abf`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对这两个值，不能使用初始包、
+`retry` 包或 `pullup` 包。
+
+本次修正依据 PDF 4.6：`GPIO0_PC7` 只执行 `LzGpioInit` 和
+`LzGpioSetDir(..., LZGPIO_DIR_IN)`，不对 K3 额外调用 `PinctrlSet`。新 ELF 和
+`Firmware.img` 中均已确认不存在 `K3 pinctrl failed` 字符串。
 
 ## 独立构建和烧录
 
@@ -147,7 +159,7 @@ Ubuntu 工程：
 
 ```bash
 cd /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831
-export PATH="/home/lzdz/.local/bin:$PATH"
+export PATH="/home/lzdz/.local/bin:/usr/bin:$PATH"
 command -v hb
 hb --help | head
 hb env
@@ -167,8 +179,8 @@ hb build
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-当前 `PULL_UP` 包烧录时只使用
-`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831` 中的
+当前 `no_pinctrl` 包烧录时只使用
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831` 中的
 `rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
 UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的当前包
@@ -182,4 +194,4 @@ MD5；烧录后应先看到 `lab02_key_lcd: K3=RELEASED`，再按住和松开 K3
 - [ ] 电机保持静止，没有重复启动或异常抖动；
 - [ ] 实际 UART 输出保存到 `records/2026-08-31-uart.txt` 后再提交验收记录。
 
-当前已完成源码、自动化测试和 `PULL_UP` 固件构建；上板验收仍待实际烧录后确认。
+当前已完成源码、自动化测试和 `no_pinctrl` 固件构建；上板验收仍待实际烧录后确认。
