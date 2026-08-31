@@ -1,0 +1,85 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+______________ test_adc_diagnostic_uses_the_board_user_key_input ______________
+
+    def test_adc_diagnostic_uses_the_board_user_key_input():
+>       source = SOURCE.read_text(encoding="utf-8")
+
+device\labs\03_lab02_key_lcd\tests\test_adc5_key_lcd_contract.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:787: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/ʵϰ/workspace/device/labs/03_lab02_key_lcd/diagnostics/adc5_key_lcd/adc5_key_lcd.c')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\ʵϰ\\workspace\\device\\labs\\03_lab02_key_lcd\\diagnostics\\adc5_key_lcd\\adc5_key_lcd.c'
+
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:771: FileNotFoundError
+__ test_adc_diagnostic_reports_raw_value_and_voltage_without_guessing_labels __
+
+    def test_adc_diagnostic_reports_raw_value_and_voltage_without_guessing_labels():
+>       source = SOURCE.read_text(encoding="utf-8")
+
+device\labs\03_lab02_key_lcd\tests\test_adc5_key_lcd_contract.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:787: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/ʵϰ/workspace/device/labs/03_lab02_key_lcd/diagnostics/adc5_key_lcd/adc5_key_lcd.c')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\ʵϰ\\workspace\\device\\labs\\03_lab02_key_lcd\\diagnostics\\adc5_key_lcd\\adc5_key_lcd.c'
+
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:771: FileNotFoundError
+______________ test_adc_diagnostic_has_a_standalone_build_target ______________
+
+    def test_adc_diagnostic_has_a_standalone_build_target():
+>       build = BUILD.read_text(encoding="utf-8")
+
+device\labs\03_lab02_key_lcd\tests\test_adc5_key_lcd_contract.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:787: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/ʵϰ/workspace/device/labs/03_lab02_key_lcd/diagnostics/adc5_key_lcd/BUILD.gn')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: 'D:\\ʵϰ\\workspace\\device\\labs\\03_lab02_key_lcd\\diagnostics\\adc5_key_lcd\\BUILD.gn'
+
+C:\Users\57219\AppData\Local\Python\pythoncore-3.14-64\Lib\pathlib\__init__.py:771: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED device/labs/03_lab02_key_lcd/tests/test_adc5_key_lcd_contract.py::test_adc_diagnostic_uses_the_board_user_key_input
+FAILED device/labs/03_lab02_key_lcd/tests/test_adc5_key_lcd_contract.py::test_adc_diagnostic_reports_raw_value_and_voltage_without_guessing_labels
+FAILED device/labs/03_lab02_key_lcd/tests/test_adc5_key_lcd_contract.py::test_adc_diagnostic_has_a_standalone_build_target
+3 failed in 0.16s
