@@ -512,7 +512,8 @@ unsigned int lcd_init()
     }
     else if (USE_HORIZONTAL == 2)
     {
-        lcd_wr_data8(0x70);
+        /* 0x60 = MX|MV，正常横屏从左上角扫描；0xA0 是反向横屏。 */
+        lcd_wr_data8(0x60);
     }
     else
     {
