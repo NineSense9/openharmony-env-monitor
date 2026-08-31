@@ -139,6 +139,8 @@
   `5f2ea974b0e1df5564a8e1ee910627bb`
 - 重新链接版构建与故障记录：
   [2026-08-31-build-landscape-normal-relinked.md5](records/2026-08-31-build-landscape-normal-relinked.md5)
+- 重新链接版构建摘要日志：
+  [2026-08-31-build-landscape-normal-relinked.log](records/2026-08-31-build-landscape-normal-relinked.log)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
