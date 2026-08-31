@@ -45,3 +45,20 @@ lab02_key_lcd_adc: USER_KEY_ADC=GPIO0_PC5 raw=123 voltage=0.397V key=KEY_UNKNOWN
 LCD 显示 ADC5、原始值和电压。烧录后先保持所有按键松开，再分别按住并松开
 K3、K4、K5、K6，每个动作保持约 2 秒，保存完整 UART。根据这五组原始值再
 固化 K3-K6 标签映射。
+
+## 当前构建产物（2026-09-01）
+
+Ubuntu 工程已重新全量构建并确认最终链接的是
+`liblab02_key_lcd_adc_diagnostic.a`。Windows 烧录目录为：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831
+```
+
+| 文件 | 大小 | MD5 |
+| --- | ---: | --- |
+| `Firmware.img` | 2,097,152 bytes | `35a412a1ef7e220efbf14bbc843994af` |
+| `rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
+
+此前该 Windows 目录仍保存旧的 23:44 诊断包，烧录旧包会继续看到旧画面；本次已用
+服务器 01:28 构建产物覆盖并完成 MD5 核对。

@@ -80,7 +80,7 @@ lab02_key_lcd: K3=RELEASED
 cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests -q
 ```
 
-当前源码契约测试结果：`6 passed`。
+当前源码契约测试结果：`9 passed`（包含 3 项 ADC5 诊断契约测试）。
 
 ## 构建记录
 
@@ -102,11 +102,12 @@ hb build
 ```
 
 本次 `hb env` 已确认 root、product path 和 device path 均指向 4.6 独立工程；
-构建完成 `853/853`，输出 `lockzhiner-rk2206 build success`，退出码为 0。
-预检和最终增量构建输出见 [2026-08-31-build.log](records/2026-08-31-build.log)，
-853 步全量构建输出见 [2026-08-31-build-full.log](records/2026-08-31-build-full.log)，
-校验值见 [2026-08-31-build.md5](records/2026-08-31-build.md5)，构建排错见
-[2026-08-31-build-troubleshooting.md](records/2026-08-31-build-troubleshooting.md)。
+构建完成 `852/852`，输出 `lockzhiner-rk2206 build success`，退出码为 0。
+历史构建排错见
+[2026-08-31-build-troubleshooting.md](records/2026-08-31-build-troubleshooting.md)，
+当前 ADC5 构建和产物同步见 [2026-09-01-build.md](records/2026-09-01-build.md)，
+历史校验值见 [2026-08-31-build.md5](records/2026-08-31-build.md5)，当前校验值见
+[2026-09-01-build.md5](records/2026-09-01-build.md5)。
 
 初始构建的镜像和 Loader 已复制到独立目录，作为历史基线保留：
 
@@ -171,12 +172,13 @@ hb env
 hb build
 ```
 
-只启用 `lab02_key_lcd`：
+只启用 `lab02_key_lcd_adc_diagnostic`：
 
-- samples 的 GN 特性加入 `"./lab02_key_lcd:lab02_key_lcd",`；
-- 最终链接使用 `-llab02_key_lcd`，移除 `-llab01_lcd`；
+- samples 的 GN 特性加入
+  `"./lab02_key_lcd/diagnostics/adc5_key_lcd:lab02_key_lcd_adc_diagnostic",`；
+- 最终链接使用 `-llab02_key_lcd_adc_diagnostic`，移除旧的业务库；
 - `main.c` 不手动调用任何实验入口，唯一入口是
-  `APP_FEATURE_INIT(lab02_key_lcd_example)`。
+  `APP_FEATURE_INIT(adc5_key_lcd_example)`。
 
 初始烧录文件单独保存到：
 
@@ -186,11 +188,18 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 
 当前唯一推荐烧录的是诊断包，只使用
 `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831` 中的
-`rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
+`rk2206_db_loader.bin` 和 `Firmware.img`。该目录已同步到 2026-09-01 最新构建，按 PDF 使用
 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
-UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中诊断包
+UART 使用 `115200 8N1`。烧录前核对 `records/2026-09-01-build.md5` 中诊断包
 MD5。重启后先确保 K3 松开，再观察至少 2 秒的 `K3 raw=...`；随后按住、松开
 K3，各保持约 2 秒并保存完整 UART。不要用 K1 做按键测试，K1 是 RESET。
+
+2026-09-01 曾出现一次“服务器已重新构建，但本地仍烧录旧诊断包”的同步问题：
+旧目录中的 `Firmware.img` 时间为 23:44，新目录文件已替换为 01:28 构建产物。
+当前诊断包的 `Firmware.img` MD5 为
+`35a412a1ef7e220efbf14bbc843994af`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须用当前目录文件并核对这两个值，
+不能仅凭文件名判断是否为最新包。
 
 ## 验收清单
 
