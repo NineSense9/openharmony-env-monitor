@@ -29,6 +29,9 @@ device/**/obj/
 # ===== Python 工具脚本 =====
 __pycache__/
 *.pyc
+.venv/
+cloud_ecs/data/
+cloud_ecs/.venv/
 
 # ===== 日志 / 系统文件 =====
 *.log
