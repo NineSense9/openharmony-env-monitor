@@ -1,0 +1,45 @@
+实验：4.5 lab01_lcd（分段刷屏版）
+日期：2026-08-31
+状态：构建通过，待物理烧录和 UART/LCD 验收
+
+本次目的：
+- 诊断版 UART 已确认 lcd_init 完成并进入 lcd_fill；
+- 用户已澄清此前按下 K1=RESET 是手动操作，不是设备自动复位；
+- 在全屏刷屏的行循环中每 8 行打印一次进度并 LOS_Msleep(1)，降低长时间占用 CPU；
+- 不改变授课文档要求的 lcd_init、全屏 lcd_fill、lcd_show_string、驻留流程。
+
+本地契约测试：
+- 命令：cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\02_lab01_lcd\tests -q
+- 结果：3 passed
+
+Ubuntu 独立源码副本：
+/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+
+构建环境核验：
+- hb：/home/lzdz/.local/bin/hb
+- product：lockzhiner-rk2206
+- build 命令：hb build -f
+- 结果：852/852，liblab01_lcd.a 参与链接，lockzhiner-rk2206 build success
+- 完整日志：device/labs/02_lab01_lcd/records/2026-08-31-build-yield.log
+
+代码变化：
+- LCD_FILL_YIELD_ROWS = 8
+- 每完成 8 行输出 lab01_lcd: LCD_FILL_PROGRESS row=.../...；
+- 每完成 8 行调用 LOS_Msleep(1)；
+- lab01_lcd 实验没有初始化或控制电机、蜂鸣器、RGB 或报警灯。
+
+Windows 烧录目录：
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_yield_20260831
+
+镜像：
+- Firmware.img：2,097,152 bytes
+- Firmware.img MD5：1060f2209ccb3706c8e2736ff9b67a9a
+- rk2206_db_loader.bin：35,093 bytes
+- rk2206_db_loader.bin MD5：5f2ea974b0e1df5564a8e1ee910627bb
+
+物理验收：
+- 尚未烧录本次分段刷屏版；
+- 诊断版现场日志停在 LCD_FILL_BEGIN，之后用户手动按 K1=RESET；
+- 该日志不能证明设备自动复位；
+- 待烧录本目录 Firmware.img，观察 LCD_FILL_PROGRESS 是否连续输出、
+  是否出现 LCD_FILL_DONE 和 lab01_lcd: LCD OK，并同时确认板上抖动是否消失。

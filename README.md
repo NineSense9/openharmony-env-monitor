@@ -56,7 +56,7 @@
 - [x] RKDevTool 烧录验证
 - [x] UART 启动日志验证
 - [x] `device/labs/01_hello_world` 独立实验
-- [ ] `device/labs/02_lab01_lcd`：LCD 实验 1（本地代码和测试已完成）
+- [ ] `device/labs/02_lab01_lcd`：LCD 实验 1（代码、测试和分段刷屏版构建完成，待物理验收）
 - [ ] `device/labs/03_lab02_key_lcd` 至 `09_lab08_wifi_ping`
 - [ ] 云端和远程控制整合实验
 

@@ -50,3 +50,16 @@ def test_lcd_experiment_has_independent_build_contract():
     assert "APP_FEATURE_INIT" in notes
     assert "do not call lab01_lcd_example from main.c" in notes
     assert not (LAB_ROOT / "patches" / "main.c.patch").exists()
+
+
+def test_lcd_fullscreen_fill_yields_and_reports_row_progress():
+    driver = (LAB_ROOT / "src" / "lcd.c").read_text(encoding="utf-8")
+    fill_body = driver.split("void lcd_fill", 1)[1].split(
+        "void lcd_draw_point", 1
+    )[0]
+
+    assert "#define LCD_FILL_YIELD_ROWS 8" in driver
+    assert "LCD_FILL_PROGRESS" in fill_body
+    assert "LOS_Msleep(1);" in fill_body
+    assert "if (((i - ysta) % LCD_FILL_YIELD_ROWS)" in fill_body
+    assert "(LCD_FILL_YIELD_ROWS - 1)" in fill_body

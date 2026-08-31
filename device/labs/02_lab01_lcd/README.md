@@ -3,8 +3,8 @@
 ## 状态
 
 已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
-单入口修复版已实际烧录，但 UART 在 LCD 初始化阶段停止，LCD 尚未通过物理验收；
-当前使用诊断版继续定位卡点。
+诊断日志已确认程序进入全屏 `lcd_fill()`；当前使用分段刷屏版继续做物理验收。
+LCD 尚未通过最终物理验收。
 
 ## 课程依据
 
@@ -58,6 +58,16 @@
   [2026-08-31-build-diagnostic.log](records/2026-08-31-build-diagnostic.log)
 - 诊断版校验记录：
   [2026-08-31-build-diagnostic.md5](records/2026-08-31-build-diagnostic.md5)
+- 分段刷屏版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_yield_20260831`
+- 分段刷屏版 `Firmware.img`：2,097,152 bytes，MD5：
+  `1060f2209ccb3706c8e2736ff9b67a9a`
+- 分段刷屏版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- 分段刷屏版完整日志：
+  [2026-08-31-build-yield.log](records/2026-08-31-build-yield.log)
+- 分段刷屏版校验记录：
+  [2026-08-31-build-yield.md5](records/2026-08-31-build-yield.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -74,6 +84,12 @@ SPI/LCD 刷新，表现为设备异常抖动、反复启动或 LCD 黑屏。
 手动调用。修复版编译日志确认 `main.c has no manual lab startup call`，
 并且 `liblab01_lcd.a` 仍参与最终链接。
 
+本实验当前版本只使用 LCD 的 GPIO0_PC0、GPIO0_PC1、GPIO0_PC2、
+GPIO0_PC3、GPIO0_PC6，不初始化或控制电机、蜂鸣器、RGB 和报警灯。
+如果后续仍听到板上持续抖动，应在 UART 记录对应的 `LCD_FILL_PROGRESS`
+行号后，再判断抖动是否与刷屏时序有关；在未确认原因前，不应让板子持续通电，
+可先断开 USB/电源。
+
 ## 当前故障定位
 
 用户已确认实际烧录的是单入口修复版目录中的新镜像：
@@ -84,8 +100,10 @@ MD5 49841b650f05384a7a614e212c8dab21
 ```
 
 UART 已输出 LCD GPIO 16、17、18、19、22 初始化成功，但没有输出
-`lab01_lcd: LCD OK`。因此当前不能把问题归因于烧录错文件；故障点位于
-LCD GPIO 初始化之后、`lcd_init()` 完成之前，或实际刷屏阶段。
+`lab01_lcd: LCD OK`。用户随后手动按下 `K1=RESET`，所以现有截图不能证明
+设备自动复位；能确认的是程序已经进入 LCD GPIO 初始化和 LCD 初始化流程，
+并停在全屏 `lcd_fill()` 之后的等待阶段。当前不能把问题归因于烧录错文件；
+本次物理验收暂不记为通过。
 
 为区分具体阶段，诊断版只增加串口标记，不改变授课文档要求的 LCD 流程：
 
@@ -109,16 +127,29 @@ D:\实习\tmp\rk2206_images\lab02_lab01_lcd_diagnostic_20260831
 - `rk2206_db_loader.bin`：35,093 bytes，MD5：
   `5f2ea974b0e1df5564a8e1ee910627bb`
 
-## 待验收
+## 分段刷屏版验收
 
-诊断阶段烧录诊断目录中的 `Firmware.img`，Loader 仍使用同目录中的
-`rk2206_db_loader.bin`。进入 MASKROM 使用 `K2`，烧录完成后按 `K1=RESET`
-重启；UART 使用 `115200 8N1`。把从启动开始到停止位置的完整日志截图发回：
+本版在保持 PDF 完整流程不变的前提下，对 `lcd_fill()` 增加了每 8 行一次的
+进度输出和 `LOS_Msleep(1)`。烧录时使用：
 
-- 停在 `LCD_GPIO_DONE`：检查 LCD 复位延时或复位引脚；
-- 出现 `LCD_INIT_DONE` 但停在 `LCD_FILL_BEGIN`：检查全屏软件 SPI 刷屏；
-- 出现 `LCD_FILL_DONE` 仍无 `LCD OK`：检查文字绘制阶段；
-- 出现 `lab01_lcd: LCD OK`：再确认屏幕三行文字。
+```text
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_yield_20260831\rk2206_db_loader.bin
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_yield_20260831\Firmware.img
+```
+
+UART 使用 `115200 8N1`。预期依次观察：
+
+```text
+lab01_lcd: LCD_FILL_BEGIN
+lab01_lcd: LCD_FILL_PROGRESS row=8/240
+...
+lab01_lcd: LCD_FILL_PROGRESS row=240/240
+lab01_lcd: LCD_FILL_DONE
+lab01_lcd: LCD OK
+```
+
+进入 MASKROM 使用 `K2`，烧录完成后恢复运行，再按 `K1=RESET`。
+本次必须记录完整 UART 输出；不要把手动按下 `RESET` 记为自动复位。
 
 最终验收要求仍是 UART 输出 `lab01_lcd: LCD OK`，LCD 显示：
 

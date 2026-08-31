@@ -222,5 +222,35 @@ LCD_FILL_DONE
 - 构建结果：`852/852`，`liblab01_lcd.a` 参与链接，
   `lockzhiner-rk2206 build success`
 
-下一步只烧录诊断版，记录上述标记最后出现的位置，再决定是 LCD 初始化时序、
-软件 SPI 刷屏速度，还是文字绘制阶段的问题。
+下一步烧录分段刷屏版，记录 `LCD_FILL_PROGRESS` 的最后行号，再决定是软件
+SPI 刷屏耗时、屏幕硬件连线，还是其他执行器噪声。
+
+### 4.5 lab01_lcd 分段刷屏版（当前待烧录）
+
+用户已澄清：诊断版日志停止后，是用户自己按下 `K1=RESET`，并非设备自动
+复位。因此当前证据只表示程序在输出 `LCD_FILL_BEGIN` 后仍未完成
+`lcd_fill()`，不能把串口断开解释为看门狗或自动重启。
+
+为降低软件模拟 SPI 全屏刷屏时的连续 CPU 占用，本次在 `src/lcd.c` 的
+`lcd_fill()` 行循环中加入：
+
+- 每完成 8 行输出一次 `LCD_FILL_PROGRESS row=.../...`；
+- 每完成 8 行调用 `LOS_Msleep(1)`，主动让出 CPU；
+- 不改变授课文档 4.5 的 `lcd_init()` → 全屏 `lcd_fill()` →
+  `lcd_show_string()` → `LOS_Msleep(1000)` 流程；
+- `lab01_lcd` 仍不初始化或控制电机、蜂鸣器、RGB、报警灯。
+
+构建与校验：
+
+- 本地契约测试：`3 passed`；
+- 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-yield.log`；
+- 构建校验：`device/labs/02_lab01_lcd/records/2026-08-31-build-yield.md5`；
+- 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_yield_20260831`；
+- `Firmware.img` MD5：`1060f2209ccb3706c8e2736ff9b67a9a`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 构建结果：`852/852`、`liblab01_lcd.a` 参与链接、
+  `lockzhiner-rk2206 build success`。
+
+待用户烧录该目录中的镜像后，记录 `LCD_FILL_PROGRESS` 的最后行号、
+`LCD_FILL_DONE`、`lab01_lcd: LCD OK` 和 LCD 实际画面，再决定是否需要继续
+处理屏幕硬件连线或其他执行器噪声。

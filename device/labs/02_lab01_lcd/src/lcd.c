@@ -31,6 +31,8 @@
 #define LCD_PIN_RES         GPIO0_PC3
 #define LCD_PIN_DC          GPIO0_PC6
 
+#define LCD_FILL_YIELD_ROWS 8
+
 #define LCD_CS_Clr()        LzGpioSetVal(LCD_PIN_CS, LZGPIO_LEVEL_LOW)
 #define LCD_CS_Set()        LzGpioSetVal(LCD_PIN_CS, LZGPIO_LEVEL_HIGH)
 
@@ -632,6 +634,14 @@ void lcd_fill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend, uint16
         {
             lcd_wr_data(color);
         }
+
+        if (((i - ysta) % LCD_FILL_YIELD_ROWS) == (LCD_FILL_YIELD_ROWS - 1))
+        {
+            printf("lab01_lcd: LCD_FILL_PROGRESS row=%u/%u\r\n",
+                   (unsigned int)(i - ysta + 1),
+                   (unsigned int)(yend - ysta));
+            LOS_Msleep(1);
+        }
     }
 }
 
@@ -1093,4 +1103,3 @@ void lcd_show_picture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, c
         }
     }
 }
-
