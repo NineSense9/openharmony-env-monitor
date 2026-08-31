@@ -7,7 +7,11 @@
 竖屏 `USE_HORIZONTAL=0/1` 尝试仍从右下角开始且方向不对；本次依据 PDF 和
 原厂程序截图恢复横屏坐标。上一版方向 3 的 `MADCTL=0xA0` 在用户实物上仍从
 右下角、从下往上加载；本次已改为正常横屏 `USE_HORIZONTAL=2`、`MADCTL=0x60`，
-并保持 SDK 参考的 `SPI_MODE_3`，新镜像等待实物确认。
+并保持 SDK 参考的 `SPI_MODE_3`。上一版镜像曾因最终 ELF 未重新链接而实际仍
+带有旧配置，已强制重新链接并生成新的镜像。
+用户已实际烧录重新链接版，确认 LCD 仍从右下角开始且文字倒置。按当前协作
+决定，暂不继续消耗时间排查 LCD 物理方向，先接受该显示效果；本版本作为后续
+实验的可运行基线。
 
 ## 课程依据
 
@@ -127,6 +131,14 @@
   `bd8fc47885a8ce13a62d9d52ee548f17`
 - SMART-R 正常横屏 `0x60` + 硬件 SPI 模式 3 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
   `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R 正常横屏 `0x60` + 硬件 SPI 模式 3 重新链接版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831`
+- SMART-R 正常横屏 `0x60` + 硬件 SPI 模式 3 重新链接版 `Firmware.img`：2,097,152 bytes，MD5：
+  `89fb0ba476d3cecb516dd7371c5e0bec`
+- SMART-R 正常横屏 `0x60` + 硬件 SPI 模式 3 重新链接版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- 重新链接版构建与故障记录：
+  [2026-08-31-build-landscape-normal-relinked.md5](records/2026-08-31-build-landscape-normal-relinked.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -174,14 +186,17 @@ SPI 后，用户再次确认文字仍从右下角开始；随后 `USE_HORIZONTAL
   不改变后续实验需要的局部擦除行为。
 
 本地契约测试为 `5 passed`，Ubuntu 构建输出 `lockzhiner-rk2206 build success`。
-`USE_HORIZONTAL=2` + `MADCTL=0x60` + `SPI_MODE_3` 新镜像尚未由用户重新烧录实物确认。
+`USE_HORIZONTAL=2` + `MADCTL=0x60` + `SPI_MODE_3` 新镜像已由用户重新烧录确认；
+实物方向仍异常，详见“当前基线”。
 
-## 当前待验收
+## 当前基线
 
-优先使用 `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_20260831`
-中的 `rk2206_db_loader.bin` 和 `Firmware.img`。按 PDF 进入 `K2=MASKROM` 烧录，
-完成后退出下载模式并按 `K1=RESET`；确认板子按正常正向摆放后，验收文字从 LCD 左上角
-开始、方向正常、刷屏速度较快且电机保持静止。
+优先使用 `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831`
+中的 `rk2206_db_loader.bin` 和 `Firmware.img`。该目录对应当前已验证可运行的
+4.5 基线：LCD 能显示实验文字，方向仍为右下角倒置，但暂不阻塞后续功能开发。
+后续实验从该版本复制独立目录，并只在各自目录中增加新功能。
+旧 LCD 镜像已集中移动到 `D:\实习\tmp\rk2206_images\archive\2026-08-31-lcd-trials`，
+归档清单见 [2026-08-31-image-archive.md](records/2026-08-31-image-archive.md)。
 
 ## SMART-R 引脚修复记录
 

@@ -412,4 +412,36 @@ soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远�
 加载。该现象与 `0xA0` 的反向横屏扫描一致。本次将默认配置改为
 `USE_HORIZONTAL=2`，发送正常横屏 `MADCTL=0x60`，其他引脚、SPI 模式和刷屏逻辑不变。
 
-本地契约测试为 `5 passed`，Ubuntu 独立工程构建成功。当前待用户烧录确认。
+本地契约测试为 `5 passed`，Ubuntu 独立工程构建成功。后续实物反馈见下一节。
+
+### 4.5 lab01_lcd 最终链接产物修复（2026-08-31）
+
+用户反馈 `0x60` 版本烧录后画面仍在右下角。复核 Ubuntu 构建树发现，源码和
+`liblab01_lcd.a` 在 19:09 已更新，但最终 `liteos.elf` 仍是 16:59 的旧文件，
+导致之后的镜像打包没有带入方向修改。删除过期 ELF 和镜像后重新执行 `hb build`，
+新 ELF 于 19:25 生成；反汇编确认 `lcd_init` 的 `0x36` 命令后确实加载 `0x60`，
+随后重新打包并复制到 Windows。
+
+新镜像目录：
+
+`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831`
+
+`Firmware.img` MD5：`89fb0ba476d3cecb516dd7371c5e0bec`；
+`rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`。
+本次构建与故障记录见 `device/labs/02_lab01_lcd/records/2026-08-31-build-landscape-normal-relinked.md5`。
+该重新链接版已完成实物验收，方向仍异常；阶段性处理见下一节。
+
+### 4.6 lab01_lcd 阶段性收口（2026-08-31）
+
+用户已烧录重新链接版目录中的镜像，确认 LCD 仍从右下角开始，文字为倒置方向，
+与之前实物表现没有变化。该版本已经能够正常运行 LCD 实验显示流程；按当前协作
+决定，暂不继续试验 LCD 方向值，保留该镜像作为后续实验的可运行基线。后续每个
+实验继续使用独立目录保存，在本实验基础上开发新功能。
+
+### 4.7 lab01_lcd 镜像目录归档（2026-08-31）
+
+为避免后续烧录选错文件，`D:\实习\tmp\rk2206_images` 主目录只保留
+`lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831` 当前基线。
+此前生成的 11 个 LCD 镜像目录已完整移动到
+`D:\实习\tmp\rk2206_images\archive\2026-08-31-lcd-trials`，没有删除历史文件。
+详细清单见 `device/labs/02_lab01_lcd/records/2026-08-31-image-archive.md`。

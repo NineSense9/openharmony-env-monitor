@@ -1,0 +1,31 @@
+实验：4.5 lab01_lcd（SMART-R 正常横屏 0x60 重新链接版）
+
+根因：上一版构建中，源码和 `liblab01_lcd.a` 已在 19:09 更新，但最终
+`liteos.elf` 仍停留在 16:59；随后打包出的 `Firmware.img` 没有包含最新
+`USE_HORIZONTAL=2` / `MADCTL=0x60` 配置，所以烧录后画面与旧版完全一致。
+
+处理：删除构建树中的过期 `liteos.elf` 和 `Firmware.img`，在 Ubuntu 工程
+`/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 重新执行 `hb build`，强制完成
+最终链接和镜像打包。构建输出为 `lockzhiner-rk2206 build success`。
+
+验证证据：
+
+- 新 `liteos.elf`：2026-08-31 19:25:43，1,497,672 bytes；
+- 新 `Firmware.img`：2026-08-31 19:25:44，2,097,152 bytes；
+- `lcd_init` 反汇编在命令 `0x36` 后明确出现 `movs r0, #96`，即 `0x60`；
+- 新镜像已从 Ubuntu 重新复制到 Windows，未覆盖旧目录。
+
+本地镜像校验：
+
+```text
+Firmware.img              89fb0ba476d3cecb516dd7371c5e0bec
+rk2206_db_loader.bin      5f2ea974b0e1df5564a8e1ee910627bb
+```
+
+新烧录目录：
+
+`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831`
+
+本地契约测试为 `5 passed`。烧录前应核对以上 MD5；按授课 PDF 使用
+`K2=MASKROM`，烧录完成退出下载模式后按 `K1=RESET` 重启。重点验收 LCD
+从左上角开始、文字方向正常、刷屏速度正常且电机保持静止。
