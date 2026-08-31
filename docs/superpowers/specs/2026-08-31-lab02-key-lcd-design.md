@@ -45,10 +45,10 @@ Makefile、Python `pytest`、UART 115200 8N1。
 
 1. `lab02_key_lcd_example` 由 `APP_FEATURE_INIT` 自动启动唯一任务；
 2. 任务调用 `lcd_init()`，失败时打印错误并退出，不继续访问 LCD；
-3. 任务调用 `tx_key_init(GPIO0_PC7)`，GPIO 初始化或输入方向设置失败时打印
+3. 任务调用 `tx_key_init()`，GPIO 初始化或输入方向设置失败时打印
    错误码并退出；
 4. 任务绘制欢迎文字和初始 `RELEASED` 状态；
-5. 循环调用 `tx_key_is_pressed()`，读取失败时返回错误状态并打印一次诊断信息，
+5. 循环调用 `tx_key_is_pressed(&pressed)`，读取失败时返回错误状态并打印一次诊断信息，
    不把读取失败误报成按下；
 6. 只有当前状态与上次状态不同才执行 `lcd_fill(10, 90, 300, 120, LCD_WHITE)`、
    `lcd_show_string()` 和 UART 状态输出；
