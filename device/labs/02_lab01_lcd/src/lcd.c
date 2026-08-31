@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <stdio.h>
+
 #include "lz_hardware.h"
 #include "lcd.h"
 #include "lcd_font.h"
@@ -483,6 +485,7 @@ unsigned int lcd_init()
     LzGpioInit(LCD_PIN_DC);
     LzGpioSetDir(LCD_PIN_DC, LZGPIO_DIR_OUT);
     LzGpioSetVal(LCD_PIN_DC, LZGPIO_LEVEL_LOW);
+    printf("lab01_lcd: LCD_GPIO_DONE\r\n");
 
     /* 重启lcd */
     LCD_RES_Clr();
@@ -490,6 +493,7 @@ unsigned int lcd_init()
     LCD_RES_Set();
     LOS_Msleep(100);
     LOS_Msleep(500);
+    printf("lab01_lcd: LCD_RESET_DONE\r\n");
     lcd_wr_reg(0x11);
     /* 等待LCD 100ms */
     LOS_Msleep(100);
@@ -576,6 +580,7 @@ unsigned int lcd_init()
     lcd_wr_data8(0x21);
     lcd_wr_data8(0x20);
     lcd_wr_reg(0x29);
+    printf("lab01_lcd: LCD_INIT_DONE\r\n");
 
     return 0;
 }
@@ -1088,5 +1093,4 @@ void lcd_show_picture(uint16_t x, uint16_t y, uint16_t length, uint16_t width, c
         }
     }
 }
-
 

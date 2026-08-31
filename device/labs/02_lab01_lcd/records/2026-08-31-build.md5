@@ -1,0 +1,54 @@
+实验：4.5 lab01_lcd（旧版双重启动构建）
+日期：2026-08-31
+状态：已作废，不得烧录
+
+作废原因：
+该次镜像虽然在错误的启动配置下编译成功，但 `main.c` 同时手动调用
+`lab01_lcd_example()`，而源码又使用 `APP_FEATURE_INIT`，导致实验入口
+可能执行两次。该镜像对应的物理现象为设备异常抖动和 LCD 无显示。
+修复版见 `2026-08-31-build-single-entry.md5`。
+
+Ubuntu 独立源码副本：
+/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+
+hb 环境：
+- root：/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+- product：lockzhiner-rk2206
+- hb：/home/lzdz/.local/bin/hb
+
+构建结果：
+- 命令：hb build -f
+- 退出码：0
+- 目标总数：852/852
+- lab01_lcd 对象：liblab01_lcd.lab01_lcd.o、liblab01_lcd.lcd.o
+- 静态库：liblab01_lcd.a
+- 结果：lockzhiner-rk2206 build success
+- 耗时：0:00:28
+
+镜像：
+- Windows 烧录目录：D:\实习\tmp\rk2206_images\lab02_lab01_lcd
+- Firmware.img：2097152 bytes
+- Firmware.img MD5：897213e0d5736f26557ae79566aed371（作废）
+- rk2206_db_loader.bin：35093 bytes
+- rk2206_db_loader.bin MD5：5f2ea974b0e1df5564a8e1ee910627bb
+- Firmware.md5：16-byte raw digest，内容与 Firmware.img MD5 一致
+
+镜像字符串核验：
+- TX-SMART-R Lab01
+- LCD OK
+- OpenHarmony
+- lab01_lcd: LCD OK
+
+本次构建过程问题与固定规避：
+1. 手写 unified diff 时 hunk 行数和上下文空格错误，导致 patch 失败或
+   只能 fuzz 匹配。已改为标准 diff 上下文，并用
+   `patch --dry-run --fuzz=0` 严格验证后再应用。
+2. 独立源码副本复制后，hb 的 product/device 配置仍指向原始源码。第一次
+   编译实际用了原始工程，不能作为实验镜像。以后每个独立副本必须先执行：
+   `hb set -root .`、`hb set -p`，再用 `hb env` 确认 root、product path、
+   device path 全部指向当前副本。
+3. 非交互 SSH 不会自动包含 hb 路径。每次构建前固定执行：
+   `export PATH="/home/lzdz/.local/bin:$PATH"`、`command -v hb`、
+   `hb --help | head`。
+4. Windows PowerShell 传递含 `$PATH` 的远端命令时，必须使用原样
+   here-string，避免本地变量插值破坏 Ubuntu 环境变量。

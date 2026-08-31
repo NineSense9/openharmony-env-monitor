@@ -1,0 +1,47 @@
+实验：4.5 lab01_lcd（单入口修复版）
+日期：2026-08-31
+状态：待物理烧录和 LCD/UART 验收
+
+修复内容：
+- 删除 `device/rockchip/rk2206/sdk_liteos/board/main.c` 中的
+  `lab01_lcd_example()` 手动调用；
+- 保留 `lab01_lcd.c` 中 PDF 要求的
+  `APP_FEATURE_INIT(lab01_lcd_example)`；
+- 确保同一个 LCD 任务只有一个启动入口。
+
+Ubuntu 独立源码副本：
+/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+
+hb 环境：
+- root：/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+- product：lockzhiner-rk2206
+- hb：/home/lzdz/.local/bin/hb
+
+启动入口核验：
+- `main.c has no manual lab startup call`
+- `lab01_lcd.c` 保留 `APP_FEATURE_INIT(lab01_lcd_example)`
+
+构建结果：
+- 命令：`hb build -f`
+- 退出码：0
+- 目标总数：852/852
+- 静态库：`liblab01_lcd.a`
+- 结果：`lockzhiner-rk2206 build success`
+- 耗时：0:00:26
+
+镜像：
+- Windows 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd`
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`49841b650f05384a7a614e212c8dab21`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+- `Firmware.md5`：内容与 `Firmware.img` MD5 一致
+
+镜像字符串核验：
+- `TX-SMART-R Lab01`
+- `LCD OK`
+- `OpenHarmony`
+- `lab01_lcd: LCD OK`
+
+对应完整日志：
+`device/labs/02_lab01_lcd/records/2026-08-31-build-single-entry.log`

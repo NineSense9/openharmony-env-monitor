@@ -16,13 +16,17 @@ static void lab01_lcd_task(void *arg)
     unsigned int ret;
 
     (void)arg;
+    printf("lab01_lcd: LCD_INIT_BEGIN\r\n");
     ret = lcd_init();
     if (ret != 0) {
         printf("lab01_lcd: lcd_init failed(%u)\r\n", ret);
         return;
     }
+    printf("lab01_lcd: LCD_INIT_OK\r\n");
 
+    printf("lab01_lcd: LCD_FILL_BEGIN\r\n");
     lcd_fill(0, 0, LCD_W, LCD_H, LCD_WHITE);
+    printf("lab01_lcd: LCD_FILL_DONE\r\n");
     lcd_show_string(10, 40, "TX-SMART-R Lab01", LCD_RED, LCD_WHITE, 16, 0);
     lcd_show_string(10, 80, "LCD OK", LCD_BLUE, LCD_WHITE, 16, 0);
     lcd_show_string(10, 120, "OpenHarmony", LCD_BLACK, LCD_WHITE, 16, 0);

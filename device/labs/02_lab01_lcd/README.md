@@ -2,8 +2,9 @@
 
 ## 状态
 
-已完成本地契约测试和自有 LCD 入口代码，待在 Ubuntu 独立源码副本中编译、
-烧录并验收屏幕显示。
+已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
+单入口修复版已实际烧录，但 UART 在 LCD 初始化阶段停止，LCD 尚未通过物理验收；
+当前使用诊断版继续定位卡点。
 
 ## 课程依据
 
@@ -37,14 +38,89 @@
 
 ## 构建规则
 
-一次只启用 `lab01_lcd`。应用补丁时必须删除上一个实验的
-`task_example()`/`-ltask_helloworld`，避免多个自启动例程同时运行。
-完整路径和命令见 `patches/README.md`。
+一次只启用 `lab01_lcd`。应用补丁时必须删除上一个实验的业务库和自启动
+任务，避免多个例程同时运行。独立源码副本首次构建前必须执行
+`hb set -root .`、`hb set -p`，再用 `hb env` 检查路径；完整命令见
+`patches/README.md`。
 
-## 预期验收
+## 已编译产物
 
-烧录 `lab01_lcd` 独立构建生成的镜像后，UART 使用 `115200 8N1`，按
-`K1=RESET` 重启。串口应输出 `lab01_lcd: LCD OK`，LCD 应显示：
+- 镜像目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd`
+- 当前修复版 `Firmware.img`：2,097,152 bytes，MD5：
+  `49841b650f05384a7a614e212c8dab21`
+- `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- 当前完整日志：
+  [2026-08-31-build-single-entry.log](records/2026-08-31-build-single-entry.log)
+- 当前校验记录：
+  [2026-08-31-build-single-entry.md5](records/2026-08-31-build-single-entry.md5)
+- 诊断版完整日志：
+  [2026-08-31-build-diagnostic.log](records/2026-08-31-build-diagnostic.log)
+- 诊断版校验记录：
+  [2026-08-31-build-diagnostic.md5](records/2026-08-31-build-diagnostic.md5)
+- 旧版双重启动构建记录：
+  [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
+  对应文件保存在
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_invalid_double_entry_20260831`
+
+## 故障修复记录
+
+旧版 `main.c` 手动调用了 `lab01_lcd_example()`，而
+`lab01_lcd.c` 同时使用 `APP_FEATURE_INIT(lab01_lcd_example)`。
+同一个 LCD 任务因此可能启动两次，两个任务并发执行 `lcd_init()` 和
+SPI/LCD 刷新，表现为设备异常抖动、反复启动或 LCD 黑屏。
+
+修复版保留 PDF 要求的 `APP_FEATURE_INIT` 唯一启动入口，删除 `main.c`
+手动调用。修复版编译日志确认 `main.c has no manual lab startup call`，
+并且 `liblab01_lcd.a` 仍参与最终链接。
+
+## 当前故障定位
+
+用户已确认实际烧录的是单入口修复版目录中的新镜像：
+
+```text
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd\Firmware.img
+MD5 49841b650f05384a7a614e212c8dab21
+```
+
+UART 已输出 LCD GPIO 16、17、18、19、22 初始化成功，但没有输出
+`lab01_lcd: LCD OK`。因此当前不能把问题归因于烧录错文件；故障点位于
+LCD GPIO 初始化之后、`lcd_init()` 完成之前，或实际刷屏阶段。
+
+为区分具体阶段，诊断版只增加串口标记，不改变授课文档要求的 LCD 流程：
+
+```text
+LCD_INIT_BEGIN
+LCD_GPIO_DONE
+LCD_RESET_DONE
+LCD_INIT_DONE
+LCD_FILL_BEGIN
+LCD_FILL_DONE
+```
+
+### 诊断版烧录目录
+
+```text
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_diagnostic_20260831
+```
+
+- `Firmware.img`：2,097,152 bytes，MD5：
+  `09e5af9c4920155384749bdd32cd5e7e`
+- `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## 待验收
+
+诊断阶段烧录诊断目录中的 `Firmware.img`，Loader 仍使用同目录中的
+`rk2206_db_loader.bin`。进入 MASKROM 使用 `K2`，烧录完成后按 `K1=RESET`
+重启；UART 使用 `115200 8N1`。把从启动开始到停止位置的完整日志截图发回：
+
+- 停在 `LCD_GPIO_DONE`：检查 LCD 复位延时或复位引脚；
+- 出现 `LCD_INIT_DONE` 但停在 `LCD_FILL_BEGIN`：检查全屏软件 SPI 刷屏；
+- 出现 `LCD_FILL_DONE` 仍无 `LCD OK`：检查文字绘制阶段；
+- 出现 `lab01_lcd: LCD OK`：再确认屏幕三行文字。
+
+最终验收要求仍是 UART 输出 `lab01_lcd: LCD OK`，LCD 显示：
 
 ```text
 TX-SMART-R Lab01

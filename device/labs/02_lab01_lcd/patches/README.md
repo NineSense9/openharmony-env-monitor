@@ -43,9 +43,10 @@
    hardware_LIBS = -lhal_iothardware -lhardware -lshellcmd -llab01_lcd
    ```
 
-3. 在 `device/rockchip/rk2206/sdk_liteos/board/main.c` 中删除
-   上一个实验的任务声明和调用，增加 `lab01_lcd_example()` 声明，并在
-   `shell_cmd_init()` 后调用 `lab01_lcd_example()`。
+3. 本实验入口使用 `APP_FEATURE_INIT(lab01_lcd_example)`，由系统启动时
+   自动执行。干净的 RK2206 基线不需要修改 `main.c`；若上一个实验在
+   `main.c` 中留下了手动任务调用，必须先删除，避免同一任务启动两次。
+   APP_FEATURE_INIT is the only startup entry; do not call lab01_lcd_example from main.c.
 
 4. 不同时启用 `lab02_key_lcd` 或其他 `lab0x` 库。
 
@@ -53,7 +54,6 @@
 
 - `samples_BUILD.gn.patch`：启用 `lab01_lcd` 静态库；
 - `Makefile.patch`：把 `lab01_lcd` 加入最终链接；
-- `main.c.patch`：在系统启动后调用 `lab01_lcd_example()`。
 
 ## 编译和验收
 

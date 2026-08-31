@@ -106,7 +106,14 @@ OHOS # hiview init success.
 - 已按授课文档 4.5 创建 `device/labs/02_lab01_lcd/`，完成自有
   `lab01_lcd.c`、LCD 驱动副本、构建说明和 2 个契约测试；
 - 本地 LCD 契约测试结果：`2 passed`；
-- Ubuntu 编译、烧录和屏幕验收尚未完成。
+- 已在独立副本 `/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 完成 LCD
+  接入和编译，`852/852`，`lockzhiner-rk2206 build success`；
+- `liblab01_lcd.a` 已生成并参与链接，镜像字符串已核验包含三行 LCD 文本；
+- 初版镜像 MD5：`897213e0d5736f26557ae79566aed371`，因双重启动配置已作废；
+- 已删除 `main.c` 手动调用，只保留 PDF 要求的
+  `APP_FEATURE_INIT(lab01_lcd_example)`；
+- 修复版镜像 MD5：`49841b650f05384a7a614e212c8dab21`；
+- 当前待用户使用修复版镜像进行 RKDevTool 烧录和 UART/LCD 实物验收。
 
 详细串口验收记录：
 `device/labs/01_hello_world/records/2026-08-31-uart.txt`
@@ -127,3 +134,93 @@ command -v hb
 hb --help | head
 hb build -f
 ```
+
+### 4.5 lab01_lcd 初版编译检查点（已作废）
+
+- 独立源码副本：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+- 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build.log`
+- 校验记录：`device/labs/02_lab01_lcd/records/2026-08-31-build.md5`
+- Windows 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd`
+- Loader：`rk2206_db_loader.bin`，35,093 bytes，
+  MD5 `5f2ea974b0e1df5564a8e1ee910627bb`
+- 固件：`Firmware.img`，2,097,152 bytes，
+  MD5 `897213e0d5736f26557ae79566aed371`（已作废）
+- 目标证据：`liblab01_lcd.lab01_lcd.o`、`liblab01_lcd.lcd.o`、
+  `liblab01_lcd.a`、`lockzhiner-rk2206 build success`
+
+本实验之前曾出现一次无效构建：独立目录的 `hb` product/device 配置仍指向
+原始源码，导致编译成功但没有 `lab01_lcd` 目标。已通过
+`hb set -root .`、`hb set -p` 修正，并以 `hb env` 全路径核验后重新编译。
+该次无效镜像不得烧录。随后又发现初版 LCD 镜像在 `main.c` 中手动调用
+`lab01_lcd_example()`，同时源码使用 `APP_FEATURE_INIT`，因此同一任务有
+两个启动入口。该版本与设备异常抖动、LCD 无显示现象对应，已作废。
+
+补丁接入期间还发现手写 unified diff 的 hunk 行数和上下文空格错误。以后
+应用补丁前固定执行：
+
+```bash
+patch --dry-run --fuzz=0 --forward --batch -p1 < patches/samples_BUILD.gn.patch
+patch --dry-run --fuzz=0 --forward --batch -p1 < patches/Makefile.patch
+patch --dry-run --fuzz=0 --forward --batch -p1 < patches/main.c.patch
+```
+
+三份补丁全部严格通过后才正式应用。
+
+### 4.5 lab01_lcd 单入口修复版
+
+- 修复日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-single-entry.log`
+- 修复校验：`device/labs/02_lab01_lcd/records/2026-08-31-build-single-entry.md5`
+- 固件：`Firmware.img`，2,097,152 bytes，
+  MD5 `49841b650f05384a7a614e212c8dab21`
+- Loader：`rk2206_db_loader.bin`，35,093 bytes，
+  MD5 `5f2ea974b0e1df5564a8e1ee910627bb`
+- 启动入口：`main.c` 无 `lab01_lcd_example()` 手动调用，
+  `lab01_lcd.c` 保留 `APP_FEATURE_INIT(lab01_lcd_example)`
+- 镜像目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd`
+- 对应旧镜像已归档到：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_invalid_double_entry_20260831`
+
+### 4.5 lab01_lcd 物理烧录结果与诊断版
+
+用户已确认实际烧录的是上面的单入口修复版镜像，文件和 MD5 均与记录一致，
+不是烧录错文件。UART 实际输出：
+
+```text
+[GPIO:D]LzGpioInit: id 16 is initialized successfully
+[GPIO:D]LzGpioInit: id 17 is initialized successfully
+[GPIO:D]LzGpioInit: id 18 is initialized successfully
+[GPIO:D]LzGpioInit: id 19 is initialized successfully
+[GPIO:D]LzGpioInit: id 22 is initialized successfully
+```
+
+随后没有出现 `lab01_lcd: LCD OK`，LCD 也没有变化。由此确认设备已经进入
+LCD GPIO 初始化路径，但还没有完成 LCD 初始化和显示流程；本次物理验收暂不记为
+通过。板子抖动、RGB 常亮和 LCD 无显示仍需结合下一版日志继续定位。
+
+为采集边界证据，已在同一独立源码副本中增加诊断标记：
+
+```text
+LCD_INIT_BEGIN
+LCD_GPIO_DONE
+LCD_RESET_DONE
+LCD_INIT_DONE
+LCD_FILL_BEGIN
+LCD_FILL_DONE
+```
+
+诊断版构建记录：
+
+- 日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-diagnostic.log`
+- 校验：`device/labs/02_lab01_lcd/records/2026-08-31-build-diagnostic.md5`
+- 镜像目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_diagnostic_20260831`
+- `Firmware.img`：2,097,152 bytes，MD5
+  `09e5af9c4920155384749bdd32cd5e7e`
+- `rk2206_db_loader.bin`：35,093 bytes，MD5
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- `hb env` 已确认 root、product path、device path 均指向
+  `/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+- 构建结果：`852/852`，`liblab01_lcd.a` 参与链接，
+  `lockzhiner-rk2206 build success`
+
+下一步只烧录诊断版，记录上述标记最后出现的位置，再决定是 LCD 初始化时序、
+软件 SPI 刷屏速度，还是文字绘制阶段的问题。

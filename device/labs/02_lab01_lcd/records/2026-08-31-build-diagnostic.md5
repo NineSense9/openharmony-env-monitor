@@ -1,0 +1,48 @@
+实验：4.5 lab01_lcd（诊断构建）
+日期：2026-08-31
+状态：构建通过，待物理烧录和 UART 阶段定位
+
+构建目的：
+- 单入口修复版已实际烧录，但 UART 在 LCD GPIO 初始化日志后停止；
+- 增加 LCD_INIT_BEGIN、LCD_GPIO_DONE、LCD_RESET_DONE、LCD_INIT_DONE、
+  LCD_FILL_BEGIN、LCD_FILL_DONE 诊断标记；
+- 不改变授课文档 4.5 要求的 lcd_init、lcd_fill、lcd_show_string 流程。
+
+Ubuntu 独立源码副本：
+/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+
+环境核验：
+- root：/home/lzdz/rk2206/lab02-lab01-lcd-20260831
+- product：lockzhiner-rk2206
+- device：/home/lzdz/rk2206/lab02-lab01-lcd-20260831/device/rockchip/rk2206/sdk_liteos
+- hb：/home/lzdz/.local/bin/hb
+
+构建结果：
+- 命令：hb build -f
+- 退出码：0
+- 目标总数：852/852
+- 静态库：liblab01_lcd.a
+- 结果：lockzhiner-rk2206 build success
+- 完整日志：device/labs/02_lab01_lcd/records/2026-08-31-build-diagnostic.log
+
+镜像：
+- Windows 烧录目录：
+  D:\实习\tmp\rk2206_images\lab02_lab01_lcd_diagnostic_20260831
+- Firmware.img：2,097,152 bytes
+- Firmware.img MD5：09e5af9c4920155384749bdd32cd5e7e
+- rk2206_db_loader.bin：35,093 bytes
+- rk2206_db_loader.bin MD5：5f2ea974b0e1df5564a8e1ee910627bb
+
+镜像字符串核验：
+- lab01_lcd: LCD_INIT_BEGIN
+- lab01_lcd: LCD_GPIO_DONE
+- lab01_lcd: LCD_RESET_DONE
+- lab01_lcd: LCD_INIT_DONE
+- lab01_lcd: LCD_FILL_BEGIN
+- lab01_lcd: LCD_FILL_DONE
+- lab01_lcd: LCD OK
+
+物理验收：
+- 尚未烧录诊断版；
+- 单入口修复版已烧录，但停止在 LCD GPIO 初始化之后；
+- 不能据此认定 LCD 实验通过。
