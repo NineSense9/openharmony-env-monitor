@@ -1,0 +1,72 @@
+实验：4.5 lab01_lcd（SMART-R LCD DC 引脚修正版）
+日期：2026-08-31
+
+## 根因与修复
+
+- 板子背面 LCD 排针丝印为 `A4 / MISO / MOSI / CLK / CS / GND / 5V`。
+- SDK 映射确认 `GPIO0_PC6 = PWM6`，SMART-R 电机使用 PWM6。
+- 旧版沿用 `b4_lcd`，错误地把 `GPIO0_PC6` 当作 LCD DC；因此 LCD 写数据时
+  会驱动电机，且 LCD 的 DC 信号接错，导致持续抖动和 LCD 空白。
+- 修复为 `LCD_PIN_DC = GPIO0_PA4`；CS/CLK/MOSI/RES 保持
+  `GPIO0_PC0/PC1/PC2/PC3`。
+- 删除临时 `lcd_set_dc_idle()` 接口、调用和实现；该临时方案只能在刷屏结束
+  后压低 PC6，不能修复 LCD 映射。
+
+## 自动化验证
+
+本地命令：
+
+```text
+cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\02_lab01_lcd\tests -q
+```
+
+结果：`4 passed`。
+
+回归测试要求 LCD 驱动包含 `GPIO0_PA4`，且不包含 `GPIO0_PC6`。
+
+## Ubuntu 构建
+
+工程：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+
+构建前检查：
+
+- `hb env` 的 root、product path、device path 均指向上述独立工程。
+- `lab01_lcd` 目录中不存在误传到根目录的 `lcd.c` 或 `lcd.h`。
+- `lcd_set_dc_idle` 和 `GPIO0_PC6` 均不存在于该实验源文件。
+
+命令：
+
+```text
+export PATH="/home/lzdz/.local/bin:$PATH"
+hb build
+```
+
+结果：`BUILD_RC=0`、`lockzhiner-rk2206 build success`；增量构建完成 `20/20`。
+`liblab01_lcd.a` 包含 `lab01_lcd.c` 和修正版 `src/lcd.c`。
+
+产物：
+
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`3fad85ef9a94dc22a831c5b7659149d6`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+- 完整构建日志：`2026-08-31-build-smart-r-a4.log`
+- Windows 烧录目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_smart_r_a4_20260831`
+
+## 本次构建问题记录
+
+1. 之前一次全量 `hb build -f` 在 VirtualBox/Hyper-V 环境下触发 Ubuntu
+   `watchdog: BUG: soft lockup`，但随后恢复并完成了 852 个编译目标；后续
+   使用已生成的构建树执行增量 `hb build`，避免反复全量编译压垮虚拟机。
+2. 远端曾残留旧入口文件调用 `lcd_set_dc_idle()`，而修正版驱动已删除该符号，
+   链接时报 `undefined reference to lcd_set_dc_idle`。重新把入口、头文件和驱动
+   分别 SCP 到准确的 `lab01_lcd/`、`include/`、`src/` 路径后，链接恢复正常。
+3. 后续同步文件必须逐个指定目标目录，不能把源码文件放到实验根目录；每次链接
+   前先 grep 检查临时符号，确认源文件版本一致。
+
+## 物理验收待办
+
+修正版镜像尚未由用户重新烧录，因此本记录不把 LCD 物理显示或电机停止标为已
+验收。烧录后应记录 UART 中的 `LCD_FILL_DONE`、`lab01_lcd: LCD OK` 和屏幕
+三行英文，同时确认板载电机不再持续抖动。

@@ -63,3 +63,10 @@ def test_lcd_fullscreen_fill_yields_and_reports_row_progress():
     assert "LOS_Msleep(1);" in fill_body
     assert "if (((i - ysta) % LCD_FILL_YIELD_ROWS)" in fill_body
     assert "(LCD_FILL_YIELD_ROWS - 1)" in fill_body
+
+
+def test_smart_r_lcd_uses_dedicated_a4_dc_pin_and_never_drives_pwm6():
+    driver = (LAB_ROOT / "src" / "lcd.c").read_text(encoding="utf-8")
+
+    assert "#define LCD_PIN_DC          GPIO0_PA4" in driver
+    assert "GPIO0_PC6" not in driver

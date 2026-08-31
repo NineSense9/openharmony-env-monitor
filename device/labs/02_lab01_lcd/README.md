@@ -3,8 +3,8 @@
 ## 状态
 
 已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
-诊断日志已确认程序进入全屏 `lcd_fill()`；当前使用分段刷屏版继续做物理验收。
-LCD 尚未通过最终物理验收。
+已根据 SMART-R 板背面 LCD 接口丝印修正 LCD DC 引脚，解决驱动误占用电机
+PWM6 的问题。修正版镜像已生成，等待重新烧录后的 LCD 和电机物理验收。
 
 ## 课程依据
 
@@ -43,16 +43,16 @@ LCD 尚未通过最终物理验收。
 `hb set -root .`、`hb set -p`，再用 `hb env` 检查路径；完整命令见
 `patches/README.md`。
 
-## 已编译产物
+## 历史与当前编译产物
 
 - 镜像目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd`
-- 当前修复版 `Firmware.img`：2,097,152 bytes，MD5：
+- 历史单入口修复版 `Firmware.img`：2,097,152 bytes，MD5：
   `49841b650f05384a7a614e212c8dab21`
 - `rk2206_db_loader.bin`：35,093 bytes，MD5：
   `5f2ea974b0e1df5564a8e1ee910627bb`
-- 当前完整日志：
+- 历史单入口完整日志：
   [2026-08-31-build-single-entry.log](records/2026-08-31-build-single-entry.log)
-- 当前校验记录：
+- 历史单入口校验记录：
   [2026-08-31-build-single-entry.md5](records/2026-08-31-build-single-entry.md5)
 - 诊断版完整日志：
   [2026-08-31-build-diagnostic.log](records/2026-08-31-build-diagnostic.log)
@@ -68,6 +68,16 @@ LCD 尚未通过最终物理验收。
   [2026-08-31-build-yield.log](records/2026-08-31-build-yield.log)
 - 分段刷屏版校验记录：
   [2026-08-31-build-yield.md5](records/2026-08-31-build-yield.md5)
+- SMART-R A4 DC 修正版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_smart_r_a4_20260831`
+- SMART-R A4 DC 修正版 `Firmware.img`：2,097,152 bytes，MD5：
+  `3fad85ef9a94dc22a831c5b7659149d6`
+- SMART-R A4 DC 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R A4 DC 修正版构建日志：
+  [2026-08-31-build-smart-r-a4.log](records/2026-08-31-build-smart-r-a4.log)
+- SMART-R A4 DC 修正版构建与故障记录：
+  [2026-08-31-build-smart-r-a4.md5](records/2026-08-31-build-smart-r-a4.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -84,13 +94,31 @@ SPI/LCD 刷新，表现为设备异常抖动、反复启动或 LCD 黑屏。
 手动调用。修复版编译日志确认 `main.c has no manual lab startup call`，
 并且 `liblab01_lcd.a` 仍参与最终链接。
 
-本实验当前版本只使用 LCD 的 GPIO0_PC0、GPIO0_PC1、GPIO0_PC2、
-GPIO0_PC3、GPIO0_PC6，不初始化或控制电机、蜂鸣器、RGB 和报警灯。
-如果后续仍听到板上持续抖动，应在 UART 记录对应的 `LCD_FILL_PROGRESS`
-行号后，再判断抖动是否与刷屏时序有关；在未确认原因前，不应让板子持续通电，
-可先断开 USB/电源。
+本实验当前版本使用 LCD 的 `GPIO0_PC0`、`GPIO0_PC1`、`GPIO0_PC2`、
+`GPIO0_PC3` 和 `GPIO0_PA4`，不初始化或控制电机、蜂鸣器、RGB 和报警灯。
+SMART-R 的电机使用 `PWM6 = GPIO0_PC6`，因此 LCD 驱动禁止使用 `GPIO0_PC6`。
+在修正版烧录前，旧镜像仍可能使电机持续抖动，应先断开 USB/电源。
 
-## 当前故障定位
+## SMART-R 引脚修复记录
+
+板子背面 LCD 排针丝印依次为 `A4 / MISO / MOSI / CLK / CS / GND / 5V`。
+结合 SDK 的 SPI0 M1 映射，当前驱动使用：
+
+| LCD 信号 | SMART-R 引脚 | 依据 |
+| --- | --- | --- |
+| `DC` | `GPIO0_PA4` | 板背丝印 `A4` |
+| `RES` | `GPIO0_PC3` | SPI0 M1 的 `MISO` 排针 |
+| `MOSI` | `GPIO0_PC2` | SPI0 M1 |
+| `CLK` | `GPIO0_PC1` | SPI0 M1 |
+| `CS` | `GPIO0_PC0` | SPI0 M1 |
+
+此前沿用普通小凌派 `b4_lcd` 驱动，把 `DC` 错设为 `GPIO0_PC6`。SDK 明确
+`GPIO0_PC6` 同时是 `PWM6`，而授课文档 4.11 将 PWM6 用于 SMART-R 电机，
+所以 LCD 写数据时会直接让电机动作；`DC` 接错也会使 LCD 收不到正确的
+指令/数据选择信号。修正版只将 `LCD_PIN_DC` 改为 `GPIO0_PA4`，并删除了
+此前只能在绘图结束后拉低 PC6 的临时 `lcd_set_dc_idle()` 方案。
+
+## 历史故障定位证据
 
 用户已确认实际烧录的是单入口修复版目录中的新镜像：
 
@@ -127,9 +155,9 @@ D:\实习\tmp\rk2206_images\lab02_lab01_lcd_diagnostic_20260831
 - `rk2206_db_loader.bin`：35,093 bytes，MD5：
   `5f2ea974b0e1df5564a8e1ee910627bb`
 
-## 分段刷屏版验收
+## 历史分段刷屏版验收
 
-本版在保持 PDF 完整流程不变的前提下，对 `lcd_fill()` 增加了每 8 行一次的
+历史版在保持 PDF 完整流程不变的前提下，对 `lcd_fill()` 增加了每 8 行一次的
 进度输出和 `LOS_Msleep(1)`。烧录时使用：
 
 ```text
@@ -158,3 +186,14 @@ TX-SMART-R Lab01
 LCD OK
 OpenHarmony
 ```
+
+本次修正版烧录文件：
+
+```text
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_smart_r_a4_20260831\rk2206_db_loader.bin
+D:\实习\tmp\rk2206_images\lab02_lab01_lcd_smart_r_a4_20260831\Firmware.img
+```
+
+进入 MASKROM 使用 `K2`，烧录完成后退出烧录模式并按 `K1=RESET`；不要把
+`K1` 误认为 K3。验收时重点观察：旧镜像导致的持续电机抖动应消失，UART
+应出现 `LCD_FILL_DONE` 和 `lab01_lcd: LCD OK`，LCD 应显示上面的三行英文。

@@ -222,16 +222,16 @@ LCD_FILL_DONE
 - 构建结果：`852/852`，`liblab01_lcd.a` 参与链接，
   `lockzhiner-rk2206 build success`
 
-下一步烧录分段刷屏版，记录 `LCD_FILL_PROGRESS` 的最后行号，再决定是软件
-SPI 刷屏耗时、屏幕硬件连线，还是其他执行器噪声。
+此前下一步曾计划烧录分段刷屏版，实际 UART 已完成全屏进度输出；随后根据
+SMART-R 板背面引脚证据定位到 LCD DC/PWM6 冲突，并由下面的修正版替代。
 
-### 4.5 lab01_lcd 分段刷屏版（当前待烧录）
+### 4.5 lab01_lcd 分段刷屏版（历史版本）
 
 用户已澄清：诊断版日志停止后，是用户自己按下 `K1=RESET`，并非设备自动
 复位。因此当前证据只表示程序在输出 `LCD_FILL_BEGIN` 后仍未完成
 `lcd_fill()`，不能把串口断开解释为看门狗或自动重启。
 
-为降低软件模拟 SPI 全屏刷屏时的连续 CPU 占用，本次在 `src/lcd.c` 的
+为降低软件模拟 SPI 全屏刷屏时的连续 CPU 占用，历史版在 `src/lcd.c` 的
 `lcd_fill()` 行循环中加入：
 
 - 每完成 8 行输出一次 `LCD_FILL_PROGRESS row=.../...`；
@@ -240,7 +240,7 @@ SPI 刷屏耗时、屏幕硬件连线，还是其他执行器噪声。
   `lcd_show_string()` → `LOS_Msleep(1000)` 流程；
 - `lab01_lcd` 仍不初始化或控制电机、蜂鸣器、RGB、报警灯。
 
-构建与校验：
+历史版构建与校验：
 
 - 本地契约测试：`3 passed`；
 - 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-yield.log`；
@@ -251,6 +251,36 @@ SPI 刷屏耗时、屏幕硬件连线，还是其他执行器噪声。
 - 构建结果：`852/852`、`liblab01_lcd.a` 参与链接、
   `lockzhiner-rk2206 build success`。
 
-待用户烧录该目录中的镜像后，记录 `LCD_FILL_PROGRESS` 的最后行号、
+该目录中的镜像曾用于记录 `LCD_FILL_PROGRESS` 的最后行号、
 `LCD_FILL_DONE`、`lab01_lcd: LCD OK` 和 LCD 实际画面，再决定是否需要继续
-处理屏幕硬件连线或其他执行器噪声。
+处理屏幕硬件连线或其他执行器噪声，现已由下面的 SMART-R 引脚修正版替代。
+
+### 4.5 lab01_lcd SMART-R DC 引脚修正版
+
+根据 SMART-R 板背面 LCD 排针丝印和 RK2206 SDK 复用表完成根因修复：
+
+- LCD 排针丝印：`A4 / MISO / MOSI / CLK / CS / GND / 5V`；
+- `DC` 改为 `GPIO0_PA4`；`RES/MOSI/CLK/CS` 为 `GPIO0_PC3/PC2/PC1/PC0`；
+- SDK 明确 `GPIO0_PC6` 是 `PWM6`，授课文档 4.11 又规定 PWM6 控制 SMART-R
+  电机；旧版把 PC6 当 LCD DC，会导致电机持续抖动并让 LCD DC 信号错误；
+- 删除只能在刷屏结束后拉低 PC6 的临时 `lcd_set_dc_idle()` 方案；
+- 新增回归约束：LCD 驱动必须使用 `GPIO0_PA4`，且不得出现 `GPIO0_PC6`。
+
+本地测试结果：`4 passed`。
+
+Ubuntu 独立工程 `/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 增量构建
+结果：`BUILD_RC=0`、`lockzhiner-rk2206 build success`，完成 `20/20`；
+`liblab01_lcd.a` 和 `liteos.elf` 均重新生成，ELF 中没有临时函数符号。
+
+修正版产物：
+
+- 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_smart_r_a4_20260831`；
+- `Firmware.img` MD5：`3fad85ef9a94dc22a831c5b7659149d6`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 记录：`device/labs/02_lab01_lcd/records/2026-08-31-build-smart-r-a4.md5`；
+- 状态：等待重新烧录，尚未完成 LCD 和电机的物理验收。
+
+本次构建问题：全量 `hb build -f` 曾在 VirtualBox/Hyper-V 环境触发 Ubuntu
+soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远端入口曾残留
+已删除的 `lcd_set_dc_idle()` 调用，导致链接 `undefined reference`；已经通过
+分别同步 `lab01_lcd.c`、`include/lcd.h` 和 `src/lcd.c` 并做符号 grep 检查修复。

@@ -29,7 +29,7 @@
 #define LCD_PIN_CLK         GPIO0_PC1
 #define LCD_PIN_MOSI        GPIO0_PC2
 #define LCD_PIN_RES         GPIO0_PC3
-#define LCD_PIN_DC          GPIO0_PC6
+#define LCD_PIN_DC          GPIO0_PA4
 
 #define LCD_FILL_YIELD_ROWS 8
 
