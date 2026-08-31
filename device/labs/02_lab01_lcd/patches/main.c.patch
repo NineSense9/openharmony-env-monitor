@@ -1,7 +1,7 @@
 diff --git a/device/rockchip/rk2206/sdk_liteos/board/main.c b/device/rockchip/rk2206/sdk_liteos/board/main.c
 --- a/device/rockchip/rk2206/sdk_liteos/board/main.c
 +++ b/device/rockchip/rk2206/sdk_liteos/board/main.c
-@@ -30,6 +30,7 @@
+@@ -27,6 +27,7 @@
  #define  MAIN_TAG              "MAIN"
  int DeviceManagerStart();
  void IotInit(void);
@@ -9,7 +9,7 @@ diff --git a/device/rockchip/rk2206/sdk_liteos/board/main.c b/device/rockchip/rk
  
  /*****************************************************************************
   * Function    : main
-@@ -51,6 +52,7 @@ LITE_OS_SEC_TEXT_INIT int Main(void)
+@@ -49,6 +50,7 @@
          UartDebugInit();
          LosShellInit();
          shell_cmd_init();
