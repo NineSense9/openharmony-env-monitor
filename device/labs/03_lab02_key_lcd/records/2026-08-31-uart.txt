@@ -1,0 +1,14 @@
+实验：4.6 lab02_key_lcd
+状态：physical test pending
+串口配置：115200 8N1
+
+预期启动与操作序列：
+lab02_key_lcd: LCD_INIT_BEGIN
+lab02_key_lcd: K3=RELEASED
+按住 K3
+lab02_key_lcd: K3=PRESSED
+松开 K3
+lab02_key_lcd: K3=RELEASED
+
+说明：以上为待上板验收的预期序列，不是实际硬件日志。用户完成烧录并提供
+UART 输出后，用实际日志替换本文件内容，再记录 LCD 状态和电机状态。

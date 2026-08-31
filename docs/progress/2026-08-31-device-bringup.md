@@ -445,3 +445,14 @@ soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远�
 此前生成的 11 个 LCD 镜像目录已完整移动到
 `D:\实习\tmp\rk2206_images\archive\2026-08-31-lcd-trials`，没有删除历史文件。
 详细清单见 `device/labs/02_lab01_lcd/records/2026-08-31-image-archive.md`。
+
+### 4.8 lab02_key_lcd 源码与构建准备（2026-08-31）
+
+严格依据授课文档第 4.6 节，在 4.5 可运行 LCD 基线之外建立独立实验
+`device/labs/03_lab02_key_lcd`。K3 使用 `GPIO0_PC7` 数字输入，按下为低电平；
+每 30 ms 轮询，仅在状态变化时刷新 LCD 状态行并输出 UART。K1/K2 仍分别只作
+RESET/MASKROM，电机 PWM6=`GPIO0_PC6` 不被访问。
+
+本地契约测试结果：`4 passed`。源码已提交，Ubuntu 独立工程和镜像仍待构建；
+构建完成后必须使用单独的 `lab03-lab02-key-lcd-20260831` 工程和独立烧录目录，
+不能覆盖 4.5 基线。当前硬件验收尚未开始。
