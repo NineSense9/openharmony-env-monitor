@@ -1,0 +1,15 @@
+[2026-08-31 19:25:43] experiment=4.5 lab01_lcd
+[2026-08-31 19:25:43] source=lab02-lab01-lcd-20260831
+[2026-08-31 19:25:43] config=USE_HORIZONTAL=2 MADCTL=0x60 SPI_MODE_3 DC=GPIO0_PA4
+[2026-08-31 19:25:43] action=remove stale liteos.elf and Firmware.img
+[2026-08-31 19:25:43] command=hb build
+[2026-08-31 19:25:43] result=lockzhiner-rk2206 build success
+[2026-08-31 19:25:43] artifact=liteos.elf size=1497672 bytes
+[2026-08-31 19:25:44] artifact=Firmware.img size=2097152 bytes
+[2026-08-31 19:25:44] artifact=Firmware.img md5=89fb0ba476d3cecb516dd7371c5e0bec
+[2026-08-31 19:25:44] artifact=rk2206_db_loader.bin size=35093 bytes
+[2026-08-31 19:25:44] artifact=rk2206_db_loader.bin md5=5f2ea974b0e1df5564a8e1ee910627bb
+[2026-08-31 19:25:44] disassembly=lcd_init sends 0x36 data value 0x60
+[2026-08-31 19:25:44] copy=D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_normal_hwspi_mode3_relinked_20260831
+[2026-08-31 19:25:44] physical=LCD displays experiment text; user reports right-bottom start and inverted text
+[2026-08-31 19:25:44] decision=accept current display orientation as 4.5 baseline; do not block next lab
