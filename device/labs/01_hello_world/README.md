@@ -27,6 +27,46 @@
 - `Firmware.img` 已复制并完成 MD5 校验；
 - 当前还未烧录本实验镜像，板子仍可按 `00_bringup` 基线重新恢复。
 
+## 编译避错记录
+
+本实验第一次构建失败的位置不是 C 源码编译，也不是静态库链接，而是最终
+`mkimage.sh` 打包阶段。非交互 SSH 会话的 `PATH` 没有包含
+`/home/lzdz/.local/bin`，脚本调用 `hb` 时出现：
+
+```text
+hb：未找到命令
+```
+
+修复后重新构建成功。以后每次通过 Ubuntu SSH 编译前，必须先执行：
+
+```bash
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+hb build -f
+```
+
+其中 `command -v hb` 必须输出 `/home/lzdz/.local/bin/hb`，否则先不要开始编译。
+完整失败和成功日志保存在 `records/2026-08-31-build.log`。
+
+## 本实验烧录文件
+
+烧录本实验时使用以下目录中的文件：
+
+```text
+D:\实习\tmp\rk2206_images\lab01_hello_world\rk2206_db_loader.bin
+D:\实习\tmp\rk2206_images\lab01_hello_world\Firmware.img
+```
+
+`Firmware.img` 的 MD5 为：
+
+```text
+5561e5deaf9c36a34fc9860c5cb5f52b
+```
+
+不要使用 `D:\实习\tmp\rk2206_images\images\Firmware.img`，那个是
+`00_bringup` 基础固件。
+
 ## 实现接入点
 
 1. 将 `src/hello_world.c` 和 `src/BUILD.gn` 放入源码树的

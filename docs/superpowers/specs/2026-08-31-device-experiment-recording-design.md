@@ -67,6 +67,22 @@ device/
 
 涉及实体按键、USB 口切换或烧录确认时，由用户完成物理操作；其余可通过 Ubuntu SSH、Windows 工具和 Git 完成的步骤由代理自动推进。
 
+### 4.1 编译前环境检查
+
+Ubuntu 中通过非交互 SSH 执行编译时，不能假设用户的交互式 shell
+配置已经生效。每个实验执行 `hb build -f` 前都必须先运行：
+
+```bash
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+```
+
+`command -v hb` 应解析到 `/home/lzdz/.local/bin/hb`。如果最终
+`mkimage.sh` 报 `hb：未找到命令`，先检查这一项；这通常表示最终打包
+环境缺少 `PATH`，不应直接判断为源码编译或静态库链接失败。失败日志、
+根因、修复命令和再次构建结果必须写入当前实验的 `records/`。
+
 ## 5. Commit 约定
 
 每个实验至少有一个阶段提交，提交信息包含实验编号和动作，例如：

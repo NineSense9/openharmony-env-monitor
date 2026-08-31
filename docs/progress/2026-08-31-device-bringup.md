@@ -99,3 +99,20 @@ OHOS # hiview init success.
 - `lockzhiner-rk2206 build success`；
 - `Firmware.img` MD5：`5561e5deaf9c36a34fc9860c5cb5f52b`；
 - 尚未烧录，等待串口验收。
+
+### 编译问题记录
+
+第一次构建在最终 `mkimage.sh` 打包阶段失败，错误为
+`hb：未找到命令`。检查完整日志后确认，静态库已经编译并参与最终
+链接，根因是非交互 SSH 会话的 `PATH` 没有包含
+`/home/lzdz/.local/bin`。执行
+`export PATH="/home/lzdz/.local/bin:$PATH"` 后重新构建成功。
+
+后续每个实验编译前固定执行：
+
+```bash
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+hb build -f
+```

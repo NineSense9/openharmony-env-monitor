@@ -27,6 +27,16 @@ hb：未找到命令
 lockzhiner-rk2206 build success
 cost time: 0:00:31
 
+固定避错检查（后续每个实验编译前执行）：
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+
+预期：
+command -v hb 输出 /home/lzdz/.local/bin/hb；
+hb --help 能正常输出帮助内容。
+如果检查不通过，不要执行 hb build -f，先修复 PATH。
+
 关键产物：
 libtask_helloworld.a 已生成并参与链接
 Firmware.img

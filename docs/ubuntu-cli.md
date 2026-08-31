@@ -14,6 +14,28 @@ The local convenience script is `D:\实习\一键连接Ubuntu命令行.bat`.
 The repository copy is `tools\connect-ubuntu-ssh.bat`.
 Both scripts start the VM in headless mode when needed and then open SSH.
 
+## Build preflight
+
+The `hb` command is installed in the user-local directory. Non-interactive SSH
+sessions may not load the interactive shell profile, so run this preflight
+before every OpenHarmony build:
+
+```bash
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+```
+
+The first command must resolve to `/home/lzdz/.local/bin/hb`. Only then run:
+
+```bash
+hb build -f
+```
+
+If the final image-packaging step reports `hb: command not found`, the source
+compilation and static-library link may already have succeeded. Check the
+non-interactive SSH `PATH` first, then rebuild with the preflight above.
+
 ## Current VM state
 
 - Ubuntu 20.04.3 is reachable over SSH.

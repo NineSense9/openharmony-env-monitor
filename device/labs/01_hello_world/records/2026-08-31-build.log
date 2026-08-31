@@ -1,0 +1,858 @@
+[OHOS INFO] ohos_build_compiler: gcc
+[OHOS INFO] hks_config_lite.h
+[OHOS INFO] ["//out/rk2206/lockzhiner-rk2206/gen/vendor/lockzhiner/rk2206/hdf_config/hdf_hex.c"]
+[OHOS INFO] Done. Made 150 targets from 124 files in 4609ms
+[OHOS INFO] [1/851] gcc cross compiler obj/base/hiviewdfx/blackbox/libblackbox.blackbox_detector.o
+[OHOS INFO] [2/851] gcc cross compiler obj/base/hiviewdfx/blackbox/libblackbox.blackbox_adapter.o
+[OHOS INFO] [3/851] gcc cross compiler obj/base/hiviewdfx/hidumper_lite/mini/libhidumper_mini.hidumper_core.o
+[OHOS INFO] [4/851] gcc cross compiler obj/base/hiviewdfx/hidumper_lite/mini/libhidumper_mini.hidumper_adapter.o
+[OHOS INFO] [5/851] gcc cross compiler obj/base/hiviewdfx/blackbox/libblackbox.blackbox_core.o
+[OHOS INFO] [6/851] gcc cross compiler obj/base/hiviewdfx/hiview_lite/libhiview_lite.hiview_cache.o
+[OHOS INFO] [7/851] gcc cross compiler obj/base/hiviewdfx/hievent_lite/frameworks/libhievent_lite.hiview_event.o
+[OHOS INFO] [8/851] gcc cross compiler obj/base/hiviewdfx/hiview_lite/libhiview_lite.hiview_service.o
+[OHOS INFO] [9/851] gcc cross compiler obj/base/hiviewdfx/hilog_lite/frameworks/mini/libhilog_lite.hiview_log_limit.o
+[OHOS INFO] [10/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.add_auth_info.o
+[OHOS INFO] [11/851] gcc cross compiler obj/base/hiviewdfx/hilog_lite/frameworks/mini/libhilog_lite.hiview_log.o
+[OHOS INFO] [12/851] gcc cross compiler obj/base/hiviewdfx/hievent_lite/frameworks/libhievent_lite.hiview_output_event.o
+[OHOS INFO] [13/851] gcc cross compiler obj/base/hiviewdfx/hiview_lite/libhiview_lite.hiview_util.o
+[OHOS INFO] [14/851] STAMP obj/build/lite/ndk.stamp
+[OHOS INFO] [15/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.add_auth_info_client.o
+[OHOS INFO] [16/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.auth_info.o
+[OHOS INFO] [17/851] gcc cross compiler obj/base/hiviewdfx/hiview_lite/libhiview_lite.hiview_config.o
+[OHOS INFO] [18/851] STAMP obj/build/lite/mark_as_prebuilts.stamp
+[OHOS INFO] [19/851] STAMP obj/base/startup/syspara_lite/frameworks/token/token_notes.stamp
+[OHOS INFO] [20/851] gcc cross compiler obj/base/update/ota_lite/frameworks/source/verify/libhota.app_rsa.o
+[OHOS INFO] [21/851] gcc cross compiler obj/base/hiviewdfx/hilog_lite/frameworks/mini/libhilog_lite.hiview_output_log.o
+[OHOS INFO] [22/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.exchange_auth_info_client.o
+[OHOS INFO] [23/851] gcc cross compiler obj/base/hiviewdfx/hiview_lite/libhiview_lite.hiview_file.o
+[OHOS INFO] [24/851] gcc cross compiler obj/base/update/ota_lite/frameworks/source/verify/libhota.app_sha256.o
+[OHOS INFO] [25/851] gcc cross compiler obj/base/update/ota_lite/frameworks/source/verify/libhota.hota_verify.o
+[OHOS INFO] [26/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.exchange_auth_info.o
+[OHOS INFO] [27/851] gcc cross compiler obj/base/update/ota_lite/frameworks/source/updater/libhota.hota_updater.o
+[OHOS INFO] [28/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/auth_info/libhichainsdk.remove_auth_info_client.o
+[OHOS INFO] [29/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/json/libhichainsdk.jsonutil.o
+[OHOS INFO] [30/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.key_agreement.o
+[OHOS INFO] [31/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.key_agreement_server.o
+[OHOS INFO] [32/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/libhichainsdk.hichain.o
+[OHOS INFO] [33/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/json/libhichainsdk.commonutil.o
+[OHOS INFO] [34/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.key_agreement_client.o
+[OHOS INFO] [35/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.pake_client.o
+[OHOS INFO] [36/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.sts_client.o
+[OHOS INFO] [37/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/log/libhichainsdk.log.o
+[OHOS INFO] [38/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/huks_adapter/libhichainsdk.huks_adapter.o
+[OHOS INFO] [39/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.sec_clone_server.o
+[OHOS INFO] [40/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.add_auth_info_request.o
+[OHOS INFO] [41/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.pake_server.o
+[OHOS INFO] [42/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/key_agreement/libhichainsdk.sts_server.o
+[OHOS INFO] [43/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/schedule/libhichainsdk.build_object.o
+[OHOS INFO] [44/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.add_auth_info_data.o
+[OHOS INFO] [45/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.add_auth_info_response.o
+[OHOS INFO] [46/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.auth_ack_request.o
+[OHOS INFO] [47/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.auth_start_response.o
+[OHOS INFO] [48/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.auth_ack_response.o
+[OHOS INFO] [49/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.auth_start_request.o
+[OHOS INFO] [50/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/schedule/libhichainsdk.distribution.o
+[OHOS INFO] [51/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.inform_message.o
+[OHOS INFO] [52/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.exchange_auth_data.o
+[OHOS INFO] [53/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.exchange_response.o
+[OHOS INFO] [54/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.import_add_auth_data.o
+[OHOS INFO] [55/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.exchange_request.o
+[OHOS INFO] [56/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.pake_client_confirm.o
+[OHOS INFO] [57/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.key_agreement_version.o
+[OHOS INFO] [58/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.pake_request.o
+[OHOS INFO] [59/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.parsedata.o
+[OHOS INFO] [60/851] STAMP obj/build/lite/config/component/cJSON/cjson_shared.stamp
+[OHOS INFO] [61/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.pake_server_confirm.o
+[OHOS INFO] [62/851] STAMP obj/build/lite/config/component/cJSON/cjson_ndk.stamp
+[OHOS INFO] [63/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.pake_response.o
+[OHOS INFO] [64/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.rmv_auth_info_response.o
+[OHOS INFO] [65/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.rmv_auth_info_data.o
+[OHOS INFO] [66/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_upgrade_storage_data.o
+[OHOS INFO] [67/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.rmv_auth_info_request.o
+[OHOS INFO] [68/851] gcc cross compiler obj/base/security/deviceauth/frameworks/deviceauth_lite/source/struct/libhichainsdk.sec_clone_data.o
+[OHOS INFO] [69/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/os_dependency/posix/libhuks_3.0_sdk.hks_file_operator_lite.o
+[OHOS INFO] [70/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/common/src/libhuks_3.0_sdk.hks_common_check.o
+[OHOS INFO] [71/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_client_check.o
+[OHOS INFO] [72/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/os_dependency/sysinfo/src/libhuks_3.0_sdk.hks_get_process_info_passthrough.o
+[OHOS INFO] [73/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_client_service_adapter_lite.o
+[OHOS INFO] [74/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/os_dependency/posix/libhuks_3.0_sdk.hks_mem.o
+[OHOS INFO] [75/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/os_dependency/ipc/src/libhuks_3.0_sdk.hks_client_service_passthrough.o
+[OHOS INFO] [76/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/os_dependency/sysinfo/src/libhuks_3.0_sdk.hks_get_udid.o
+[OHOS INFO] [77/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/common/src/libhuks_3.0_sdk.hks_crypto_adapter.o
+[OHOS INFO] [78/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_auth.o
+[OHOS INFO] [79/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/common/src/libhuks_3.0_sdk.hks_param.o
+[OHOS INFO] [80/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/core/src/libhuks_3.0_sdk.hks_local_engine.o
+[OHOS INFO] [81/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_keyblob.o
+[OHOS INFO] [82/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_client_service.o
+[OHOS INFO] [83/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/common/src/libhuks_3.0_sdk.hks_base_check.o
+[OHOS INFO] [84/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/common/src/libhuks_3.0_sdk.hks_check_paramset.o
+[OHOS INFO] [85/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_rkc.o
+[OHOS INFO] [86/851] gcc cross compiler obj/base/security/huks/interfaces/innerkits/huks_standard/main/src/libhuks_3.0_sdk.hks_api.o
+[OHOS INFO] [87/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_storage_adapter.o
+[OHOS INFO] [88/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_core_service.o
+[OHOS INFO] [89/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_upgrade_key_info.o
+[OHOS INFO] [90/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_rkc_rw.o
+[OHOS INFO] [91/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_crypto_ed25519.o
+[OHOS INFO] [92/851] gcc cross compiler obj/base/security/huks/interfaces/innerkits/huks_lite/libhuks_3.0_sdk.hks_tmp_client.o
+[OHOS INFO] [93/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_bn.o
+[OHOS INFO] [94/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_ecc.o
+[OHOS INFO] [95/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_common.o
+[OHOS INFO] [96/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_engine/main/core/src/libhuks_3.0_sdk.hks_keyblob_lite.o
+[OHOS INFO] [97/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/os_dependency/idl/passthrough/libhuks_3.0_sdk.hks_passthrough_access.o
+[OHOS INFO] [98/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_aes.o
+[OHOS INFO] [99/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_ecdh.o
+[OHOS INFO] [100/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_ecdsa.o
+[OHOS INFO] [101/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_rsa.o
+[OHOS INFO] [102/851] gcc cross compiler obj/base/security/huks/services/huks_standard/huks_service/main/core/src/libhuks_3.0_sdk.hks_storage_lite.o
+[OHOS INFO] [103/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_hash.o
+[OHOS INFO] [104/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_hmac.o
+[OHOS INFO] [105/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_kdf.o
+[OHOS INFO] [106/851] gcc cross compiler obj/base/startup/bootstrap_lite/services/source/libbootstrap.system_init.o
+[OHOS INFO] [107/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_engine.o
+[OHOS INFO] [108/851] gcc cross compiler obj/base/startup/bootstrap_lite/services/source/libbootstrap.bootstrap_service.o
+[OHOS INFO] [109/851] gcc cross compiler obj/base/security/huks/frameworks/huks_standard/main/crypto_engine/mbedtls/src/libhuks_3.0_sdk.hks_mbedtls_x25519.o
+[OHOS INFO] [110/851] gcc cross compiler obj/base/startup/syspara_lite/frameworks/parameter/src/param_impl_hal/libsysparam.param_impl_hal.o
+[OHOS INFO] [111/851] gcc cross compiler obj/base/startup/syspara_lite/frameworks/parameter/src/libsysparam.parameter_common.o
+[OHOS INFO] [112/851] gcc cross compiler obj/base/startup/syspara_lite/frameworks/token/src/token_impl_hal/libtoken_static.token.o
+[OHOS INFO] [113/851] gcc cross compiler obj/foundation/communication/softbus_lite/authmanager/source/libauthmanager.msg_get_deviceid.o
+[OHOS INFO] [114/851] gcc cross compiler obj/foundation/communication/softbus_lite/authmanager/source/libauthmanager.auth_interface.o
+[OHOS INFO] [115/851] gcc cross compiler obj/foundation/communication/softbus_lite/authmanager/source/libauthmanager.bus_manager.o
+[OHOS INFO] [116/851] STAMP obj/device/rockchip/rk2206/rk2206.stamp
+[OHOS INFO] [117/851] gcc cross compiler obj/foundation/communication/softbus_lite/authmanager/source/libauthmanager.wifi_auth_manager.o
+[OHOS INFO] [118/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/adapter/cmsis/libsamgr_adapter.thread_adapter.o
+[OHOS INFO] [119/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/adapter/cmsis/libsamgr_adapter.memory_adapter.o
+[OHOS INFO] [120/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/adapter/cmsis/libsamgr_adapter.queue_adapter.o
+[OHOS INFO] [121/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/adapter/cmsis/libsamgr_adapter.time_adapter.o
+[OHOS INFO] [122/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/communication/wifi_lite/wifiservice/source/libwifiservice.wifi_device.o
+[OHOS INFO] [123/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_spi.o
+[OHOS INFO] [124/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/communication/wifi_lite/wifiservice/source/libwifiservice.wifi_device_util.o
+[OHOS INFO] [125/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_pwm.o
+[OHOS INFO] [126/851] gcc cross compiler obj/third_party/cJSON/libcjson_static.cJSON_Utils.o
+[OHOS INFO] [127/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/communication/wifi_lite/wifiservice/source/libwifiservice.wifi_hotspot.o
+[OHOS INFO] [128/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/communication/wifi_lite/wifiaware/source/libhal_wifiaware.hal_wifiaware.o
+[OHOS INFO] [129/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_i2c.o
+[OHOS INFO] [130/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_uart.o
+[OHOS INFO] [131/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/utils/file/libhal_file_static.hal_file.o
+[OHOS INFO] [132/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_gpio.o
+[OHOS INFO] [133/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_watchdog.o
+[OHOS INFO] [134/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_adc.o
+[OHOS INFO] [135/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_iot_flash.o
+[OHOS INFO] [136/851] gcc cross compiler obj/third_party/cJSON/libcjson_static.cJSON.o
+[OHOS INFO] [137/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_reset.o
+[OHOS INFO] [138/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/iot_hardware/wifiiot_lite/libhal_iothardware.hal_lowpower.o
+[OHOS INFO] [139/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/libboard.dprintf.o
+[OHOS INFO] [140/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/libboard.iotmain.o
+[OHOS INFO] [141/851] gcc cross compiler obj/device/rockchip/rk2206/adapter/hals/update/libhal_update_static.hal_hota_board.o
+[OHOS INFO] [142/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_tcp.o
+[OHOS INFO] [143/851] STAMP obj/domains/iot/link/link.stamp
+[OHOS INFO] [144/851] STAMP obj/domains/iot/link/iot.stamp
+[OHOS INFO] [145/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_ifconfig.o
+[OHOS INFO] [146/851] gcc cross compiler obj/drivers/framework/ability/config/libhdf_core.device_resource_if.o
+[OHOS INFO] [147/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/startup/libboard.startup_rk2206.o
+[OHOS INFO] [148/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/libboard.uart.o
+[OHOS INFO] [149/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_test.o
+[OHOS INFO] [150/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_hwinfo.o
+[OHOS INFO] [151/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_flash.o
+[OHOS INFO] [152/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/libboard.main.o
+[OHOS INFO] [153/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/board/src/libboard.config_network.o
+[OHOS INFO] [154/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_uname.o
+[OHOS INFO] [155/851] gcc cross compiler obj/device/rockchip/rk2206/third_party/littlefs/liblzlittlefs.lfs.o
+[OHOS INFO] [156/851] gcc cross compiler obj/drivers/framework/ability/config/hcs_parser/src/libhdf_core.hcs_parser.o
+[OHOS INFO] [157/851] gcc cross compiler obj/device/rockchip/rk2206/third_party/littlefs/liblzlittlefs.lfs_util.o
+[OHOS INFO] [158/851] gcc cross compiler obj/device/rockchip/rk2206/sdk_liteos/shell/src/libshellcmd.shell_cmd.o
+[OHOS INFO] [159/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.adc_if.o
+[OHOS INFO] [160/851] gcc cross compiler obj/drivers/framework/ability/config/hcs_parser/src/libhdf_core.hcs_generate_tree.o
+[OHOS INFO] [161/851] gcc cross compiler obj/drivers/framework/ability/config/hcs_parser/src/libhdf_core.hcs_blob_if.o
+[OHOS INFO] [162/851] gcc cross compiler obj/drivers/framework/ability/config/hcs_parser/src/libhdf_core.hcs_tree_if.o
+[OHOS INFO] [163/851] gcc cross compiler obj/device/rockchip/rk2206/third_party/littlefs/liblzlittlefs.lfs_api.o
+[OHOS INFO] [164/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.adc_core.o
+[OHOS INFO] [165/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.spi_if.o
+[OHOS INFO] [166/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/platform/libhdf_platform_lite.plat_common.o
+[OHOS INFO] [167/851] gcc cross compiler obj/drivers/framework/ability/sbuf/src/libhdf_core.hdf_sbuf.o
+[OHOS INFO] [168/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.spi_core.o
+[OHOS INFO] [169/851] gcc cross compiler obj/drivers/framework/core/common/src/libhdf_core.devlite_object_config.o
+[OHOS INFO] [170/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.i2c_if.o
+[OHOS INFO] [171/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.gpio_core.o
+[OHOS INFO] [172/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.gpio_if.o
+[OHOS INFO] [173/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.pwm_core.o
+[OHOS INFO] [174/851] gcc cross compiler obj/drivers/framework/support/platform/src/libhdf_platform_lite.i2c_core.o
+[OHOS INFO] [175/851] gcc cross compiler obj/drivers/framework/core/common/src/libhdf_core.load_driver_entry.o
+[OHOS INFO] [176/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.devhost_service.o
+[OHOS INFO] [177/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.devmgr_service_clnt.o
+[OHOS INFO] [178/851] gcc cross compiler obj/drivers/framework/ability/sbuf/src/libhdf_core.hdf_sbuf_impl_raw.o
+[OHOS INFO] [179/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.devsvc_manager_clnt.o
+[OHOS INFO] [180/851] gcc cross compiler obj/drivers/framework/core/common/src/libhdf_core.hdf_attribute.o
+[OHOS INFO] [181/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_device.o
+[OHOS INFO] [182/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_device_object.o
+[OHOS INFO] [183/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_device_node.o
+[OHOS INFO] [184/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_service_subscriber.o
+[OHOS INFO] [185/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_device_token.o
+[OHOS INFO] [186/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_driver_loader.o
+[OHOS INFO] [187/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_service_observer.o
+[OHOS INFO] [188/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.power_state_token.o
+[OHOS INFO] [189/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.device_token_clnt.o
+[OHOS INFO] [190/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.hdf_driver_installer.o
+[OHOS INFO] [191/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.hdf_host_info.o
+[OHOS INFO] [192/851] gcc cross compiler obj/drivers/framework/core/host/src/libhdf_core.hdf_observer_record.o
+[OHOS INFO] [193/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.devhost_service_clnt.o
+[OHOS INFO] [194/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.devmgr_service.o
+[OHOS INFO] [195/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.devsvc_manager.o
+[OHOS INFO] [196/851] gcc cross compiler obj/drivers/framework/core/shared/src/libhdf_core.hdf_service_record.o
+[OHOS INFO] [197/851] gcc cross compiler obj/drivers/framework/utils/src/libhdf_core.hdf_cstring.o
+[OHOS INFO] [198/851] gcc cross compiler obj/drivers/framework/core/shared/src/libhdf_core.hdf_object_manager.o
+[OHOS INFO] [199/851] gcc cross compiler obj/drivers/framework/core/manager/src/libhdf_core.power_state_token_clnt.o
+[OHOS INFO] [200/851] gcc cross compiler obj/drivers/framework/core/shared/src/libhdf_core.hdf_device_info.o
+[OHOS INFO] [201/851] gcc cross compiler obj/drivers/framework/utils/src/libhdf_core.hdf_sref.o
+[OHOS INFO] [202/851] gcc cross compiler obj/drivers/framework/utils/src/libhdf_core.hdf_map.o
+[OHOS INFO] [203/851] gcc cross compiler obj/drivers/framework/utils/src/libhdf_core.hdf_slist.o
+[OHOS INFO] [204/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/core/common/src/libhdf_core.hdf_device_node_ext.o
+[OHOS INFO] [205/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_mutex.o
+[OHOS INFO] [206/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_sem.o
+[OHOS INFO] [207/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/core/common/src/libhdf_core.devmgr_service_start.o
+[OHOS INFO] [208/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_spinlock.o
+[OHOS INFO] [209/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_mem.o
+[OHOS INFO] [210/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_thread.o
+[OHOS INFO] [211/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_time.o
+[OHOS INFO] [212/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/osal/src/libhdf_osal_lite.osal_timer.o
+[OHOS INFO] [213/851] gcc cross compiler obj/foundation/communication/softbus_lite/os_adapter/source/L0/libdiscovery.os_adapter.o
+[OHOS INFO] [214/851] gcc cross compiler obj/foundation/communication/softbus_lite/authmanager/source/libauthmanager.auth_conn.o
+[OHOS INFO] [215/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/libdistbus/libtrans_service.auth_conn_manager.o
+[OHOS INFO] [216/851] gcc cross compiler obj/drivers/adapter/khdf/liteos_m/test/sample_driver/src/libsample_driver.sample_driver.o
+[OHOS INFO] [217/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/discovery_service/source/libdiscovery.discovery_service.o
+[OHOS INFO] [218/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_flash_test.o
+[OHOS INFO] [219/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_gpio_test.o
+[OHOS INFO] [220/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.coap_socket.o
+[OHOS INFO] [221/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/communication/broadcast/source/libbroadcast.broadcast_service.o
+[OHOS INFO] [222/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/communication/broadcast/source/libbroadcast.pub_sub_feature.o
+[OHOS INFO] [223/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.coap_adapter.o
+[OHOS INFO] [224/851] gcc cross compiler obj/foundation/communication/wifi_aware/frameworks/source/libwifiaware.wifiaware.o
+[OHOS INFO] [225/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.coap_discover.o
+[OHOS INFO] [226/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.nstackx_device.o
+[OHOS INFO] [227/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/discovery_service/source/libdiscovery.coap_service.o
+[OHOS INFO] [228/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/discovery_service/source/libdiscovery.common_info_manager.o
+[OHOS INFO] [229/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/libdistbus/libtrans_service.tcp_session.o
+[OHOS INFO] [230/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/libdistbus/libtrans_service.trans_lock.o
+[OHOS INFO] [231/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.json_payload.o
+[OHOS INFO] [232/851] gcc cross compiler obj/foundation/communication/softbus_lite/discovery/coap/source/libdiscovery.nstackx_common.o
+[OHOS INFO] [233/851] COPY ../../../foundation/distributedschedule/samgr_lite/config/system_capability.json obj/foundation/distributedschedule/samgr_lite/config/system_capability.json
+[OHOS INFO] [234/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/libdistbus/libtrans_service.tcp_session_manager.o
+[OHOS INFO] [235/851] STAMP obj/foundation/distributedschedule/samgr_lite/ConfigFiles.stamp
+[OHOS INFO] [236/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/utils/libtrans_service.message.o
+[OHOS INFO] [237/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/registry/libsamgr.service_registry.o
+[OHOS INFO] [238/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/utils/libtrans_service.aes_gcm.o
+[OHOS INFO] [239/851] gcc cross compiler obj/foundation/communication/softbus_lite/trans_service/source/utils/libtrans_service.tcp_socket.o
+[OHOS INFO] [240/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/communication/broadcast/source/libbroadcast.pub_sub_implement.o
+[OHOS INFO] [241/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.message.o
+[OHOS INFO] [242/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.task_manager.o
+[OHOS INFO] [243/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vswprintf_s.o
+[OHOS INFO] [244/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vwscanf_s.o
+[OHOS INFO] [245/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.service.o
+[OHOS INFO] [246/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wcscat_s.o
+[OHOS INFO] [247/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr.samgr_lite.o
+[OHOS INFO] [248/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vswscanf_s.o
+[OHOS INFO] [249/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wcscpy_s.o
+[OHOS INFO] [250/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wcsncat_s.o
+[OHOS INFO] [251/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wcsncpy_s.o
+[OHOS INFO] [252/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wmemcpy_s.o
+[OHOS INFO] [253/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wmemmove_s.o
+[OHOS INFO] [254/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wcstok_s.o
+[OHOS INFO] [255/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.wscanf_s.o
+[OHOS INFO] [256/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.feature.o
+[OHOS INFO] [257/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.iunknown.o
+[OHOS INFO] [258/851] gcc cross compiler obj/kernel/liteos_m/components/cppsupport/libcppsupport.los_cppsupport.o
+[OHOS INFO] [259/851] gcc cross compiler obj/foundation/distributedschedule/samgr_lite/samgr/source/libsamgr_source.common.o
+[OHOS INFO] [260/851] gcc cross compiler obj/kernel/liteos_m/components/backtrace/libbacktrace.los_backtrace.o
+[OHOS INFO] [261/851] gcc cross compiler obj/kernel/liteos_m/components/exchook/libexchook.los_exchook.o
+[OHOS INFO] [262/851] gcc cross compiler obj/kernel/liteos_m/components/cpup/libcpup.los_cpup.o
+[OHOS INFO] [263/851] gcc cross compiler obj/kernel/liteos_m/components/exchook/libexchook.los_exc_info.o
+[OHOS INFO] [264/851] gcc cross compiler obj/third_party/FatFs/source/libfatfs.diskio.o
+[OHOS INFO] [265/851] gcc cross compiler obj/third_party/FatFs/source/libfatfs.ffsystem.o
+[OHOS INFO] [266/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/enhancement/src/liblwip.fixme.o
+[OHOS INFO] [267/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/enhancement/src/liblwip.lwip_ifaddrs.o
+[OHOS INFO] [268/851] gcc cross compiler obj/kernel/liteos_m/components/fs/libfs_operations.fs.o
+[OHOS INFO] [269/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.init.o
+[OHOS INFO] [270/851] gcc cross compiler obj/third_party/FatFs/source/libfatfs.ffunicode.o
+[OHOS INFO] [271/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.driverif.o
+[OHOS INFO] [272/851] gcc cross compiler obj/third_party/littlefs/liblittlefs.lfs_util.o
+[OHOS INFO] [273/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.api_shell.o
+[OHOS INFO] [274/851] gcc cross compiler obj/kernel/liteos_m/components/fs/fatfs/libfatfs.fatfs.o
+[OHOS INFO] [275/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.date_shell.o
+[OHOS INFO] [276/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.fullpath.o
+[OHOS INFO] [277/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.lwip_init.o
+[OHOS INFO] [278/851] gcc cross compiler obj/kernel/liteos_m/components/fs/littlefs/liblittlefs.lfs_api.o
+[OHOS INFO] [279/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.mempt_shellcmd.o
+[OHOS INFO] [280/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.task_shellcmd.o
+[OHOS INFO] [281/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.shell_shellcmd.o
+[OHOS INFO] [282/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_sem.o
+[OHOS INFO] [283/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_sched.o
+[OHOS INFO] [284/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_sortlink.o
+[OHOS INFO] [285/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/cmds/libshell.vfs_shellcmd.o
+[OHOS INFO] [286/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_swtmr.o
+[OHOS INFO] [287/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.malloc.o
+[OHOS INFO] [288/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.libc.o
+[OHOS INFO] [289/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_tick.o
+[OHOS INFO] [290/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.errno.o
+[OHOS INFO] [291/851] gcc cross compiler obj/third_party/FatFs/source/libfatfs.ff.o
+[OHOS INFO] [292/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.sockets_porting.o
+[OHOS INFO] [293/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_task.o
+[OHOS INFO] [294/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.netdb_porting.o
+[OHOS INFO] [295/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.def.o
+[OHOS INFO] [296/851] gcc cross compiler obj/kernel/liteos_m/components/net/lwip-2.1/porting/src/liblwip.sys_arch.o
+[OHOS INFO] [297/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.inet_chksum.o
+[OHOS INFO] [298/851] gcc cross compiler obj/third_party/littlefs/liblittlefs.lfs.o
+[OHOS INFO] [299/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.ip.o
+[OHOS INFO] [300/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.mem.o
+[OHOS INFO] [301/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.dns.o
+[OHOS INFO] [302/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.memp.o
+[OHOS INFO] [303/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.sys.o
+[OHOS INFO] [304/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.altcp.o
+[OHOS INFO] [305/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.raw.o
+[OHOS INFO] [306/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.stats.o
+[OHOS INFO] [307/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.netif.o
+[OHOS INFO] [308/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.altcp_tcp.o
+[OHOS INFO] [309/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.altcp_alloc.o
+[OHOS INFO] [310/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.udp.o
+[OHOS INFO] [311/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.autoip.o
+[OHOS INFO] [312/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.pbuf.o
+[OHOS INFO] [313/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.tcp_out.o
+[OHOS INFO] [314/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.timeouts.o
+[OHOS INFO] [315/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.tcp.o
+[OHOS INFO] [316/851] gcc cross compiler obj/third_party/lwip/src/core/liblwip.tcp_in.o
+[OHOS INFO] [317/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.icmp.o
+[OHOS INFO] [318/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.igmp.o
+[OHOS INFO] [319/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.ip4_addr.o
+[OHOS INFO] [320/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.dhcp6.o
+[OHOS INFO] [321/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.ip4_frag.o
+[OHOS INFO] [322/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.inet6.o
+[OHOS INFO] [323/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.ethip6.o
+[OHOS INFO] [324/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.etharp.o
+[OHOS INFO] [325/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.ip4.o
+[OHOS INFO] [326/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.icmp6.o
+[OHOS INFO] [327/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.mld6.o
+[OHOS INFO] [328/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.ip6.o
+[OHOS INFO] [329/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.ip6_addr.o
+[OHOS INFO] [330/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.ip6_frag.o
+[OHOS INFO] [331/851] gcc cross compiler obj/third_party/lwip/src/core/ipv6/liblwip.nd6.o
+[OHOS INFO] [332/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.netbuf.o
+[OHOS INFO] [333/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.api_lib.o
+[OHOS INFO] [334/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.err.o
+[OHOS INFO] [335/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.if_api.o
+[OHOS INFO] [336/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.netdb.o
+[OHOS INFO] [337/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.netifapi.o
+[OHOS INFO] [338/851] gcc cross compiler obj/third_party/lwip/src/core/ipv4/liblwip.dhcp.o
+[OHOS INFO] [339/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.api_msg.o
+[OHOS INFO] [340/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.ethernet.o
+[OHOS INFO] [341/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.bridgeif.o
+[OHOS INFO] [342/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.tcpip.o
+[OHOS INFO] [343/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.slipif.o
+[OHOS INFO] [344/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.auth.o
+[OHOS INFO] [345/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.ccp.o
+[OHOS INFO] [346/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.chap_ms.o
+[OHOS INFO] [347/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.bridgeif_fdb.o
+[OHOS INFO] [348/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.chap-md5.o
+[OHOS INFO] [349/851] gcc cross compiler obj/third_party/lwip/src/api/liblwip.sockets.o
+[OHOS INFO] [350/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.chap-new.o
+[OHOS INFO] [351/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.eap.o
+[OHOS INFO] [352/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.eui64.o
+[OHOS INFO] [353/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.demand.o
+[OHOS INFO] [354/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.ecp.o
+[OHOS INFO] [355/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.fsm.o
+[OHOS INFO] [356/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.ipcp.o
+[OHOS INFO] [357/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.ipv6cp.o
+[OHOS INFO] [358/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.lcp.o
+[OHOS INFO] [359/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.magic.o
+[OHOS INFO] [360/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.ppp.o
+[OHOS INFO] [361/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.mppe.o
+[OHOS INFO] [362/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.multilink.o
+[OHOS INFO] [363/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.pppcrypt.o
+[OHOS INFO] [364/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.pppapi.o
+[OHOS INFO] [365/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.pppoe.o
+[OHOS INFO] [366/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.pppos.o
+[OHOS INFO] [367/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.pppol2tp.o
+[OHOS INFO] [368/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.upap.o
+[OHOS INFO] [369/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.utils.o
+[OHOS INFO] [370/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/liblwip.vj.o
+[OHOS INFO] [371/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/polarssl/liblwip.arc4.o
+[OHOS INFO] [372/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/polarssl/liblwip.des.o
+[OHOS INFO] [373/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/polarssl/liblwip.md4.o
+[OHOS INFO] [374/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/polarssl/liblwip.md5.o
+[OHOS INFO] [375/851] gcc cross compiler obj/third_party/lwip/src/netif/ppp/polarssl/liblwip.sha1.o
+[OHOS INFO] [376/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.lowpan6_common.o
+[OHOS INFO] [377/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.lowpan6_ble.o
+[OHOS INFO] [378/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.zepif.o
+[OHOS INFO] [379/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.pthread.o
+[OHOS INFO] [380/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.pthread_attr.o
+[OHOS INFO] [381/851] gcc cross compiler obj/third_party/lwip/src/netif/liblwip.lowpan6.o
+[OHOS INFO] [382/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.pthread_cond.o
+[OHOS INFO] [383/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.mqueue.o
+[OHOS INFO] [384/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/base/libshell.shcmdparse.o
+[OHOS INFO] [385/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/base/libshell.show.o
+[OHOS INFO] [386/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/base/libshell.shcmd.o
+[OHOS INFO] [387/851] gcc cross compiler obj/kernel/liteos_m/components/shell/src/base/libshell.shmsg.o
+[OHOS INFO] [388/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.pthread_mutex.o
+[OHOS INFO] [389/851] gcc cross compiler obj/kernel/liteos_m/utils/libutils.los_error.o
+[OHOS INFO] [390/851] gcc cross compiler obj/kernel/liteos_m/kal/cmsis/libcmsis.cmsis_liteos2.o
+[OHOS INFO] [391/851] gcc cross compiler obj/kernel/liteos_m/components/power/libpm.los_pm.o
+[OHOS INFO] [392/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.semaphore.o
+[OHOS INFO] [393/851] gcc cross compiler obj/kernel/liteos_m/utils/libutils.los_debug.o
+[OHOS INFO] [394/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_mux.o
+[OHOS INFO] [395/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_event.o
+[OHOS INFO] [396/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_init.o
+[OHOS INFO] [397/851] gcc cross compiler obj/kernel/liteos_m/kal/posix/src/libposix.time.o
+[OHOS INFO] [398/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_dispatch.o
+[OHOS INFO] [399/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_mpu.o
+[OHOS INFO] [400/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_context.o
+[OHOS INFO] [401/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_exc.o
+[OHOS INFO] [402/851] STAMP obj/prebuilts/lite/sysroot/sysroot.stamp
+[OHOS INFO] [403/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/mm/libkernel.los_membox.o
+[OHOS INFO] [404/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_timer.o
+[OHOS INFO] [405/851] STAMP obj/build/lite/prebuilts.stamp
+[OHOS INFO] [406/851] STAMP obj/applications/sample/wifi-iot/app/startup/startup.stamp
+[OHOS INFO] [407/851] STAMP obj/applications/sample/wifi-iot/app/app.stamp
+[OHOS INFO] [408/851] AR libs/libblackbox.a
+[OHOS INFO] [409/851] AR libs/libhidumper_mini.a
+[OHOS INFO] [410/851] AR libs/libhiview_lite.a
+[OHOS INFO] [411/851] AR libs/libhievent_lite.a
+[OHOS INFO] [412/851] AR libs/libhilog_lite.a
+[OHOS INFO] [413/851] STAMP obj/base/hiviewdfx/hilog_lite/frameworks/mini/hilog_lite_ndk.stamp
+[OHOS INFO] [414/851] AR libs/libbootstrap.a
+[OHOS INFO] [415/851] AR libs/libcjson_static.a
+[OHOS INFO] [416/851] ACTION //device/rockchip/hardware:hardware(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [417/851] STAMP obj/device/rockchip/hardware/hardware.stamp
+[OHOS INFO] [418/851] AR libs/libhal_wifiaware.a
+[OHOS INFO] [419/851] AR libs/libwifiservice.a
+[OHOS INFO] [420/851] STAMP obj/device/rockchip/rk2206/adapter/hals/communication/wifi_lite/wifiservice/wifiservice_ndk.stamp
+[OHOS INFO] [421/851] AR libs/libhal_file_static.a
+[OHOS INFO] [422/851] gcc cross compiler obj/kernel/liteos_m/utils/libutils.los_hook.o
+[OHOS INFO] [423/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/libkernel.los_queue.o
+[OHOS INFO] [424/851] gcc cross compiler obj/kernel/liteos_m/kernel/arch/arm/cortex-m4/gcc/libarch.los_interrupt.o
+[OHOS INFO] [425/851] AR libs/libhal_iothardware.a
+[OHOS INFO] [426/851] AR libs/libhal_update_static.a
+[OHOS INFO] [427/851] AR libs/libboard.a
+[OHOS INFO] [428/851] STAMP obj/base/iot_hardware/peripheral/iothardware.stamp
+[OHOS INFO] [429/851] AR libs/libshellcmd.a
+[OHOS INFO] [430/851] STAMP obj/base/iot_hardware/peripheral/iothardware_ndk.stamp
+[OHOS INFO] [431/851] AR libs/libhdf_osal_lite.a
+[OHOS INFO] [432/851] gcc cross compiler obj/kernel/liteos_m/kernel/src/mm/libkernel.los_memory.o
+[OHOS INFO] [433/851] gcc cross compiler obj/test/xts/acts/communication_lite/wifiservice_hal/src/libmodule_ActsWifiServiceTest.wifiservice_func_test.o
+[OHOS INFO] [434/851] gcc cross compiler obj/test/xts/acts/communication_lite/lwip_hal/src/libmodule_ActsLwipTest.lwip_func_test.o
+[OHOS INFO] [435/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.featureapi_func_test.o
+[OHOS INFO] [436/851] STAMP obj/foundation/communication/wifi_lite/wifi.stamp
+[OHOS INFO] [437/851] AR libs/libauthmanager.a
+[OHOS INFO] [438/851] AR libs/libwifiaware.a
+[OHOS INFO] [439/851] AR libs/libhdf_core.a
+[OHOS INFO] [440/851] AR libs/libdiscovery.a
+[OHOS INFO] [441/851] AR libs/libtrans_service.a
+[OHOS INFO] [442/851] AR libs/libbroadcast.a
+[OHOS INFO] [443/851] AR libs/libcppsupport.a
+[OHOS INFO] [444/851] AR libs/libsamgr_adapter.a
+[OHOS INFO] [445/851] AR libs/libbacktrace.a
+[OHOS INFO] [446/851] AR libs/libhdf_platform_lite.a
+[OHOS INFO] [447/851] STAMP obj/foundation/communication/softbus_lite/softbus.stamp
+[OHOS INFO] [448/851] STAMP obj/foundation/communication/softbus_lite/trans_service_ndk.stamp
+[OHOS INFO] [449/851] AR libs/libsample_driver.a
+[OHOS INFO] [450/851] STAMP obj/foundation/communication/softbus_lite/discovery_ndk.stamp
+[OHOS INFO] [451/851] AR libs/libexchook.a
+[OHOS INFO] [452/851] AR libs/libcpup.a
+[OHOS INFO] [453/851] AR libs/libsamgr_source.a
+[OHOS INFO] [454/851] AR libs/libcmsis.a
+[OHOS INFO] [455/851] STAMP obj/foundation/communication/softbus_lite/softbus_lite_ndk.stamp
+[OHOS INFO] [456/851] AR libs/libpm.a
+[OHOS INFO] [457/851] AR libs/libutils.a
+[OHOS INFO] [458/851] AR libs/libarch.a
+[OHOS INFO] [459/851] AR libs/libsamgr.a
+[OHOS INFO] [460/851] ACTION //device/rockchip/rk2206/third_party/lwip:rk2206_lwip(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [461/851] AR libs/libkernel.a
+[OHOS INFO] [462/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.iunknown_func_test.o
+[OHOS INFO] [463/851] STAMP obj/foundation/distributedschedule/samgr_lite/samgr.stamp
+[OHOS INFO] [464/851] STAMP obj/device/rockchip/rk2206/third_party/lwip/rk2206_lwip.stamp
+[OHOS INFO] [465/851] STAMP obj/foundation/distributedschedule/samgr_lite/samgr_lite_ndk.stamp
+[OHOS INFO] [466/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.broadcast_publish_func_test.o
+[OHOS INFO] [467/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.sendresponse_func_test.o
+[OHOS INFO] [468/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.sendrequest_func_test.o
+[OHOS INFO] [469/851] gcc cross compiler obj/test/xts/acts/hiviewdfx_lite/hievent_hal/src/libmodule_ActsHieventLiteTest.hievent_lite_test.o
+[OHOS INFO] [470/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.common_func_test.o
+[OHOS INFO] [471/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.taskpool_notask_func_test.o
+[OHOS INFO] [472/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.defaultfeatureapi_func_test.o
+[OHOS INFO] [473/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.feature_func_test.o
+[OHOS INFO] [474/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.sendsharerequest_func_test.o
+[OHOS INFO] [475/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.service_func_test.o
+[OHOS INFO] [476/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.broadcast_subscribe_func_test.o
+[OHOS INFO] [477/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/utils/libmodule_ActsSamgrTest.samgr_maintenance.o
+[OHOS INFO] [478/851] gcc cross compiler obj/test/xts/acts/hiviewdfx_lite/hilog_hal/src/libmodule_ActsDfxFuncTest.dfx_hilog.o
+[OHOS INFO] [479/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_aes_test.o
+[OHOS INFO] [480/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.taskpool_specifiedtask_func_test.o
+[OHOS INFO] [481/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_i2c_test.o
+[OHOS INFO] [482/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_pwm_test.o
+[OHOS INFO] [483/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.taskpool_sharedtask_func_test.o
+[OHOS INFO] [484/851] gcc cross compiler obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/src/libmodule_ActsSamgrTest.taskpool_singletask_func_test.o
+[OHOS INFO] [485/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_agreement_test.o
+[OHOS INFO] [486/851] ACTION //test/xts/acts/build_lite:acts_xdevice(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [487/851] STAMP obj/test/xts/acts/build_lite/acts_xdevice.stamp
+[OHOS INFO] [488/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_watchdog_test.o
+[OHOS INFO] [489/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.iot_uart_test.o
+[OHOS INFO] [490/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.reset_test.o
+[OHOS INFO] [491/851] gcc cross compiler obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/src/libmodule_ActsWifiIotTest.lowpower_test.o
+[OHOS INFO] [492/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_api_performance.o
+[OHOS INFO] [493/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_mem.o
+[OHOS INFO] [494/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_cipher.o
+[OHOS INFO] [495/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_file_operator.o
+[OHOS INFO] [496/851] gcc cross compiler obj/test/xts/acts/startup_lite/syspara_hal/src/libmodule_ActsParameterTest.parameter_utils.o
+[OHOS INFO] [497/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_aes.o
+[OHOS INFO] [498/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_curve25519.o
+[OHOS INFO] [499/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_bn_exp_mod_test.o
+[OHOS INFO] [500/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/common/libhuks_test_common.hks_test_common.o
+[OHOS INFO] [501/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_curve25519_test.o
+[OHOS INFO] [502/851] AR libs/libhuks_test_common.a
+[OHOS INFO] [503/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_delete_test.o
+[OHOS INFO] [504/851] gcc cross compiler obj/test/xts/acts/startup_lite/syspara_hal/src/libmodule_ActsParameterTest.parameter_reli_test.o
+[OHOS INFO] [505/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_cipher_test.o
+[OHOS INFO] [506/851] gcc cross compiler obj/test/xts/acts/startup_lite/bootstrap_hal/src/libmodule_ActsBootstrapTest.samgr_api_test.o
+[OHOS INFO] [507/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_generate_key_test.o
+[OHOS INFO] [508/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_generate_random_test.o
+[OHOS INFO] [509/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_hash_test.o
+[OHOS INFO] [510/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_derive_test.o
+[OHOS INFO] [511/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_safe_cipher_key_test.o
+[OHOS INFO] [512/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_exist_test.o
+[OHOS INFO] [513/851] gcc cross compiler obj/test/xts/acts/update_lite/dupdate_hal/src/libmodule_ActsUpdaterFuncTest.ota_func_test.o
+[OHOS INFO] [514/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_safe_compare_key_test.o
+[OHOS INFO] [515/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_modify_key_test.o
+[OHOS INFO] [516/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_others_test.o
+[OHOS INFO] [517/851] gcc cross compiler obj/test/xts/acts/security_lite/huks/liteos_m_adapter/libmodule_ActsHuksHalFunctionTest.hks_mac_test.o
+[OHOS INFO] [518/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.gets_s.o
+[OHOS INFO] [519/851] gcc cross compiler obj/test/xts/acts/startup_lite/syspara_hal/src/libmodule_ActsParameterTest.parameter_func_test.o
+[OHOS INFO] [520/851] gcc cross compiler obj/test/xts/tools/lite/hctest/src/libhctest.hctest_service.o
+[OHOS INFO] [521/851] gcc cross compiler obj/test/xts/tools/lite/hctest/src/libhctest.hctest.o
+[OHOS INFO] [522/851] STAMP obj/third_party/bounds_checking_function/libsec_shared.stamp
+[OHOS INFO] [523/851] gcc cross compiler obj/test/xts/acts/utils_lite/file_hal/src/libmodule_ActsUtilsFileTest.utils_file_reli_test.o
+[OHOS INFO] [524/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.memcpy_s.o
+[OHOS INFO] [525/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.memmove_s.o
+[OHOS INFO] [526/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.fscanf_s.o
+[OHOS INFO] [527/851] gcc cross compiler obj/test/xts/acts/utils_lite/file_hal/src/libmodule_ActsUtilsFileTest.utils_file_func_test.o
+[OHOS INFO] [528/851] gcc cross compiler obj/test/xts/acts/utils_lite/kv_store_hal/src/libmodule_ActsKvStoreTest.kvstore_func_test.o
+[OHOS INFO] [529/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.memset_s.o
+[OHOS INFO] [530/851] gcc cross compiler obj/third_party/unity/src/libhctest.unity.o
+[OHOS INFO] [531/851] AR libs/libhctest.a
+[OHOS INFO] [532/851] AR libs/libmodule_ActsLwipTest.a
+[OHOS INFO] [533/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.fwscanf_s.o
+[OHOS INFO] [534/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ccm.o
+[OHOS INFO] [535/851] AR libs/libmodule_ActsHieventLiteTest.a
+[OHOS INFO] [536/851] AR libs/libmodule_ActsWifiServiceTest.a
+[OHOS INFO] [537/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.cmac.o
+[OHOS INFO] [538/851] ACTION //test/xts/acts/communication_lite/lwip_hal:ActsLwipTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [539/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.chacha20.o
+[OHOS INFO] [540/851] AR libs/libmodule_ActsSamgrTest.a
+[OHOS INFO] [541/851] STAMP obj/test/xts/acts/communication_lite/lwip_hal/ActsLwipTest.stamp
+[OHOS INFO] [542/851] AR libs/libmodule_ActsDfxFuncTest.a
+[OHOS INFO] [543/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.chachapoly.o
+[OHOS INFO] [544/851] AR libs/libmodule_ActsWifiIotTest.a
+[OHOS INFO] [545/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.cipher_wrap.o
+[OHOS INFO] [546/851] AR libs/libmodule_ActsBootstrapTest.a
+[OHOS INFO] [547/851] ACTION //test/xts/acts/hiviewdfx_lite/hievent_hal:ActsHieventLiteTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [548/851] ACTION //test/xts/acts/communication_lite/wifiservice_hal:ActsWifiServiceTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [549/851] ACTION //test/xts/acts/distributed_schedule_lite/system_ability_manager_hal:ActsSamgrTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [550/851] AR libs/libmodule_ActsHuksHalFunctionTest.a
+[OHOS INFO] [551/851] STAMP obj/test/xts/acts/hiviewdfx_lite/hievent_hal/ActsHieventLiteTest.stamp
+[OHOS INFO] [552/851] STAMP obj/test/xts/acts/communication_lite/wifiservice_hal/ActsWifiServiceTest.stamp
+[OHOS INFO] [553/851] ACTION //test/xts/acts/hiviewdfx_lite/hilog_hal:ActsDfxFuncTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [554/851] STAMP obj/test/xts/acts/distributed_schedule_lite/system_ability_manager_hal/ActsSamgrTest.stamp
+[OHOS INFO] [555/851] ACTION //test/xts/acts/iot_hardware_lite/iot_controller_hal:ActsWifiIotTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [556/851] AR libs/libmodule_ActsParameterTest.a
+[OHOS INFO] [557/851] AR libs/libmodule_ActsUtilsFileTest.a
+[OHOS INFO] [558/851] STAMP obj/test/xts/acts/hiviewdfx_lite/hilog_hal/ActsDfxFuncTest.stamp
+[OHOS INFO] [559/851] AR libs/libmodule_ActsUpdaterFuncTest.a
+[OHOS INFO] [560/851] STAMP obj/test/xts/acts/iot_hardware_lite/iot_controller_hal/ActsWifiIotTest.stamp
+[OHOS INFO] [561/851] ACTION //test/xts/acts/startup_lite/bootstrap_hal:ActsBootstrapTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [562/851] STAMP obj/test/xts/tools/lite/tools.stamp
+[OHOS INFO] [563/851] ACTION //test/xts/acts/security_lite/huks/liteos_m_adapter:ActsHuksHalFunctionTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [564/851] AR libs/libmodule_ActsKvStoreTest.a
+[OHOS INFO] [565/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.cipher.o
+[OHOS INFO] [566/851] STAMP obj/test/xts/acts/startup_lite/bootstrap_hal/ActsBootstrapTest.stamp
+[OHOS INFO] [567/851] ACTION //test/xts/acts/utils_lite/file_hal:ActsUtilsFileTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [568/851] STAMP obj/test/xts/acts/security_lite/huks/liteos_m_adapter/ActsHuksHalFunctionTest.stamp
+[OHOS INFO] [569/851] ACTION //test/xts/acts/startup_lite/syspara_hal:ActsParameterTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [570/851] STAMP obj/test/xts/acts/utils_lite/file_hal/ActsUtilsFileTest.stamp
+[OHOS INFO] [571/851] ACTION //test/xts/acts/update_lite/dupdate_hal:ActsUpdaterFuncTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [572/851] ACTION //test/xts/acts/utils_lite/kv_store_hal:ActsKvStoreTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [573/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.aria.o
+[OHOS INFO] [574/851] STAMP obj/test/xts/acts/security_lite/securitytest.stamp
+[OHOS INFO] [575/851] STAMP obj/test/xts/acts/startup_lite/syspara_hal/ActsParameterTest.stamp
+[OHOS INFO] [576/851] STAMP obj/test/xts/acts/update_lite/dupdate_hal/ActsUpdaterFuncTest.stamp
+[OHOS INFO] [577/851] STAMP obj/test/xts/acts/utils_lite/kv_store_hal/ActsKvStoreTest.stamp
+[OHOS INFO] [578/851] STAMP obj/test/xts/acts/build_lite/acts_component.stamp
+[OHOS INFO] [579/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.blowfish.o
+[OHOS INFO] [580/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.asn1parse.o
+[OHOS INFO] [581/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ctr_drbg.o
+[OHOS INFO] [582/851] ACTION //test/xts/acts/build_lite:acts_generate_module_data(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [583/851] STAMP obj/test/xts/acts/build_lite/acts_generate_module_data.stamp
+[OHOS INFO] [584/851] ACTION //test/xts/acts/build_lite:acts(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [585/851] STAMP obj/test/xts/acts/build_lite/acts.stamp
+[OHOS INFO] [586/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.asn1write.o
+[OHOS INFO] [587/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.base64.o
+[OHOS INFO] [588/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.camellia.o
+[OHOS INFO] [589/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.scanf_s.o
+[OHOS INFO] [590/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.securecutil.o
+[OHOS INFO] [591/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.secureinput_a.o
+[OHOS INFO] [592/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.sscanf_s.o
+[OHOS INFO] [593/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.secureinput_w.o
+[OHOS INFO] [594/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.snprintf_s.o
+[OHOS INFO] [595/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.sprintf_s.o
+[OHOS INFO] [596/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.bignum.o
+[OHOS INFO] [597/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.strcat_s.o
+[OHOS INFO] [598/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.strncat_s.o
+[OHOS INFO] [599/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.secureprintoutput_a.o
+[OHOS INFO] [600/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.strcpy_s.o
+[OHOS INFO] [601/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.strncpy_s.o
+[OHOS INFO] [602/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.strtok_s.o
+[OHOS INFO] [603/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.secureprintoutput_w.o
+[OHOS INFO] [604/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.swprintf_s.o
+[OHOS INFO] [605/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.swscanf_s.o
+[OHOS INFO] [606/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vfwscanf_s.o
+[OHOS INFO] [607/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vfscanf_s.o
+[OHOS INFO] [608/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vscanf_s.o
+[OHOS INFO] [609/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vsnprintf_s.o
+[OHOS INFO] [610/851] STAMP obj/third_party/bounds_checking_function/sec_shared.stamp
+[OHOS INFO] [611/851] STAMP obj/third_party/mbedtls/mbedtls_shared.stamp
+[OHOS INFO] [612/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vsprintf_s.o
+[OHOS INFO] [613/851] gcc cross compiler obj/third_party/bounds_checking_function/src/libsec_static.vsscanf_s.o
+[OHOS INFO] [614/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.aesni.o
+[OHOS INFO] [615/851] STAMP obj/third_party/bounds_checking_function/libsec_ndk.stamp
+[OHOS INFO] [616/851] AR libs/libsec_static.a
+[OHOS INFO] [617/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.ntohl.o
+[OHOS INFO] [618/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.ntohs.o
+[OHOS INFO] [619/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.inet_ntoa.o
+[OHOS INFO] [620/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.arc4.o
+[OHOS INFO] [621/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isascii.o
+[OHOS INFO] [622/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/exit/libmusl-c.abort.o
+[OHOS INFO] [623/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/exit/libmusl-c.assert.o
+[OHOS INFO] [624/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isspace.o
+[OHOS INFO] [625/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isxdigit.o
+[OHOS INFO] [626/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isdigit.o
+[OHOS INFO] [627/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.islower.o
+[OHOS INFO] [628/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isupper.o
+[OHOS INFO] [629/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isalnum.o
+[OHOS INFO] [630/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.tolower.o
+[OHOS INFO] [631/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.toupper.o
+[OHOS INFO] [632/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/misc/libmusl-c.dirname.o
+[OHOS INFO] [633/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.__ctype_get_mb_cur_max.o
+[OHOS INFO] [634/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.aes.o
+[OHOS INFO] [635/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/ctype/libmusl-c.isprint.o
+[OHOS INFO] [636/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.dhm.o
+[OHOS INFO] [637/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.des.o
+[OHOS INFO] [638/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ecdh.o
+[OHOS INFO] [639/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ecdsa.o
+[OHOS INFO] [640/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.entropy_poll.o
+[OHOS INFO] [641/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.error.o
+[OHOS INFO] [642/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.havege.o
+[OHOS INFO] [643/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.entropy.o
+[OHOS INFO] [644/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.hmac_drbg.o
+[OHOS INFO] [645/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.hkdf.o
+[OHOS INFO] [646/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.gcm.o
+[OHOS INFO] [647/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.md2.o
+[OHOS INFO] [648/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.md4.o
+[OHOS INFO] [649/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ecp_curves.o
+[OHOS INFO] [650/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.md.o
+[OHOS INFO] [651/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.memory_buffer_alloc.o
+[OHOS INFO] [652/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.md5.o
+[OHOS INFO] [653/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.padlock.o
+[OHOS INFO] [654/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ecjpake.o
+[OHOS INFO] [655/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.md_wrap.o
+[OHOS INFO] [656/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.nist_kw.o
+[OHOS INFO] [657/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.net_sockets.o
+[OHOS INFO] [658/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ecp.o
+[OHOS INFO] [659/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pem.o
+[OHOS INFO] [660/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pkcs12.o
+[OHOS INFO] [661/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pk.o
+[OHOS INFO] [662/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.oid.o
+[OHOS INFO] [663/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.platform_util.o
+[OHOS INFO] [664/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pk_wrap.o
+[OHOS INFO] [665/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pkcs5.o
+[OHOS INFO] [666/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pkwrite.o
+[OHOS INFO] [667/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.platform.o
+[OHOS INFO] [668/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.poly1305.o
+[OHOS INFO] [669/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.pkparse.o
+[OHOS INFO] [670/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ssl_ciphersuites.o
+[OHOS INFO] [671/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ripemd160.o
+[OHOS INFO] [672/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.rsa_internal.o
+[OHOS INFO] [673/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.sha256.o
+[OHOS INFO] [674/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.sha512.o
+[OHOS INFO] [675/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.version.o
+[OHOS INFO] [676/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.threading.o
+[OHOS INFO] [677/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.version_features.o
+[OHOS INFO] [678/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.timing.o
+[OHOS INFO] [679/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ssl_cli.o
+[OHOS INFO] [680/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.x509.o
+[OHOS INFO] [681/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.rsa.o
+[OHOS INFO] [682/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.x509_crl.o
+[OHOS INFO] [683/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.xtea.o
+[OHOS INFO] [684/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/unistd/libmusl-c.getuid.o
+[OHOS INFO] [685/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.sha1.o
+[OHOS INFO] [686/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.h_errno.o
+[OHOS INFO] [687/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.htonl.o
+[OHOS INFO] [688/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/network/libmusl-c.htons.o
+[OHOS INFO] [689/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/internal/libmusl-c.inet_addr.o
+[OHOS INFO] [690/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/internal/libmusl-c.inet_aton.o
+[OHOS INFO] [691/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/internal/libmusl-c.syscall_ret.o
+[OHOS INFO] [692/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/internal/libmusl-c.shgetc.o
+[OHOS INFO] [693/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdlib/libmusl-c.atoi.o
+[OHOS INFO] [694/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/internal/libmusl-c.intscan.o
+[OHOS INFO] [695/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdlib/libmusl-c.atol.o
+[OHOS INFO] [696/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdlib/libmusl-c.atoll.o
+[OHOS INFO] [697/851] gcc cross compiler obj/utils/native/lite/os_dump/libdump_static.dump_syspara.o
+[OHOS INFO] [698/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdlib/libmusl-c.abs.o
+[OHOS INFO] [699/851] STAMP obj/vendor/lockzhiner/rk2206/rk2206.stamp
+[OHOS INFO] [700/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/samples/libpahomqtt_static.transport.o
+[OHOS INFO] [701/851] gcc cross compiler obj/utils/native/lite/kv_store/src/kvstore_common/libutils_kv_store.kvstore_common.o
+[OHOS INFO] [702/851] STAMP obj/build/lite/product.stamp
+[OHOS INFO] [703/851] gcc cross compiler obj/utils/native/lite/file/src/file_impl_hal/libnative_file.file.o
+[OHOS INFO] [704/851] gcc cross compiler obj/utils/native/lite/kv_store/src/kvstore_impl_hal/libutils_kv_store.kv_store.o
+[OHOS INFO] [705/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.x509_crt.o
+[OHOS INFO] [706/851] AR libs/libnative_file.a
+[OHOS INFO] [707/851] AR libs/libutils_kv_store.a
+[OHOS INFO] [708/851] STAMP obj/utils/native/lite/file/file.stamp
+[OHOS INFO] [709/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/locale/libmusl-c.__lctrans.o
+[OHOS INFO] [710/851] STAMP obj/utils/native/lite/kv_store/kv_store.stamp
+[OHOS INFO] [711/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/locale/libmusl-c.c_locale.o
+[OHOS INFO] [712/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fputs.o
+[OHOS INFO] [713/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/locale/libmusl-c.langinfo.o
+[OHOS INFO] [714/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__stdio_close.o
+[OHOS INFO] [715/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__toread.o
+[OHOS INFO] [716/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fflush.o
+[OHOS INFO] [717/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.ofl_add.o
+[OHOS INFO] [718/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__stdio_seek.o
+[OHOS INFO] [719/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__uflow.o
+[OHOS INFO] [720/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__stdio_read.o
+[OHOS INFO] [721/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fread.o
+[OHOS INFO] [722/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.ftell.o
+[OHOS INFO] [723/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fclose.o
+[OHOS INFO] [724/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fwrite.o
+[OHOS INFO] [725/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fileno.o
+[OHOS INFO] [726/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.stderr.o
+[OHOS INFO] [727/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.perror.o
+[OHOS INFO] [728/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__lockfile.o
+[OHOS INFO] [729/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__fmodeflags.o
+[OHOS INFO] [730/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fgets.o
+[OHOS INFO] [731/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.clearerr.o
+[OHOS INFO] [732/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__stdio_write.o
+[OHOS INFO] [733/851] gcc cross compiler obj/third_party/mbedtls/library/libmbedtls.ssl_tls.o
+[OHOS INFO] [734/851] ACTION //vendor/lockzhiner/rk2206/hdf_config:hc_gen(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [735/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__fdopen.o
+[OHOS INFO] [736/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.ofl.o
+[OHOS INFO] [737/851] AR libs/libmbedtls.a
+[OHOS INFO] [738/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fseek.o
+[OHOS INFO] [739/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__towrite.o
+[OHOS INFO] [740/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.__stdout_write.o
+[OHOS INFO] [741/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.rewind.o
+[OHOS INFO] [742/851] STAMP obj/third_party/mbedtls/mbedtls.stamp
+[OHOS INFO] [743/851] STAMP obj/third_party/mbedtls/mbedtls_ndk.stamp
+[OHOS INFO] [744/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.feof.o
+[OHOS INFO] [745/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.stdout.o
+[OHOS INFO] [746/851] AR libs/libhuks_3.0_sdk.a
+[OHOS INFO] [747/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.stdin.o
+[OHOS INFO] [748/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/stdio/libmusl-c.fopen.o
+[OHOS INFO] [749/851] STAMP obj/base/security/huks/frameworks/huks_lite/huks_sdk.stamp
+[OHOS INFO] [750/851] AR libs/libhichainsdk.a
+[OHOS INFO] [751/851] STAMP obj/base/security/deviceauth/frameworks/deviceauth_lite/hichainsdk.stamp
+[OHOS INFO] [752/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.strptime.o
+[OHOS INFO] [753/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.__year_to_secs.o
+[OHOS INFO] [754/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.__month_to_secs.o
+[OHOS INFO] [755/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.__tz.o
+[OHOS INFO] [756/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.__tm_to_secs.o
+[OHOS INFO] [757/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/prng/libmusl-c.random.o
+[OHOS INFO] [758/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strcspn.o
+[OHOS INFO] [759/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/time/libmusl-c.strftime.o
+[OHOS INFO] [760/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/regex/libmusl-c.regexec.o
+[OHOS INFO] [761/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/regex/libmusl-c.tre-mem.o
+[OHOS INFO] [762/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strrchr.o
+[OHOS INFO] [763/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.memcmp.o
+[OHOS INFO] [764/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strstr.o
+[OHOS INFO] [765/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/regex/libmusl-c.regcomp.o
+[OHOS INFO] [766/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strchr.o
+[OHOS INFO] [767/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strncmp.o
+[OHOS INFO] [768/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strcmp.o
+[OHOS INFO] [769/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strchrnul.o
+[OHOS INFO] [770/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.memcpy.o
+[OHOS INFO] [771/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strncasecmp.o
+[OHOS INFO] [772/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strcasecmp.o
+[OHOS INFO] [773/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.memchr.o
+[OHOS INFO] [774/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.wcslen.o
+[OHOS INFO] [775/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.memrchr.o
+[OHOS INFO] [776/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strdup.o
+[OHOS INFO] [777/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.memset.o
+[OHOS INFO] [778/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.wcschr.o
+[OHOS INFO] [779/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/string/libmusl-c.strlen.o
+[OHOS INFO] [780/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/sched/libmusl-c.sched_yield.o
+[OHOS INFO] [781/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/mman/libmusl-c.munmap.o
+[OHOS INFO] [782/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.pow_data.o
+[OHOS INFO] [783/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.log_data.o
+[OHOS INFO] [784/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/mman/libmusl-c.mmap.o
+[OHOS INFO] [785/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.sqrt.o
+[OHOS INFO] [786/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTDeserializePublish.o
+[OHOS INFO] [787/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTConnectServer.o
+[OHOS INFO] [788/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTConnectClient.o
+[OHOS INFO] [789/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTClient-C/src/liteOS/libpahomqtt_static.MQTTLiteOS.o
+[OHOS INFO] [790/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.log.o
+[OHOS INFO] [791/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTFormat.o
+[OHOS INFO] [792/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTSubscribeClient.o
+[OHOS INFO] [793/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.pow.o
+[OHOS INFO] [794/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTSerializePublish.o
+[OHOS INFO] [795/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTSubscribeServer.o
+[OHOS INFO] [796/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTClient-C/src/libpahomqtt_static.MQTTClient.o
+[OHOS INFO] [797/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTPacket.o
+[OHOS INFO] [798/851] AR libs/libmusl-c.a
+[OHOS INFO] [799/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.exp_data.o
+[OHOS INFO] [800/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTUnsubscribeServer.o
+[OHOS INFO] [801/851] STAMP obj/vendor/lockzhiner/rk2206/hdf_config/hc_gen.stamp
+[OHOS INFO] [802/851] gcc cross compiler obj/third_party/paho_mqtt/MQTTPacket/src/libpahomqtt_static.MQTTUnsubscribeClient.o
+[OHOS INFO] [803/851] gcc cross compiler obj/third_party/musl/porting/liteos_m/kernel/src/math/libmusl-m.round.o
+[OHOS INFO] [804/851] AR libs/libpahomqtt_static.a
+[OHOS INFO] [805/851] ACTION //vendor/lockzhiner/rk2206/hdf_drivers:khdf_platform_gn(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [806/851] AR libs/libmusl-m.a
+[OHOS INFO] [807/851] STAMP obj/vendor/lockzhiner/rk2206/hdf_drivers/khdf_platform_gn.stamp
+[OHOS INFO] [808/851] STAMP obj/third_party/musl/porting/liteos_m/kernel/kernel.stamp
+[OHOS INFO] [809/851] AR libs/libposix.a
+[OHOS INFO] [810/851] AR libs/liblzlittlefs.a
+[OHOS INFO] [811/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hals/utils/token/libhal_token_static.hal_token.o
+[OHOS INFO] [812/851] gcc cross compiler obj/out/rk2206/lockzhiner-rk2206/gen/vendor/lockzhiner/rk2206/hdf_config/libhdf_config.hdf_hex.o
+[OHOS INFO] [813/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hdf_drivers/adc/libadc_driver.adc_driver.o
+[OHOS INFO] [814/851] AR libs/libfs_operations.a
+[OHOS INFO] [815/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hals/utils/sys_param/libhal_sysparam.hal_sys_param.o
+[OHOS INFO] [816/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hdf_drivers/i2c/libi2c_driver.i2c_driver_rk2206.o
+[OHOS INFO] [817/851] AR libs/libfatfs.a
+[OHOS INFO] [818/851] AR libs/liblittlefs.a
+[OHOS INFO] [819/851] AR libs/libshell.a
+[OHOS INFO] [820/851] STAMP obj/kernel/liteos_m/kal/kal.stamp
+[OHOS INFO] [821/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hdf_drivers/gpio/libgpio_driver.gpio_driver_rk2206.o
+[OHOS INFO] [822/851] AR libs/libhal_sysparam.a
+[OHOS INFO] [823/851] AR libs/libhal_token_static.a
+[OHOS INFO] [824/851] STAMP obj/kernel/liteos_m/components/fs/fs.stamp
+[OHOS INFO] [825/851] AR libs/libadc_driver.a
+[OHOS INFO] [826/851] AR libs/liblwip.a
+[OHOS INFO] [827/851] AR libs/libhdf_config.a
+[OHOS INFO] [828/851] AR libs/libgpio_driver.a
+[OHOS INFO] [829/851] AR libs/libtoken_static.a
+[OHOS INFO] [830/851] STAMP obj/vendor/lockzhiner/rk2206/samples/app.stamp
+[OHOS INFO] [831/851] STAMP obj/kernel/liteos_m/kernel.stamp
+[OHOS INFO] [832/851] AR libs/libi2c_driver.a
+[OHOS INFO] [833/851] AR libs/libsysparam.a
+[OHOS INFO] [834/851] STAMP obj/base/startup/syspara_lite/frameworks/token/token.stamp
+[OHOS INFO] [835/851] STAMP obj/base/startup/syspara_lite/frameworks/parameter/parameter.stamp
+[OHOS INFO] [836/851] STAMP obj/base/startup/syspara_lite/frameworks/parameter/parameter_notes.stamp
+[OHOS INFO] [837/851] AR libs/libhota.a
+[OHOS INFO] [838/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hdf_drivers/spi/libspi_driver.spi_driver.o
+[OHOS INFO] [839/851] AR libs/libdump_static.a
+[OHOS INFO] [840/851] AR libs/libspi_driver.a
+[OHOS INFO] [841/851] STAMP obj/utils/native/lite/os_dump/utils_os_dump.stamp
+[OHOS INFO] [842/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/samples/a0_hello_world/libtask_helloworld.hello_world.o
+[OHOS INFO] [843/851] AR libs/libtask_helloworld.a
+[OHOS INFO] [844/851] gcc cross compiler obj/vendor/lockzhiner/rk2206/hdf_drivers/pwm/libpwm_driver.pwm_driver.o
+[OHOS INFO] [845/851] AR libs/libpwm_driver.a
+[OHOS INFO] [846/851] STAMP obj/vendor/lockzhiner/rk2206/hdf_drivers/hdf_drivers.stamp
+[OHOS INFO] [847/851] STAMP obj/device/rockchip/rk2206/sdk_liteos/sdk.stamp
+[OHOS INFO] [848/851] STAMP obj/device/rockchip/rk2206/sdk_liteos/wifiiot_sdk.stamp
+[OHOS INFO] [849/851] STAMP obj/build/lite/ohos.stamp
+[OHOS INFO] [850/851] ACTION //device/rockchip/rk2206/sdk_liteos:liteos(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [851/851] STAMP obj/device/rockchip/rk2206/sdk_liteos/liteos.stamp
+[OHOS INFO] /home/lzdz/rk2206/lab01-hello-world-20260831/vendor/lockzhiner/rk2206/fs.yml not found, stop packing fs. If the product does not need to be packaged, ignore it.
+[OHOS INFO] lockzhiner-rk2206 build success
+[OHOS INFO] cost time: 0:00:31
