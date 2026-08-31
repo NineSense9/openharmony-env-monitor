@@ -1,0 +1,6 @@
+实验：4.6 lab02_key_lcd
+阶段：TDD RED
+命令：cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests -q
+结果：4 failed in 0.17s
+退出码：1
+失败原因：生产源码、BUILD.gn、K3 引脚头文件和 tx_key 驱动尚未创建，测试按预期报告 FileNotFoundError。
