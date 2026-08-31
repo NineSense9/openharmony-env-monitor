@@ -1,0 +1,70 @@
+实验：4.5 lab01_lcd（SMART-R 竖屏 + 硬件 SPI 修正版）
+日期：2026-08-31
+
+## 本次物理反馈
+
+- 用户已确认电机不再抖动，LCD 已能显示三行实验文字。
+- 现象仍有两点：画面方向与板上正常阅读方向相反，首次全屏显示速度偏慢。
+- 方向问题对应 `USE_HORIZONTAL=2` 的横屏 MADCTL 配置；速度问题对应旧版
+  `LCD_ENABLE_SPI=0` 的逐位 GPIO 模拟 SPI。
+
+## 修改内容
+
+- `include/lcd.h`：SMART-R LCD 改为竖屏 `USE_HORIZONTAL=0`，尺寸为
+  `LCD_W=240`、`LCD_H=320`。
+- `src/lcd.c`：启用 SDK 的 SPI0 M1 硬件通道；继续使用已验证的
+  `CS/CLK/MOSI/RES=GPIO0_PC0/PC1/PC2/PC3` 和 `DC=GPIO0_PA4`。
+- SPI 时序设置为 `SPI_MODE_0`，与旧软件模拟 SPI 的“低电平准备数据、上升沿采样”
+  时序一致；没有重新使用未实际启用的 `SPI_MODE_3`。
+- `lcd_fill()` 改为每行构造 RGB565 缓冲区后批量发送，同时保留局部矩形填充的
+  `(xend - xsta) * 2` 长度，供后续实验擦除局部文字使用。
+- 未使用 `GPIO0_PC6`，避免再次占用 SMART-R 电机 PWM6。
+
+## 自动化验证
+
+本地命令：
+
+```text
+cloud_ecs\\.venv\\Scripts\\python.exe -m pytest device\\labs\\02_lab01_lcd\\tests -q
+```
+
+结果：`5 passed`。
+
+新增回归约束已验证：必须是 `USE_HORIZONTAL=0`，启用硬件 SPI，使用
+`SPI_MODE_0`，全屏和局部填充按行批量发送；LCD 驱动使用 `GPIO0_PA4` 且不出现
+`GPIO0_PC6`。
+
+## Ubuntu 构建
+
+独立工程：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+
+构建前已确认 `hb env` 的 root、product path、device path 均指向该独立工程。
+构建命令使用显式 PATH：
+
+```text
+export PATH=/home/lzdz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+hb build
+```
+
+结果：`lockzhiner-rk2206 build success`；`liblab01_lcd.a` 重新编译并参与链接。
+本次构建日志中同时保留了远端命令包装失败的说明：首次尝试因 SSH 环境 PATH
+未包含 `tee` 导致 `bash: tee：未找到命令`，未进入构建；随后用
+`/usr/bin/tee` 和显式 PATH 重跑成功。这不是源码或链接错误。
+
+产物：
+
+- Windows 烧录目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_hwspi_20260831`
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`7dcff693bfe9fdfe61ba579a2377142d`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+- 完整构建日志：[2026-08-31-build-portrait-hwspi.log](2026-08-31-build-portrait-hwspi.log)
+
+## 烧录与待验收
+
+本版只烧录上面新目录中的两个文件：Loader 选择
+`rk2206_db_loader.bin`，Firmware 选择 `Firmware.img`。按授课文档进入
+`K2=MASKROM`，烧录完成退出下载模式后用 `K1=RESET` 重启。
+
+本版尚未由用户烧录，因此方向修正和速度提升仍待实物确认；烧录后需要记录 UART
+中的 `lab01_lcd: LCD OK`，并确认文字方向正常、刷屏明显变快且电机保持静止。

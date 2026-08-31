@@ -284,3 +284,36 @@ Ubuntu 独立工程 `/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 增量构建
 soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远端入口曾残留
 已删除的 `lcd_set_dc_idle()` 调用，导致链接 `undefined reference`；已经通过
 分别同步 `lab01_lcd.c`、`include/lcd.h` 和 `src/lcd.c` 并做符号 grep 检查修复。
+
+### 4.5 lab01_lcd 竖屏 + 硬件 SPI 修正版（2026-08-31）
+
+用户已完成上一版 `SMART-R A4 DC` 镜像的实物确认：电机已经停止抖动，LCD
+已经显示三行正常信息，但画面方向反了且刷屏速度较慢。根因分别是旧版
+`USE_HORIZONTAL=2` 的横屏 `MADCTL=0x70` 与 LCD 安装方向不一致，以及旧版
+`LCD_ENABLE_SPI=0` 使用逐位 GPIO 模拟 SPI。
+
+本次修改：
+
+- `include/lcd.h` 设置 `USE_HORIZONTAL=0`，LCD 尺寸恢复为 `240x320` 竖屏；
+- `src/lcd.c` 启用 SDK SPI0 M1 硬件接口，保持 `PC0/PC1/PC2/PC3` 的
+  `CS/CLK/MOSI/RES` 映射和已验证的 `PA4` DC；
+- 硬件 SPI 使用 `SPI_MODE_0`，与原软件模拟 SPI 的上升沿采样时序一致；
+- `lcd_fill()` 每行批量发送 RGB565 数据，局部填充按实际矩形宽度发送，兼容后续
+  实验局部擦除文字；
+- 保持不使用 `GPIO0_PC6`，防止重新占用 SMART-R 电机 PWM6。
+
+验证结果：本地契约测试 `5 passed`；Ubuntu 独立工程
+`/home/lzdz/rk2206/lab02-lab01-lcd-20260831` 构建成功，输出
+`lockzhiner-rk2206 build success`，`liblab01_lcd.a` 参与链接。
+
+新镜像单独保存，不覆盖历史版本：
+
+- 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_hwspi_20260831`；
+- `Firmware.img`：2,097,152 bytes，MD5：`7dcff693bfe9fdfe61ba579a2377142d`；
+- `rk2206_db_loader.bin`：35,093 bytes，MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 构建日志：`device/labs/02_lab01_lcd/records/2026-08-31-build-portrait-hwspi.log`；
+- 详细记录：`device/labs/02_lab01_lcd/records/2026-08-31-build-portrait-hwspi.md5`。
+
+该版本尚未完成物理验收。烧录后应记录 UART 的 `lab01_lcd: LCD OK`，确认文字
+方向正常、全屏刷屏速度提升且电机保持静止。烧录仍按 PDF：`K2=MASKROM`，烧录
+完成退出下载模式后用 `K1=RESET` 重启。

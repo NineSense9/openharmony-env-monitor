@@ -3,8 +3,8 @@
 ## 状态
 
 已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
-已根据 SMART-R 板背面 LCD 接口丝印修正 LCD DC 引脚，解决驱动误占用电机
-PWM6 的问题。修正版镜像已生成，等待重新烧录后的 LCD 和电机物理验收。
+用户已确认电机不再抖动，LCD 能显示三行文字；本次又修正了画面方向并切换到
+硬件 SPI，新的镜像等待实物确认方向和刷新速度。
 
 ## 课程依据
 
@@ -30,7 +30,7 @@ PWM6 的问题。修正版镜像已生成，等待重新烧录后的 LCD 和电�
 
 - `lab01_lcd.c`：本项目自有的 LiteOS-M 任务和 LCD 显示逻辑；
 - `src/lcd.c`：板厂 LCD SPI 适配驱动；
-- `include/lcd.h`：LCD API、颜色和横屏尺寸定义；
+- `include/lcd.h`：LCD API、颜色和屏幕方向/尺寸定义；
 - `BUILD.gn`：`lab01_lcd` 独立静态库；
 - `patches/README.md`：源码复制、构建和启动入口修改说明；
 - `tests/test_lab01_lcd_contract.py`：自动化契约测试；
@@ -78,6 +78,16 @@ PWM6 的问题。修正版镜像已生成，等待重新烧录后的 LCD 和电�
   [2026-08-31-build-smart-r-a4.log](records/2026-08-31-build-smart-r-a4.log)
 - SMART-R A4 DC 修正版构建与故障记录：
   [2026-08-31-build-smart-r-a4.md5](records/2026-08-31-build-smart-r-a4.md5)
+- SMART-R 竖屏 + 硬件 SPI 修正版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_portrait_hwspi_20260831`
+- SMART-R 竖屏 + 硬件 SPI 修正版 `Firmware.img`：2,097,152 bytes，MD5：
+  `7dcff693bfe9fdfe61ba579a2377142d`
+- SMART-R 竖屏 + 硬件 SPI 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R 竖屏 + 硬件 SPI 修正版构建日志：
+  [2026-08-31-build-portrait-hwspi.log](records/2026-08-31-build-portrait-hwspi.log)
+- SMART-R 竖屏 + 硬件 SPI 修正版构建与反馈记录：
+  [2026-08-31-build-portrait-hwspi.md5](records/2026-08-31-build-portrait-hwspi.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -98,6 +108,21 @@ SPI/LCD 刷新，表现为设备异常抖动、反复启动或 LCD 黑屏。
 `GPIO0_PC3` 和 `GPIO0_PA4`，不初始化或控制电机、蜂鸣器、RGB 和报警灯。
 SMART-R 的电机使用 `PWM6 = GPIO0_PC6`，因此 LCD 驱动禁止使用 `GPIO0_PC6`。
 在修正版烧录前，旧镜像仍可能使电机持续抖动，应先断开 USB/电源。
+
+## 方向与速度修复记录
+
+用户已确认上一版 `SMART-R A4 DC` 镜像能正常显示三行文字且电机停止，但实物
+画面方向反了、全屏刷屏速度较慢。经核对授课文档和现有驱动实现：
+
+- `USE_HORIZONTAL=2` 会发送横屏 `MADCTL=0x70`，与 SMART-R LCD 的安装方向
+  不一致；已改为竖屏 `USE_HORIZONTAL=0`，恢复 PDF 约定的左上角坐标 API。
+- 旧版 `LCD_ENABLE_SPI=0`，`lcd_fill()` 每个 RGB565 字节都通过 GPIO 模拟，
+  全屏共发送约 153,600 个字节并产生大量 GPIO 调用；已切换到 SDK 的 SPI0 M1
+  硬件接口，速度设置保持 50 MHz，SPI 时序使用与模拟实现一致的 `SPI_MODE_0`。
+- `lcd_fill()` 现在每行批量发送 RGB565 缓冲区，局部区域仍按实际宽度发送，
+  不改变后续实验需要的局部擦除行为。
+
+本地契约测试为 `5 passed`，但新方向和速度尚未由用户重新烧录实物确认。
 
 ## SMART-R 引脚修复记录
 

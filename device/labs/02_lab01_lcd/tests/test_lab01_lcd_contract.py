@@ -70,3 +70,16 @@ def test_smart_r_lcd_uses_dedicated_a4_dc_pin_and_never_drives_pwm6():
 
     assert "#define LCD_PIN_DC          GPIO0_PA4" in driver
     assert "GPIO0_PC6" not in driver
+
+
+def test_smart_r_lcd_uses_portrait_orientation_and_hardware_spi():
+    header = (LAB_ROOT / "include" / "lcd.h").read_text(encoding="utf-8")
+    driver = (LAB_ROOT / "src" / "lcd.c").read_text(encoding="utf-8")
+    fill_body = driver.split("void lcd_fill", 1)[1].split(
+        "void lcd_draw_point", 1
+    )[0]
+
+    assert "#define USE_HORIZONTAL      0" in header
+    assert "#define LCD_ENABLE_SPI      1" in driver
+    assert ".mode = SPI_MODE_0" in driver
+    assert "LzSpiWrite(LCD_SPI_BUS, 0, row_buffer, (xend - xsta) * 2)" in fill_body

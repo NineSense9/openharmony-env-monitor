@@ -22,7 +22,7 @@
  * 0 => 禁用SPI，使用gpio模拟SPI通信
  * 1 => 启用SPI
  */
-#define LCD_ENABLE_SPI      0
+#define LCD_ENABLE_SPI      1
 #define LCD_SPI_BUS         0
 
 #define LCD_PIN_CS          GPIO0_PC0
@@ -59,7 +59,7 @@ static SpiBusIo m_spiBus = {
     .mode = FUNC_MODE_M1,
 };
 
-static LzSpiConfig m_spiConf = {.bitsPerWord = SPI_PERWORD_8BITS, .firstBit = SPI_MSB, .mode = SPI_MODE_3,
+static LzSpiConfig m_spiConf = {.bitsPerWord = SPI_PERWORD_8BITS, .firstBit = SPI_MSB, .mode = SPI_MODE_0,
                                .csm = SPI_CMS_ONE_CYCLES, .speed = 50000000, .isSlave = false};
 #endif
 
@@ -483,7 +483,7 @@ unsigned int lcd_init()
     LzGpioSetDir(LCD_PIN_RES, LZGPIO_DIR_OUT);
     LzGpioSetVal(LCD_PIN_RES, LZGPIO_LEVEL_HIGH);
 
-    /* 初始化GPIO0_C6 */
+    /* 初始化 LCD DC 引脚 */
     LzGpioInit(LCD_PIN_DC);
     LzGpioSetDir(LCD_PIN_DC, LZGPIO_DIR_OUT);
     LzGpioSetVal(LCD_PIN_DC, LZGPIO_LEVEL_LOW);
@@ -624,16 +624,28 @@ unsigned int lcd_deinit()
 void lcd_fill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend, uint16_t color)
 {
     uint16_t i, j;
+#if LCD_ENABLE_SPI
+    uint8_t row_buffer[LCD_W * 2];
+#endif
 
     /* 设置显示范围 */
     lcd_address_set(xsta, ysta, xend-1, yend-1);
     /* 填充颜色 */
     for (i = ysta; i < yend; i++)
     {
+#if LCD_ENABLE_SPI
+        for (j = xsta; j < xend; j++)
+        {
+            row_buffer[(j - xsta) * 2] = (uint8_t)(color >> 8);
+            row_buffer[(j - xsta) * 2 + 1] = (uint8_t)color;
+        }
+        LzSpiWrite(LCD_SPI_BUS, 0, row_buffer, (xend - xsta) * 2);
+#else
         for (j = xsta; j < xend; j++)
         {
             lcd_wr_data(color);
         }
+#endif
 
         if (((i - ysta) % LCD_FILL_YIELD_ROWS) == (LCD_FILL_YIELD_ROWS - 1))
         {
