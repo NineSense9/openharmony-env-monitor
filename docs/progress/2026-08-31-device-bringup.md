@@ -89,7 +89,8 @@ OHOS # hiview init success.
 
 ## 下一步
 
-开始 `device/labs/01_hello_world/`，已保留独立源码和补丁并完成编译。下一步烧录该实验镜像，通过串口确认两个周期任务的输出后再提交下一个阶段。
+进入 `device/labs/01_hello_world/`，已保留独立源码和补丁并完成编译、烧录
+和 UART 验收。下一步按顺序开始 `02_gpio`。
 
 ## 01_hello_world 编译检查点
 
@@ -98,7 +99,12 @@ OHOS # hiview init success.
 - `libtask_helloworld.a` 已生成并参与链接；
 - `lockzhiner-rk2206 build success`；
 - `Firmware.img` MD5：`5561e5deaf9c36a34fc9860c5cb5f52b`；
-- 尚未烧录，等待串口验收。
+- 实验镜像已烧录；
+- UART 已确认 `Hello World` 约每 1 秒输出、`Hello OpenHarmony` 约每 2 秒输出；
+- 板载显示屏无输出，确认是因为本实验没有 LCD 初始化和绘图代码。
+
+详细串口验收记录：
+`device/labs/01_hello_world/records/2026-08-31-uart.txt`
 
 ### 编译问题记录
 

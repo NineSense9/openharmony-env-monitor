@@ -54,4 +54,10 @@ Firmware.img MD5：
 5561e5deaf9c36a34fc9860c5cb5f52b
 
 当前状态：
-源码和补丁已保存，镜像已编译并校验；尚未将 01_hello_world 镜像烧录到板子，待串口验证 Hello World 和 Hello OpenHarmony 周期输出。
+源码和补丁已保存，镜像已编译并校验；01_hello_world 镜像已烧录到板子，
+UART 已验证 Hello World 和 Hello OpenHarmony 周期输出。
+
+显示屏验收说明：
+本实验源码只使用 printf 输出到 UART，没有 LCD 初始化、清屏或绘字代码。
+因此板载显示屏无输出属于预期现象，不作为本实验失败依据；LCD 将在
+03_lcd 实验中独立实现和验收。

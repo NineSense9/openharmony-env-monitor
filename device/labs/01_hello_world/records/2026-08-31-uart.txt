@@ -1,0 +1,30 @@
+实验：01_hello_world
+日期：2026-08-31
+
+烧录结果：
+使用 lab01_hello_world 目录中的 Loader 和 Firmware.img 完成烧录。
+
+串口配置：
+设备：USB-SERIAL CH340 (COM5)
+参数：115200 8N1，无流控
+
+实际现象：
+串口持续输出：
+Hello World
+Hello OpenHarmony
+
+周期观察：
+Hello World 约每 1 秒输出一次；
+Hello OpenHarmony 约每 2 秒输出一次。
+
+截图依据：
+2026-08-31 用户提供的串口截图。
+
+显示屏说明：
+本实验源码只使用 printf 输出到 UART，不包含 LCD 初始化、清屏或绘字代码。
+因此板载显示屏无输出属于预期现象，不代表烧录失败或任务未运行。
+LCD 功能留到 03_lcd 实验单独实现。
+
+验收结论：
+01_hello_world 的编译、烧录和 UART 周期输出验收通过。
+下一步进入 02_gpio，保持每个实验独立目录保存。
