@@ -1,22 +1,22 @@
 # 太空空间站内部环境监测端云一体化系统
 
 沈阳航空航天大学生产实习项目(软通动力方向,2026.08.31 – 2026.09.11)。
-基于 **OpenHarmony 南北向全栈**:RK2206 开发板采集舱内温湿度/气压/风速 → Wi-Fi/MQTT 上云 → 鸿蒙 APP 实时可视化与远程管控。
+基于 **OpenHarmony 南北向全栈**:RK2206 开发板采集舱内环境数据 → Wi-Fi/HTTP 上云 → 鸿蒙 APP 实时可视化与远程管控。
 
 ## 系统链路
 
 ```
 感知层(传感器) → 鸿蒙终端层(RK2206) → 网络层(Wi-Fi)
-  → 云端服务层(MQTT/历史数据) → 鸿蒙APP应用层(ArkTS/ArkUI)
+  → 云端服务层(FastAPI/SQLite) → 鸿蒙APP应用层(ArkTS/ArkUI)
 ```
 
 ## 技术栈
 
 | 层 | 技术 |
 |---|---|
-| 北向 APP | ArkTS / ArkUI(DevEco Studio)、ECharts 可视化、MQTT 客户端 |
+| 北向 APP | ArkTS / ArkUI(DevEco Studio)、环境数据可视化、HTTP API |
 | 南向设备 | RK2206 + C 语言、GPIO/I2C/SPI、传感器驱动、Wi-Fi 上云、低功耗 |
-| 云端 | MQTT 服务、历史数据存储、远程指令下发 |
+| 云端 | FastAPI、SQLAlchemy、SQLite、历史数据和远程指令 |
 
 ## 目录结构
 
@@ -49,6 +49,18 @@
 - [ ] **整合答辩** Day10(9/11):全链路联调、文档、答辩
 
 > 详细逐日计划见 [docs/生产实习流程梳理.md](docs/生产实习流程梳理.md)
+
+## 当前实际进度(2026-08-31)
+
+- [x] 南向源码准备、`hb` 安装、基础固件编译
+- [x] RKDevTool 烧录验证
+- [x] UART 启动日志验证
+- [ ] `device/labs/01_hello_world` 独立实验
+- [ ] GPIO、LCD、传感器、Wi-Fi、云端和远程控制实验
+
+南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
+[南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
+当前基线见 [00_bringup](device/labs/00_bringup/README.md)。
 
 ## 团队分工
 
