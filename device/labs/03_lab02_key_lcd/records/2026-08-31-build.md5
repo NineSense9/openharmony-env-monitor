@@ -1,0 +1,39 @@
+实验：4.6 lab02_key_lcd
+日期：2026-08-31
+
+## 构建环境
+
+- Ubuntu 工程：`/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831`
+- 根目录：`/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831`
+- Board：`rk2206`
+- Kernel：`liteos_m`
+- Product：`lockzhiner-rk2206`
+- hb：`/home/lzdz/.local/bin/hb`
+- 构建命令：`hb build`
+- 构建结果：`853/853`，`lockzhiner-rk2206 build success`，`BUILD_RC=0`
+
+## 构建产物
+
+| 文件 | Ubuntu 路径 | 大小 | MD5 |
+| --- | --- | ---: | --- |
+| `liteos.elf` | `/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831/out/rk2206/lockzhiner-rk2206/liteos.elf` | 1,498,200 bytes | `58d217164781afb9986874c891323684` |
+| `liblab02_key_lcd.a` | `/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831/out/rk2206/lockzhiner-rk2206/libs/liblab02_key_lcd.a` | 34,160 bytes | `f524678eeaaa92fdb933b6d5cd3b6c88` |
+| `Firmware.img` | `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831\Firmware.img` | 2,097,152 bytes | `5ed8e34a6069dee30ebd8bd83bf90919` |
+| `rk2206_db_loader.bin` | `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831\rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
+
+Windows 侧已重新计算 `Firmware.img` 和 `rk2206_db_loader.bin` 的 MD5，结果与
+Ubuntu 产物一致。4.5 的镜像目录未被覆盖。
+
+## 集成证据
+
+- samples 特性：`"./lab02_key_lcd:lab02_key_lcd",`
+- 最终业务库：`-llab02_key_lcd`
+- 最终库中包含 `lab02_key_lcd.o`、`lcd.o` 和 `tx_key.o`；
+- `main.c` 没有手动调用实验入口；
+- 4.5 的 `lab01_lcd` 未参与本实验最终链接。
+
+## 烧录状态
+
+尚未进行实物验收。烧录时只使用本记录对应目录中的 Loader 和 Firmware，完成后
+按 PDF 退出 MASKROM，再用 K1=RESET 重启；UART 使用 `115200 8N1`。待用户按下
+并松开 K3 后补充实际 UART、LCD 和电机状态。

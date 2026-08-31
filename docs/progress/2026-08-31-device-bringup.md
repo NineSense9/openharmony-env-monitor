@@ -446,13 +446,22 @@ soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远�
 `D:\实习\tmp\rk2206_images\archive\2026-08-31-lcd-trials`，没有删除历史文件。
 详细清单见 `device/labs/02_lab01_lcd/records/2026-08-31-image-archive.md`。
 
-### 4.8 lab02_key_lcd 源码与构建准备（2026-08-31）
+### 4.8 lab02_key_lcd 源码与构建完成（2026-08-31）
 
 严格依据授课文档第 4.6 节，在 4.5 可运行 LCD 基线之外建立独立实验
 `device/labs/03_lab02_key_lcd`。K3 使用 `GPIO0_PC7` 数字输入，按下为低电平；
 每 30 ms 轮询，仅在状态变化时刷新 LCD 状态行并输出 UART。K1/K2 仍分别只作
 RESET/MASKROM，电机 PWM6=`GPIO0_PC6` 不被访问。
 
-本地契约测试结果：`4 passed`。源码已提交，Ubuntu 独立工程和镜像仍待构建；
-构建完成后必须使用单独的 `lab03-lab02-key-lcd-20260831` 工程和独立烧录目录，
-不能覆盖 4.5 基线。当前硬件验收尚未开始。
+本地契约测试结果：`4 passed`。源码已提交，Ubuntu 独立工程构建完成
+`853/853`，输出 `lockzhiner-rk2206 build success`。固件和 Loader 已生成到
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831`，Firmware MD5 为
+`5ed8e34a6069dee30ebd8bd83bf90919`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。构建日志、校验和排错记录均保存在
+`device/labs/03_lab02_key_lcd/records/`。
+
+本次构建遇到并记录了两项可复用问题：复制基线会带入旧 `out/` 导致 `hb env`
+指向 4.5，以及多源 `scp` 会将 `include/`、`src/` 文件扁平化。已删除新工程
+`out/`、重新执行 `hb set -root .`/`hb set -p`，并恢复远端目录结构后构建成功。
+当前只完成源码、测试和构建，尚未进行 K3 实物烧录验收；实际 UART、LCD 状态和
+电机状态待用户烧录后补录。详细说明见 `device/labs/03_lab02_key_lcd/README.md`。

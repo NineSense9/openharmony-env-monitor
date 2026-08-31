@@ -2,7 +2,7 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建准备，等待烧录后的 K3 实物验收。当前镜像会继承
+已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前镜像会继承
 4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
 LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。
 
@@ -76,6 +76,42 @@ cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests 
 
 当前源码契约测试结果：`4 passed`。
 
+## 构建记录
+
+Ubuntu 独立工程：
+
+```text
+/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831
+```
+
+构建前固定执行：
+
+```bash
+cd /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831
+export PATH="/home/lzdz/.local/bin:$PATH"
+command -v hb
+hb --help | head
+hb env
+hb build
+```
+
+本次 `hb env` 已确认 root、product path 和 device path 均指向 4.6 独立工程；
+构建完成 `853/853`，输出 `lockzhiner-rk2206 build success`，退出码为 0。
+预检和最终增量构建输出见 [2026-08-31-build.log](records/2026-08-31-build.log)，
+853 步全量构建输出见 [2026-08-31-build-full.log](records/2026-08-31-build-full.log)，
+校验值见 [2026-08-31-build.md5](records/2026-08-31-build.md5)，构建排错见
+[2026-08-31-build-troubleshooting.md](records/2026-08-31-build-troubleshooting.md)。
+
+镜像和 Loader 已复制到独立目录：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
+```
+
+烧录前核对 `2026-08-31-build.md5`。本目录中的 `Firmware.img` MD5 为
+`5ed8e34a6069dee30ebd8bd83bf90919`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。
+
 ## 独立构建和烧录
 
 Ubuntu 工程：
@@ -119,3 +155,5 @@ UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的
 - [ ] 松开 K3 后 UART 和 LCD 恢复 `K3=RELEASED`；
 - [ ] 电机保持静止，没有重复启动或异常抖动；
 - [ ] 实际 UART 输出保存到 `records/2026-08-31-uart.txt` 后再提交验收记录。
+
+当前仅完成源码、自动化测试和固件构建；上板验收仍待实际烧录后确认。

@@ -56,14 +56,15 @@
 - [x] RKDevTool 烧录验证
 - [x] UART 启动日志验证
 - [x] `device/labs/01_hello_world` 独立实验
-- [ ] `device/labs/02_lab01_lcd`：LCD 实验 1（代码、测试和分段刷屏版构建完成，待物理验收）
-- [ ] `device/labs/03_lab02_key_lcd` 至 `09_lab08_wifi_ping`
+- [x] `device/labs/02_lab01_lcd`：LCD 实验 1（功能基线可运行，方向倒置问题暂不阻塞后续实验）
+- [ ] `device/labs/03_lab02_key_lcd`：按键 + LCD 实验 2（源码和构建完成，待 K3 实物验收）
+- [ ] `device/labs/04_lab03_light_key_lcd` 至 `09_lab08_wifi_ping`
 - [ ] 云端和远程控制整合实验
 
 南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
 [南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
 当前基线见 [00_bringup](device/labs/00_bringup/README.md)，当前实施实验见
-[02_lab01_lcd](device/labs/02_lab01_lcd/README.md)。
+[03_lab02_key_lcd](device/labs/03_lab02_key_lcd/README.md)。
 
 ## 团队分工
 

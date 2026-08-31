@@ -1,0 +1,40 @@
+$ command -v hb
+/home/lzdz/.local/bin/hb
+$ hb --help | head -5
+usage: hb [-h] [-v] {build,set,env,clean,deps} ...
+
+OHOS Build System version 0.4.3
+
+positional arguments:
+$ hb env
+[OHOS INFO] root path: /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831
+[OHOS INFO] board: rk2206
+[OHOS INFO] kernel: liteos_m
+[OHOS INFO] product: lockzhiner-rk2206
+[OHOS INFO] product path: /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831/vendor/lockzhiner/rk2206
+[OHOS INFO] device path: /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831/device/rockchip/rk2206/sdk_liteos
+$ hb build
+[OHOS INFO] [1/1] Regenerating ninja files
+[OHOS INFO] [1/41] STAMP obj/device/rockchip/hardware/hardware.stamp
+[OHOS INFO] [2/41] ACTION //test/xts/acts/iot_hardware_lite/iot_controller_hal:ActsWifiIotTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [3/40] ACTION //test/xts/acts/communication_lite/wifiservice_hal:ActsWifiServiceTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [4/39] ACTION //test/xts/acts/communication_lite/lwip_hal:ActsLwipTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [5/38] ACTION //test/xts/acts/distributed_schedule_lite/system_ability_manager_hal:ActsSamgrTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [6/37] ACTION //device/rockchip/rk2206/third_party/lwip:rk2206_lwip(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [7/36] ACTION //test/xts/acts/hiviewdfx_lite/hilog_hal:ActsDfxFuncTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [8/35] ACTION //test/xts/acts/hiviewdfx_lite/hievent_hal:ActsHieventLiteTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [9/34] ACTION //test/xts/acts/startup_lite/bootstrap_hal:ActsBootstrapTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [10/33] ACTION //test/xts/acts/security_lite/huks/liteos_m_adapter:ActsHuksHalFunctionTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [11/31] ACTION //test/xts/acts/startup_lite/syspara_hal:ActsParameterTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [12/30] ACTION //test/xts/acts/utils_lite/file_hal:ActsUtilsFileTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [13/29] ACTION //test/xts/acts/update_lite/dupdate_hal:ActsUpdaterFuncTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [14/28] ACTION //test/xts/acts/utils_lite/kv_store_hal:ActsKvStoreTest(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [15/22] ACTION //vendor/lockzhiner/rk2206/hdf_drivers:khdf_platform_gn(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] [16/20] STAMP obj/device/rockchip/rk2206/sdk_liteos/sdk.stamp
+[OHOS INFO] [17/20] STAMP obj/device/rockchip/rk2206/sdk_liteos/wifiiot_sdk.stamp
+[OHOS INFO] [18/20] STAMP obj/build/lite/ohos.stamp
+[OHOS INFO] [19/20] ACTION //device/rockchip/rk2206/sdk_liteos:liteos(//build/lite/toolchain:arm-none-eabi-gcc)
+[OHOS INFO] /home/lzdz/rk2206/lab03-lab02-key-lcd-20260831/vendor/lockzhiner/rk2206/fs.yml not found, stop packing fs. If the product does not need to be packaged, ignore it.
+[OHOS INFO] lockzhiner-rk2206 build success
+[OHOS INFO] cost time: 0:00:12
+BUILD_RC=0
