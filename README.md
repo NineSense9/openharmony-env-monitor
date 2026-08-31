@@ -55,12 +55,15 @@
 - [x] 南向源码准备、`hb` 安装、基础固件编译
 - [x] RKDevTool 烧录验证
 - [x] UART 启动日志验证
-- [ ] `device/labs/01_hello_world` 独立实验
-- [ ] GPIO、LCD、传感器、Wi-Fi、云端和远程控制实验
+- [x] `device/labs/01_hello_world` 独立实验
+- [ ] `device/labs/02_lab01_lcd`：LCD 实验 1（本地代码和测试已完成）
+- [ ] `device/labs/03_lab02_key_lcd` 至 `09_lab08_wifi_ping`
+- [ ] 云端和远程控制整合实验
 
 南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
 [南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
-当前基线见 [00_bringup](device/labs/00_bringup/README.md)。
+当前基线见 [00_bringup](device/labs/00_bringup/README.md)，当前实施实验见
+[02_lab01_lcd](device/labs/02_lab01_lcd/README.md)。
 
 ## 团队分工
 

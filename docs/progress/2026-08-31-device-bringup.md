@@ -90,7 +90,8 @@ OHOS # hiview init success.
 ## 下一步
 
 进入 `device/labs/01_hello_world/`，已保留独立源码和补丁并完成编译、烧录
-和 UART 验收。下一步按顺序开始 `02_gpio`。
+和 UART 验收。根据《授课文档.pdf》第四章，下一步改为
+`02_lab01_lcd`（4.5 实验 1：LCD），不能按旧的 ADC/GPIO 推断方案推进。
 
 ## 01_hello_world 编译检查点
 
@@ -102,6 +103,10 @@ OHOS # hiview init success.
 - 实验镜像已烧录；
 - UART 已确认 `Hello World` 约每 1 秒输出、`Hello OpenHarmony` 约每 2 秒输出；
 - 板载显示屏无输出，确认是因为本实验没有 LCD 初始化和绘图代码。
+- 已按授课文档 4.5 创建 `device/labs/02_lab01_lcd/`，完成自有
+  `lab01_lcd.c`、LCD 驱动副本、构建说明和 2 个契约测试；
+- 本地 LCD 契约测试结果：`2 passed`；
+- Ubuntu 编译、烧录和屏幕验收尚未完成。
 
 详细串口验收记录：
 `device/labs/01_hello_world/records/2026-08-31-uart.txt`

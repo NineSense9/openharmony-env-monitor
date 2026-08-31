@@ -1,0 +1,13 @@
+实验：4.5 lab01_lcd
+阶段：TDD RED
+日期：2026-08-31
+
+命令：
+cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\02_lab01_lcd\tests -q
+
+结果：
+2 failed
+
+失败原因：
+实验入口 src/lab01_lcd.c 和 src/BUILD.gn 尚未创建。
+测试按预期因 FileNotFoundError 失败，随后才开始编写实现。

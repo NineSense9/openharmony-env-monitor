@@ -1,0 +1,16 @@
+static_library("lab01_lcd") {
+    sources = [
+        "lab01_lcd.c",
+        "src/lcd.c",
+    ]
+
+    include_dirs = [
+        "//utils/native/lite/include",
+        "//device/lockzhiner/rk2206/adapter/include",
+        "include",
+    ]
+
+    deps = [
+        "//device/rockchip/hardware:hardware",
+    ]
+}
