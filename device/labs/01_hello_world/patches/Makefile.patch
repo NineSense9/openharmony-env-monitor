@@ -1,0 +1,10 @@
+diff --git a/device/rockchip/rk2206/sdk_liteos/Makefile b/device/rockchip/rk2206/sdk_liteos/Makefile
+--- a/device/rockchip/rk2206/sdk_liteos/Makefile
++++ b/device/rockchip/rk2206/sdk_liteos/Makefile
+@@ -45,5 +45,5 @@
+ LDSCRIPT = board.ld
+ 
+ boot_LIBS = -lbootstrap -lbroadcast
+-hardware_LIBS = -lhal_iothardware -lhardware -lshellcmd
++hardware_LIBS = -lhal_iothardware -lhardware -lshellcmd -ltask_helloworld
+ hdf_LIBS = -lhdf_config -lhdf_core -lhdf_osal_lite -lhdf_platform_lite \

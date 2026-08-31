@@ -89,4 +89,13 @@ OHOS # hiview init success.
 
 ## 下一步
 
-开始 `device/labs/01_hello_world/`，保留独立源码和补丁，完成两个周期任务的串口输出后再提交下一个阶段。
+开始 `device/labs/01_hello_world/`，已保留独立源码和补丁并完成编译。下一步烧录该实验镜像，通过串口确认两个周期任务的输出后再提交下一个阶段。
+
+## 01_hello_world 编译检查点
+
+- 独立 worktree：`/home/lzdz/rk2206/lab01-hello-world-20260831`
+- 补丁检查通过；
+- `libtask_helloworld.a` 已生成并参与链接；
+- `lockzhiner-rk2206 build success`；
+- `Firmware.img` MD5：`5561e5deaf9c36a34fc9860c5cb5f52b`；
+- 尚未烧录，等待串口验收。

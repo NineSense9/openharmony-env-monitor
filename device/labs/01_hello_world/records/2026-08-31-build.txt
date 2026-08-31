@@ -1,0 +1,47 @@
+实验：01_hello_world
+日期：2026-08-31
+
+基础源码基线：
+35339be8 修改i2c的一处错误问题
+
+补丁检查：
+main.c.patch：通过
+Makefile.patch：通过
+sdk_liteos_BUILD.gn.patch：通过
+
+构建工作区：
+/home/lzdz/rk2206/lab01-hello-world-20260831
+
+构建命令：
+export PATH="/home/lzdz/.local/bin:$PATH"
+/home/lzdz/.local/bin/hb build -f
+
+第一次构建：
+失败于最终打包阶段。静态库已经成功生成，但 mkimage.sh 找不到 hb：
+hb：未找到命令
+
+处理：
+为非交互 SSH 构建显式加入 /home/lzdz/.local/bin 到 PATH。
+
+第二次构建：
+lockzhiner-rk2206 build success
+cost time: 0:00:31
+
+关键产物：
+libtask_helloworld.a 已生成并参与链接
+Firmware.img
+Firmware.md5
+rk2206_db_loader.bin
+
+实验镜像：
+Windows 备份目录：
+D:\实习\tmp\rk2206_images\lab01_hello_world
+
+Firmware.img 大小：
+2097152 bytes
+
+Firmware.img MD5：
+5561e5deaf9c36a34fc9860c5cb5f52b
+
+当前状态：
+源码和补丁已保存，镜像已编译并校验；尚未将 01_hello_world 镜像烧录到板子，待串口验证 Hello World 和 Hello OpenHarmony 周期输出。

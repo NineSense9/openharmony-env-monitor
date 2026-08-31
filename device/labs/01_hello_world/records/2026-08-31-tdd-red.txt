@@ -1,0 +1,12 @@
+实验：01_hello_world
+阶段：TDD RED
+日期：2026-08-31
+
+命令：
+cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\01_hello_world\tests -q
+
+结果：
+1 failed
+
+失败原因：
+实验源码 src/hello_world.c 尚未创建，测试按预期报告 FileNotFoundError。

@@ -1,0 +1,10 @@
+diff --git a/device/rockchip/rk2206/sdk_liteos/BUILD.gn b/device/rockchip/rk2206/sdk_liteos/BUILD.gn
+--- a/device/rockchip/rk2206/sdk_liteos/BUILD.gn
++++ b/device/rockchip/rk2206/sdk_liteos/BUILD.gn
+@@ -38,5 +38,6 @@ lite_component("sdk") {
+     "//vendor/lockzhiner/rk2206/hdf_config:hdf_config",
+     "//vendor/lockzhiner/rk2206/hdf_drivers:hdf_drivers",
+     "//vendor/lockzhiner/rk2206/samples:app",
++    "//vendor/lockzhiner/rk2206/samples/a0_hello_world:task_helloworld",
+   ]
+ }
