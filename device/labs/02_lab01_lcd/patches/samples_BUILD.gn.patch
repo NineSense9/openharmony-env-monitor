@@ -1,0 +1,9 @@
+diff --git a/vendor/lockzhiner/rk2206/samples/BUILD.gn b/vendor/lockzhiner/rk2206/samples/BUILD.gn
+--- a/vendor/lockzhiner/rk2206/samples/BUILD.gn
++++ b/vendor/lockzhiner/rk2206/samples/BUILD.gn
+@@ -72,6 +72,7 @@ lite_component("app") {
+         #"./d7_iot_cloud_intelligent_agriculture:iot_ia_example",
++        "./lab01_lcd:lab01_lcd",
+     ]
+ 
+     deps = [

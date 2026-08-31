@@ -5,6 +5,9 @@ LAB_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = LAB_ROOT / "lab01_lcd.c"
 BUILD = LAB_ROOT / "BUILD.gn"
 PATCH_NOTES = LAB_ROOT / "patches" / "README.md"
+SAMPLES_PATCH = LAB_ROOT / "patches" / "samples_BUILD.gn.patch"
+MAKEFILE_PATCH = LAB_ROOT / "patches" / "Makefile.patch"
+MAIN_PATCH = LAB_ROOT / "patches" / "main.c.patch"
 FONT_HEADER = LAB_ROOT / "include" / "lcd_font.h"
 
 
@@ -25,6 +28,9 @@ def test_lcd_experiment_owns_startup_and_display_flow():
 def test_lcd_experiment_has_independent_build_contract():
     build = BUILD.read_text(encoding="utf-8")
     notes = PATCH_NOTES.read_text(encoding="utf-8")
+    samples_patch = SAMPLES_PATCH.read_text(encoding="utf-8")
+    makefile_patch = MAKEFILE_PATCH.read_text(encoding="utf-8")
+    main_patch = MAIN_PATCH.read_text(encoding="utf-8")
 
     assert 'static_library("lab01_lcd")' in build
     assert '"lab01_lcd.c"' in build
@@ -32,4 +38,8 @@ def test_lcd_experiment_has_independent_build_contract():
     assert FONT_HEADER.exists()
     assert "-llab01_lcd" in notes
     assert "删除" in notes
-    assert "helloworld" in notes
+    assert "上一个实验" in notes
+    assert '"./lab01_lcd:lab01_lcd",' in samples_patch
+    assert "-lhal_iothardware -lhardware -lshellcmd -llab01_lcd" in makefile_patch
+    assert "void lab01_lcd_example(void);" in main_patch
+    assert "lab01_lcd_example();" in main_patch

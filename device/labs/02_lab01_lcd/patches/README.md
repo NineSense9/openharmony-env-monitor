@@ -37,17 +37,23 @@
    ```
 
 2. 在 `device/rockchip/rk2206/sdk_liteos/Makefile` 的
-   `hardware_LIBS` 中删除 `-ltask_helloworld`，只保留本实验库：
+   `hardware_LIBS` 中删除上一个实验的业务库，并保留系统库：
 
    ```make
-   hardware_LIBS = -lhal_iothardware -lhardware -llab01_lcd
+   hardware_LIBS = -lhal_iothardware -lhardware -lshellcmd -llab01_lcd
    ```
 
 3. 在 `device/rockchip/rk2206/sdk_liteos/board/main.c` 中删除
-   `task_example()` 声明和调用，增加 `lab01_lcd_example()` 声明，并在
+   上一个实验的任务声明和调用，增加 `lab01_lcd_example()` 声明，并在
    `shell_cmd_init()` 后调用 `lab01_lcd_example()`。
 
 4. 不同时启用 `lab02_key_lcd` 或其他 `lab0x` 库。
+
+可直接应用的补丁：
+
+- `samples_BUILD.gn.patch`：启用 `lab01_lcd` 静态库；
+- `Makefile.patch`：把 `lab01_lcd` 加入最终链接；
+- `main.c.patch`：在系统启动后调用 `lab01_lcd_example()`。
 
 ## 编译和验收
 
