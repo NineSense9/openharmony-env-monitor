@@ -11,6 +11,8 @@ static void lab02_key_lcd_task(void *arg)
     unsigned int ret;
     uint32_t pressed;
     uint32_t last_pressed;
+    uint32_t diagnostic_elapsed_ms;
+    LzGpioValue raw_level;
 
     (void)arg;
     printf("lab02_key_lcd: LCD_INIT_BEGIN\r\n");
@@ -31,21 +33,26 @@ static void lab02_key_lcd_task(void *arg)
     lcd_show_string(10, 80, "LCD OK", LCD_BLUE, LCD_WHITE, 16, 0);
     lcd_show_string(10, 120, "OpenHarmony", LCD_BLACK, LCD_WHITE, 16, 0);
 
-    ret = tx_key_is_pressed(&pressed);
+    ret = tx_key_read_level(&raw_level);
     if (ret != LZ_HARDWARE_SUCCESS) {
         /* Keep the task alive so a transient GPIO read failure is observable. */
         last_pressed = 2U;
+        diagnostic_elapsed_ms = 0U;
         lcd_show_string(10, 96, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
         printf("lab02_key_lcd: initial K3 read failed(%u)\r\n", ret);
     } else {
+        pressed = (raw_level == LZGPIO_LEVEL_LOW) ? 1U : 0U;
         last_pressed = pressed;
+        diagnostic_elapsed_ms = 0U;
         lcd_show_string(10, 96, pressed ? "K3: PRESSED" : "K3: RELEASED",
                         LCD_BLUE, LCD_WHITE, 16, 0);
+        printf("lab02_key_lcd: K3 raw=%u pressed=%u\r\n",
+               (unsigned int)raw_level, (unsigned int)pressed);
         printf("lab02_key_lcd: K3=%s\r\n", pressed ? "PRESSED" : "RELEASED");
     }
 
     while (1) {
-        ret = tx_key_is_pressed(&pressed);
+        ret = tx_key_read_level(&raw_level);
         if (ret != LZ_HARDWARE_SUCCESS) {
             if (last_pressed != 2U) {
                 lcd_fill(10, 90, 300, 120, LCD_WHITE);
@@ -57,6 +64,7 @@ static void lab02_key_lcd_task(void *arg)
             continue;
         }
 
+        pressed = (raw_level == LZGPIO_LEVEL_LOW) ? 1U : 0U;
         if (pressed != last_pressed) {
             last_pressed = pressed;
             lcd_fill(10, 90, 300, 120, LCD_WHITE);
@@ -64,6 +72,13 @@ static void lab02_key_lcd_task(void *arg)
                             LCD_BLUE, LCD_WHITE, 16, 0);
             printf("lab02_key_lcd: K3=%s\r\n",
                    pressed ? "PRESSED" : "RELEASED");
+        }
+
+        diagnostic_elapsed_ms += 30U;
+        if (diagnostic_elapsed_ms >= 500U) {
+            printf("lab02_key_lcd: K3 raw=%u pressed=%u\r\n",
+                   (unsigned int)raw_level, (unsigned int)pressed);
+            diagnostic_elapsed_ms = 0U;
         }
 
         LOS_Msleep(30);

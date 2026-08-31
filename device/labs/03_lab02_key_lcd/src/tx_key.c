@@ -23,6 +23,15 @@ unsigned int tx_key_init(void)
     return LZ_HARDWARE_SUCCESS;
 }
 
+unsigned int tx_key_read_level(LzGpioValue *level)
+{
+    if (level == NULL) {
+        return LZ_HARDWARE_FAILURE;
+    }
+
+    return LzGpioGetVal(TX_KEY_K3, level);
+}
+
 unsigned int tx_key_is_pressed(uint32_t *pressed)
 {
     LzGpioValue value = LZGPIO_LEVEL_HIGH;
@@ -32,7 +41,7 @@ unsigned int tx_key_is_pressed(uint32_t *pressed)
         return LZ_HARDWARE_FAILURE;
     }
 
-    ret = LzGpioGetVal(TX_KEY_K3, &value);
+    ret = tx_key_read_level(&value);
     if (ret != LZ_HARDWARE_SUCCESS) {
         return ret;
     }

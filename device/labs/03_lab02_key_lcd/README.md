@@ -2,10 +2,10 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前镜像会
-继承 4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
-LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。此前的 `PULL_KEEP` 和
-`PULL_UP` 包都已确认会在 K3 的额外 pinctrl 配置阶段失败，不能继续烧录。
+已完成源码、契约测试和独立构建。用户上板反馈 LCD 已正常显示 `LCD OK` 和
+`K3: PRESSED`，但继续按下 K3 没有状态变化；当前新增原始 GPIO 电平诊断包，等待
+进一步上板采样。此前的 `PULL_KEEP` 和 `PULL_UP` 包都已确认会在 K3 的额外
+pinctrl 配置阶段失败，不能继续烧录。
 
 ## 课程依据
 
@@ -40,7 +40,7 @@ PDF 规定的核心流程：
 - `include/lcd.h`、`include/lcd_font.h`、`src/lcd.c`：从 4.5 原样继承的 LCD 基线；
 - `BUILD.gn`：`lab02_key_lcd` 独立静态库；
 - `patches/README.md`：Ubuntu 工程复制、集成和构建说明；
-- `tests/test_lab02_key_lcd_contract.py`：5 项自动化契约测试；
+- `tests/test_lab02_key_lcd_contract.py`：6 项自动化契约测试；
 - `records/`：TDD、构建、烧录和 UART 记录。
 
 ## 业务行为
@@ -66,7 +66,8 @@ lab02_key_lcd: K3=RELEASED
 程序每 30 ms 轮询一次，但只有状态变化才擦除 `(10,90)-(300,120)` 并重画状态行，
 避免持续整屏刷新。GPIO 初始化或方向设置失败时打印错误并退出初始化；GPIO 读取
 失败时显示 `K3: READ ERR`、打印错误并每 100 ms 重试，读取恢复后继续处理按键，
-不会把读取失败误报成按下。
+不会把读取失败误报成按下。诊断包每 500 ms 输出一次
+`lab02_key_lcd: K3 raw=%u pressed=%u`，用于确认 PC7 的原始电平是否随实体按键变化。
 
 ## 自动化验证
 
@@ -76,7 +77,7 @@ lab02_key_lcd: K3=RELEASED
 cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests -q
 ```
 
-当前源码契约测试结果：`5 passed`。
+当前源码契约测试结果：`6 passed`。
 
 ## 构建记录
 
@@ -124,7 +125,7 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831
 `K3 pinctrl failed ret=1`，因此标记为作废，仅保留用于故障记录。其
 `Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，不能继续使用。
 
-当前唯一可用于本次验收的烧录包单独保存到：
+此前的 `PULL_UP` 作废包单独保存到：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831
@@ -132,22 +133,23 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831
 
 该包在实物上仍输出 `K3 pinctrl failed ret=1`，现标记为作废，仅保留用于排错记录。
 
-当前唯一可用于本次验收的烧录包单独保存到：
+此前的无额外 pinctrl 基线包单独保存到：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
 ```
 
-只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`。当前包的
+该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img` 仍保留用于回退对照，但当前
+不要用它做 K3 诊断。该包的
 `Firmware.img` MD5 为 `4bcd54b6926794a78620fd7c30f64abf`，Loader MD5 为
 `5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对这两个值，不能使用初始包、
 `retry` 包或 `pullup` 包。
 
-本次修正依据 PDF 4.6：`GPIO0_PC7` 只执行 `LzGpioInit` 和
+该基线依据 PDF 4.6：`GPIO0_PC7` 只执行 `LzGpioInit` 和
 `LzGpioSetDir(..., LZGPIO_DIR_IN)`，不对 K3 额外调用 `PinctrlSet`。新 ELF 和
 `Firmware.img` 中均已确认不存在 `K3 pinctrl failed` 字符串。
 
-## 独立构建和烧录
+## 当前诊断构建和烧录
 
 Ubuntu 工程：
 
@@ -179,19 +181,21 @@ hb build
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-当前 `no_pinctrl` 包烧录时只使用
-`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831` 中的
+当前唯一推荐烧录的是诊断包，只使用
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831` 中的
 `rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
-UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的当前包
-MD5；烧录后应先看到 `lab02_key_lcd: K3=RELEASED`，再按住和松开 K3 验证状态。
+UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中诊断包
+MD5。重启后先确保 K3 松开，再观察至少 2 秒的 `K3 raw=...`；随后按住、松开
+K3，各保持约 2 秒并保存完整 UART。不要用 K1 做按键测试，K1 是 RESET。
 
 ## 验收清单
 
-- [ ] UART 出现 LCD 初始化成功和初始 `K3=RELEASED`，或明确出现 `K3: READ ERR`；
+- [ ] UART 出现 LCD 初始化成功和原始 `K3 raw=...` 诊断输出；
 - [ ] 按住 K3 后 UART 和 LCD 显示 `K3=PRESSED`；
 - [ ] 松开 K3 后 UART 和 LCD 恢复 `K3=RELEASED`；
+- [ ] 原始 GPIO 电平随 K3 操作在高低电平之间变化；
 - [ ] 电机保持静止，没有重复启动或异常抖动；
 - [ ] 实际 UART 输出保存到 `records/2026-08-31-uart.txt` 后再提交验收记录。
 
-当前已完成源码、自动化测试和 `no_pinctrl` 固件构建；上板验收仍待实际烧录后确认。
+当前已完成源码、自动化测试和诊断固件构建；最终 K3 修复仍待原始电平诊断结果确认。

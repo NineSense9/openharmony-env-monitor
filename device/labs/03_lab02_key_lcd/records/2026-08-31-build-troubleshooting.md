@@ -122,3 +122,47 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
 Firmware.img MD5: 4bcd54b6926794a78620fd7c30f64abf
 Loader MD5: 5f2ea974b0e1df5564a8e1ee910627bb
 ```
+
+## 问题 7：LCD 显示 K3=PRESSED，但按键没有状态变化
+
+用户上板反馈 LCD 已显示 `LCD OK` 和 `K3: PRESSED`，但继续按下 K3 没有变化。
+这说明当前固件至少已经完成 LCD 初始化、K3 初始化和一次 GPIO 读取，但单条状态
+文字不能区分以下情况：启动时 K3 本来就处于按下状态、PC7 释放后仍被拉低、PC7
+浮空，或按键实际没有连接到当前输入。
+
+按照系统调试流程，先不改 GPIO 编号、不改成 ADC，也不再次尝试已失败的额外
+`PinctrlSet`。新增 `tx_key_read_level()` 直接返回 `LzGpioGetVal()` 的原始值；
+任务保持 30 ms 状态轮询，同时每 500 ms 打印：
+
+```text
+lab02_key_lcd: K3 raw=%u pressed=%u
+```
+
+诊断包单独保存到：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831
+```
+
+其 `Firmware.img` MD5 为 `95f25a65162f806cdf1e66ada6436799`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。下一步烧录后先松开 K3，连续观察 raw 值，
+再按住和松开 K3。根据结果分别判断硬件电平、按键映射或业务逻辑，不能在证据不足时
+直接修改 GPIO 或按下电平定义。
+
+## 问题 8：远端同步文件位置错误导致最终链接失败
+
+本次增加诊断接口后，第一次 `scp` 将三个文件同时传到了实验目录根部，导致
+Ubuntu 工程仍编译旧的 `src/tx_key.c`，最终链接报：
+
+```text
+undefined reference to `tx_key_read_level'
+```
+
+该错误不是 C 代码或 SDK 错误。随后按工程目录结构重新传输：业务文件放在实验
+目录根部，`include/tx_key.h` 放入 `include/`，`src/tx_key.c` 放入 `src/`，再执行
+`hb build -f`，最终 `853/853` 成功。后续同步源码必须保持 `include/`、`src/` 的
+目录结构，并在编译前用 `grep` 确认远端文件包含本次接口。
+
+第一次构建命令还因 PowerShell 转义破坏远端 `PATH`，误报 `hb：未找到命令`；随后
+显式设置 `PATH="/home/lzdz/.local/bin:/usr/bin:$PATH"` 并用 `command -v hb` 验证
+为 `/home/lzdz/.local/bin/hb` 后重新构建成功。

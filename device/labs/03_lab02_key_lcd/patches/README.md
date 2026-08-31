@@ -56,15 +56,16 @@ hb env
 hb build
 ```
 
-当前 `no_pinctrl` 版本的镜像和 Loader 单独保存到：
+当前诊断版本的镜像和 Loader 单独保存到：
 
 ```text
-D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831
 ```
 
 UART 使用 `115200 8N1`。启动后预期显示 `K3: RELEASED`；按住 K3 显示并输出
 `K3: PRESSED`，松开后恢复 `K3: RELEASED`。程序每 30 ms 轮询，但仅在状态变化
-时擦除并重画状态区域。LCD 方向继承 4.5 的已知倒置现象，本实验不修改方向配置。
+时擦除并重画状态区域。LCD 使用当前已验证的 4.5 基线方向，本实验不修改方向配置。
 K3 初始化严格按 PDF 4.6 只执行 `LzGpioInit` 和输入方向设置，不额外调用
 `PinctrlSet`；`retry` 和 `pullup` 目录中的旧包都会在 pinctrl 初始化阶段失败，
-已作废，不能继续烧录。
+已作废，不能继续烧录。诊断版本还会每 500 ms 输出 PC7 原始电平，便于区分按键
+电气状态没有变化和业务状态判断问题。

@@ -3,7 +3,10 @@
 
 #include <stdint.h>
 
+#include "lz_hardware.h"
+
 unsigned int tx_key_init(void);
+unsigned int tx_key_read_level(LzGpioValue *level);
 unsigned int tx_key_is_pressed(uint32_t *pressed);
 
 #endif

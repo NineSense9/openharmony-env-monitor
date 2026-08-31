@@ -57,6 +57,18 @@ def test_key_read_failure_is_visible_and_retried():
     assert "LOS_Msleep(100);" in source
 
 
+def test_key_diagnostic_reports_raw_gpio_level():
+    header = KEY_HEADER.read_text(encoding="utf-8")
+    driver = KEY_DRIVER.read_text(encoding="utf-8")
+    source = SOURCE.read_text(encoding="utf-8")
+
+    assert "tx_key_read_level" in header
+    assert "LzGpioValue *level" in header
+    assert "tx_key_read_level" in driver
+    assert "K3 raw=%u pressed=%u" in source
+    assert "diagnostic_elapsed_ms >= 500U" in source
+
+
 def test_key_lcd_has_independent_build_and_integration_contract():
     build = BUILD.read_text(encoding="utf-8")
     notes = PATCH_NOTES.read_text(encoding="utf-8")
