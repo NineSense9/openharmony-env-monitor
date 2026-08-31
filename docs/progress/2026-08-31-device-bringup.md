@@ -376,3 +376,32 @@ soft lockup；后续采用已生成构建树的增量 `hb build`。此外，远�
 当前仍待实物验收，不能在用户烧录确认前标记 LCD 方向已修复。验收时按 PDF 使用
 `K2=MASKROM`，烧录结束退出下载模式后用 `K1=RESET` 重启，并按板子正常正向摆放
 确认文字是否从 LCD 左上角开始。
+
+### 4.5 lab01_lcd 横屏方向 3 硬件 SPI 模式 3 修正版（2026-08-31）
+
+用户烧录上一版横屏方向 3 镜像后再次确认 LCD 从右下角开始。前面只调整
+`MADCTL` 的方向值没有解决问题，因此继续对比底层实现。SDK 原始 `b4_lcd`
+的硬件 SPI 配置明确使用 `SPI_MODE_3`，项目上一版却依据 GPIO 模拟 SPI 的边沿
+直觉使用了 `SPI_MODE_0`。在 RK2206 硬件 SPI 抽象层中这两个配置不能直接等同，
+模式 0 可能造成初始化命令中的方向配置没有被 LCD 可靠接收。
+
+本次只恢复硬件 SPI 模式：
+
+- `src/lcd.c` 的 `m_spiConf.mode` 从 `SPI_MODE_0` 改为 SDK 参考的 `SPI_MODE_3`；
+- `USE_HORIZONTAL=3`、`LCD_W=320`、`LCD_H=240`、PA4 DC、SPI0 M1、50 MHz、
+  批量逐行刷屏和唯一启动入口均保持不变。
+
+本地 TDD 契约先在旧模式上失败（`1 failed, 4 passed`），恢复模式 3 后为
+`5 passed`。Ubuntu 独立工程重新构建成功，输出
+`lockzhiner-rk2206 build success`，退出码 0。
+
+新镜像单独保存：
+
+- 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_mode3_20260831`；
+- `Firmware.img` MD5：`6d3cf42e42146864862b0e8fdb8d2f38`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`；
+- 构建日志：[2026-08-31-build-landscape-orientation3-mode3.log](../../device/labs/02_lab01_lcd/records/2026-08-31-build-landscape-orientation3-mode3.log)；
+- 详细记录：[2026-08-31-build-landscape-orientation3-mode3.md5](../../device/labs/02_lab01_lcd/records/2026-08-31-build-landscape-orientation3-mode3.md5)。
+
+当前仍待用户物理验收，不能提前标记方向已修复。烧录仍按 PDF 使用 `K2=MASKROM`，
+完成后退出下载模式并按 `K1=RESET`，记录 UART、LCD 方向和电机状态。

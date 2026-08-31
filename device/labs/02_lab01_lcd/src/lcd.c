@@ -59,7 +59,8 @@ static SpiBusIo m_spiBus = {
     .mode = FUNC_MODE_M1,
 };
 
-static LzSpiConfig m_spiConf = {.bitsPerWord = SPI_PERWORD_8BITS, .firstBit = SPI_MSB, .mode = SPI_MODE_0,
+/* RK2206 SDK 的 SPI 适配层按 b4_lcd 参考实现使用模式 3。 */
+static LzSpiConfig m_spiConf = {.bitsPerWord = SPI_PERWORD_8BITS, .firstBit = SPI_MSB, .mode = SPI_MODE_3,
                                .csm = SPI_CMS_ONE_CYCLES, .speed = 50000000, .isSlave = false};
 #endif
 

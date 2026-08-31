@@ -5,7 +5,9 @@
 已完成本地契约测试、Ubuntu 独立源码编译和镜像核验，已修复重复启动问题。
 用户已确认电机不再抖动，LCD 能显示三行文字，硬件 SPI 已完成切换。此前的
 竖屏 `USE_HORIZONTAL=0/1` 尝试仍从右下角开始且方向不对；本次依据 PDF 和
-原厂程序截图恢复横屏坐标，改用横屏方向 `USE_HORIZONTAL=3`，新镜像等待实物确认。
+原厂程序截图恢复横屏坐标，改用横屏方向 `USE_HORIZONTAL=3`。上一版方向 3
+仍使用了未经 SDK 参考验证的 `SPI_MODE_0`，用户实物反馈仍在右下角；本次已按
+原始 `b4_lcd` 硬件实现恢复 `SPI_MODE_3`，新镜像等待实物确认。
 
 ## 课程依据
 
@@ -109,6 +111,16 @@
   [2026-08-31-build-landscape-orientation3.log](records/2026-08-31-build-landscape-orientation3.log)
 - SMART-R 横屏方向 3 + 硬件 SPI 修正版构建与反馈记录：
   [2026-08-31-build-landscape-orientation3.md5](records/2026-08-31-build-landscape-orientation3.md5)
+- SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版镜像目录：
+  `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_mode3_20260831`
+- SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版 `Firmware.img`：2,097,152 bytes，MD5：
+  `6d3cf42e42146864862b0e8fdb8d2f38`
+- SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版 `rk2206_db_loader.bin`：35,093 bytes，MD5：
+  `5f2ea974b0e1df5564a8e1ee910627bb`
+- SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版构建日志：
+  [2026-08-31-build-landscape-orientation3-mode3.log](records/2026-08-31-build-landscape-orientation3-mode3.log)
+- SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版构建与故障记录：
+  [2026-08-31-build-landscape-orientation3-mode3.md5](records/2026-08-31-build-landscape-orientation3-mode3.md5)
 - 旧版双重启动构建记录：
   [2026-08-31-build.md5](records/2026-08-31-build.md5)，已作废；
   对应文件保存在
@@ -145,16 +157,18 @@ SPI 后，用户再次确认文字仍从右下角开始；随后 `USE_HORIZONTAL
   修正原 `USE_HORIZONTAL=2` (`MADCTL=0x70`) 的反向显示。
 - 旧版 `LCD_ENABLE_SPI=0`，`lcd_fill()` 每个 RGB565 字节都通过 GPIO 模拟，
   全屏共发送约 153,600 个字节并产生大量 GPIO 调用；已切换到 SDK 的 SPI0 M1
-  硬件接口，速度设置保持 50 MHz，SPI 时序使用与模拟实现一致的 `SPI_MODE_0`。
+  硬件接口，速度设置保持 50 MHz。上一版错误地将硬件 SPI 设置为
+  `SPI_MODE_0`；对比 SDK 原始 `b4_lcd` 和 RK2206 SPI 适配文档后，本版恢复
+  参考实现使用的 `SPI_MODE_3`，不再把软件 GPIO 的边沿直译为硬件 SPI 模式。
 - `lcd_fill()` 现在每行批量发送 RGB565 缓冲区，局部区域仍按实际宽度发送，
   不改变后续实验需要的局部擦除行为。
 
-本地契约测试为 `5 passed`，Ubuntu 增量构建输出 `lockzhiner-rk2206 build success`。
-`USE_HORIZONTAL=3` 新镜像尚未由用户重新烧录实物确认。
+本地契约测试为 `5 passed`，Ubuntu 构建输出 `lockzhiner-rk2206 build success`。
+`USE_HORIZONTAL=3` + `SPI_MODE_3` 新镜像尚未由用户重新烧录实物确认。
 
 ## 当前待验收
 
-只使用 `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_20260831`
+优先使用 `D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_mode3_20260831`
 中的 `rk2206_db_loader.bin` 和 `Firmware.img`。按 PDF 进入 `K2=MASKROM` 烧录，
 完成后退出下载模式并按 `K1=RESET`；确认板子按正常正向摆放后，验收文字从 LCD 左上角
 开始、方向正常、刷屏速度较快且电机保持静止。

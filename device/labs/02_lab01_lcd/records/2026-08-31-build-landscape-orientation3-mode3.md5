@@ -1,0 +1,78 @@
+实验：4.5 lab01_lcd（SMART-R 横屏方向 3 + 硬件 SPI 模式 3 修正版）
+日期：2026-08-31
+
+## 反馈与根因定位
+
+用户实际烧录横屏方向 3 镜像后确认：LCD 仍从右下角开始，说明上一版仅修改
+`MADCTL` 方向值没有解决问题。
+
+对比 SDK 原始 `b4_lcd` 和 RK2206 SPI 适配代码后发现：原始 LCD 硬件 SPI
+参考实现使用 `SPI_MODE_3`，而项目上一版根据 GPIO 模拟 SPI 的直觉改用了
+`SPI_MODE_0`。这两个实现的时钟边沿不能直接等同；在当前硬件抽象层下，模式 0
+可能让 LCD 能显示部分内容，但不能可靠接收初始化中的方向命令。
+
+本次只将硬件 SPI 配置恢复为 `SPI_MODE_3`，保持以下内容不变：
+
+- `USE_HORIZONTAL=3`，`LCD_W=320`，`LCD_H=240`；
+- `LCD_PIN_DC=GPIO0_PA4`，不使用电机 PWM6 的 `GPIO0_PC6`；
+- SPI0 M1、50 MHz、批量逐行刷屏和唯一 `APP_FEATURE_INIT` 启动入口。
+
+## TDD 验证
+
+先把本地契约从 `SPI_MODE_0` 改为 SDK 要求的 `SPI_MODE_3`，旧实现按预期失败：
+
+```text
+1 failed, 4 passed
+AssertionError: assert '.mode = SPI_MODE_3' in driver
+```
+
+恢复实现后重新运行：
+
+```text
+cloud_ecs\\.venv\\Scripts\\python.exe -m pytest device\\labs\\02_lab01_lcd\\tests -q
+.....                                                                    [100%]
+5 passed in 0.02s
+```
+
+## Ubuntu 构建
+
+独立工程：`/home/lzdz/rk2206/lab02-lab01-lcd-20260831`
+
+构建前确认：
+
+```text
+SPI_MODE_3
+USE_HORIZONTAL=3
+LCD_ENABLE_SPI=1
+LCD_PIN_DC=GPIO0_PA4
+```
+
+构建命令：
+
+```text
+export PATH=/home/lzdz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+hb build 2>&1 | tee build-landscape-orientation3-mode3.log
+```
+
+结果：`lockzhiner-rk2206 build success`，退出码 0，`liblab01_lcd.a` 重新编译
+并参与最终链接。完整输出见
+`2026-08-31-build-landscape-orientation3-mode3.log`。
+
+## 烧录产物
+
+- Windows 目录：`D:\实习\tmp\rk2206_images\lab02_lab01_lcd_landscape_orientation3_hwspi_mode3_20260831`
+- `Firmware.img`：2,097,152 bytes
+- `Firmware.img` MD5：`6d3cf42e42146864862b0e8fdb8d2f38`
+- `rk2206_db_loader.bin`：35,093 bytes
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`
+
+## 物理验收
+
+当前尚未由用户烧录确认，不能标记为通过。烧录时仅使用上述目录中的 Loader
+和 Firmware，按 PDF 用 `K2=MASKROM` 进入下载模式，完成后退出下载模式并用
+`K1=RESET` 重启。重点观察：
+
+- LCD 文字是否从左上角开始且方向正常；
+- UART 是否出现 `lab01_lcd: LCD OK`；
+- 电机是否保持静止；
+- 全屏刷屏速度是否正常。

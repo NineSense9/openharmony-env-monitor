@@ -83,6 +83,6 @@ def test_smart_r_lcd_uses_landscape_orientation_and_hardware_spi():
     assert "#define LCD_W 320" in header
     assert "#define LCD_H 240" in header
     assert "#define LCD_ENABLE_SPI      1" in driver
-    assert ".mode = SPI_MODE_0" in driver
+    assert ".mode = SPI_MODE_3" in driver
     assert "lcd_wr_data8(0xA0)" in driver
     assert "LzSpiWrite(LCD_SPI_BUS, 0, row_buffer, (xend - xsta) * 2)" in fill_body
