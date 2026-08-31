@@ -72,5 +72,27 @@ PATH 后重新执行 `hb build -f`，最终 `853/853`、返回码 0。完整日�
 初始实现遇到 `tx_key_is_pressed()` 读取错误时直接 `return`，因此 LCD 欢迎文字
 仍可显示，但状态行不显示，后续 K3 轮询也不会运行，表现为“K3 没反应”。修复后
 首次读取失败会显示 `K3: READ ERR`，任务保留并每 100 ms 重试；读取恢复后再
-输出并显示 `K3=PRESSED` 或 `K3=RELEASED`。同时按 SDK GPIO 示例将上拉配置改为
-`PULL_KEEP`。
+输出并显示 `K3=PRESSED` 或 `K3=RELEASED`。
+
+## 问题 5：PULL_KEEP 导致 K3 pinctrl 初始化失败
+
+第一次为解决 GPIO 读取失败而采用 `PULL_KEEP`，但用户烧录该版本后的 UART 明确
+输出：
+
+```text
+lab02_key_lcd: K3 pinctrl failed ret=1
+lab02_key_lcd: tx_key_init failed(1)
+```
+
+这说明失败发生在 `PinctrlSet` 初始化阶段，任务还没有进入 K3 状态轮询；因此
+截图中的“K3 没反应”不是按键读取逻辑或 K3 机械按键的结论。该版本的
+`Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，已标记作废。
+
+## 处理结果
+
+保留读取失败可见、100 ms 重试和 30 ms 正常轮询逻辑，将 K3 pinctrl 上拉配置改回
+`PULL_UP`，并重新执行 `hb build -f`。新构建完成 `853/853`，镜像 MD5 为
+`5d5360c5bcea67ec33f0c30924e27f4a`，产物目录为
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831`。
+
+烧录前必须先核对目录和 MD5；在实物反馈前，不把 K3 修复标记为已验收。

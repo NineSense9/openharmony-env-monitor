@@ -25,7 +25,8 @@ def test_key_driver_uses_pdf_k3_gpio_contract():
     assert "LZGPIO_DIR_IN" in driver
     assert "LzGpioGetVal" in driver
     assert "LZGPIO_LEVEL_LOW" in driver
-    assert "PULL_KEEP" in driver
+    assert "PULL_UP" in driver
+    assert "PULL_KEEP" not in driver
     assert "pressed" in driver
     assert "GPIO0_PC6" not in driver
     assert "LzSaradcReadValue" not in driver

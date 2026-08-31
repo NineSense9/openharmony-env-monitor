@@ -482,4 +482,33 @@ RESET/MASKROM，电机 PWM6=`GPIO0_PC6` 不被访问。
 `D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831`，
 `Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，Loader MD5 为
 `5f2ea974b0e1df5564a8e1ee910627bb`。新镜像内含 `K3: READ ERR` 和失败重试日志，
-待烧录后补录实际 UART/LCD/K3 结果。
+待烧录后补录实际 UART/LCD/K3 结果；该包随后因 `PULL_KEEP` pinctrl 失败而作废，
+下方 `PULL_UP` 版本才是当前验收包。
+
+## 4.6 K3 pinctrl 配置修正（2026-08-31）
+
+用户提供的 UART 截图显示旧 `PULL_KEEP` 包启动后立即输出：
+
+```text
+lab02_key_lcd: K3 pinctrl failed ret=1
+lab02_key_lcd: tx_key_init failed(1)
+```
+
+失败点在 `PinctrlSet(GPIO0_PC7, ...)`，业务任务没有进入 K3 轮询，因此此前的
+“K3 没反应”是初始化失败造成的，不是 K3 状态判断逻辑已经运行但读取不到。
+旧重试包 `Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，现标记
+作废。
+
+源码和契约测试已将 K3 pinctrl 改为 `PULL_UP`，保留读取失败显示和重试逻辑。远端
+Ubuntu 工程 `/home/lzdz/rk2206/lab03-lab02-key-lcd-20260831` 重新执行
+`hb build -f`，完成 `853/853`，返回码 0。当前烧录包为：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831\Firmware.img
+MD5: 5d5360c5bcea67ec33f0c30924e27f4a
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831\rk2206_db_loader.bin
+MD5: 5f2ea974b0e1df5564a8e1ee910627bb
+```
+
+该版本尚未完成实物烧录验收。烧录前不要再使用初始包或 `retry` 包；完成烧录后
+记录 UART、K3 按下/松开、LCD 显示和电机状态。

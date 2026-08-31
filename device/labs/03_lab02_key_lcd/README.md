@@ -2,9 +2,10 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前重试镜像会继承
-4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
-LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。
+已完成源码、契约测试和独立构建，等待烧录后的 K3 实物验收。当前 `PULL_UP` 镜像会
+继承 4.5 的 LCD 方向：屏幕能够显示内容，但文字仍从右下角倒置显示；本实验不修改
+LCD 初始化或方向寄存器，先验证 PDF 规定的 K3 按键状态链路。此前的 `PULL_KEEP`
+重试包已确认会在 pinctrl 初始化阶段失败，不能继续烧录。
 
 ## 课程依据
 
@@ -113,16 +114,26 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 `5ed8e34a6069dee30ebd8bd83bf90919`，Loader MD5 为
 `5f2ea974b0e1df5564a8e1ee910627bb`。
 
-本次 K3 读取失败修复后的当前烧录包单独保存到：
+此前的 K3 读取失败重试包单独保存到：
 
 ```text
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831
 ```
 
-当前只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`。新包的
-`Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，Loader MD5 仍为
-`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对该 MD5，不能继续使用上面
-初始包目录中的 `Firmware.img`。
+该包使用了错误的 `PULL_KEEP` 配置；实物 UART 已确认
+`K3 pinctrl failed ret=1`，因此标记为作废，仅保留用于故障记录。其
+`Firmware.img` MD5 为 `df7f5e3fbb3926bcbc08e3d657453a59`，不能继续使用。
+
+当前唯一可用于本次验收的烧录包单独保存到：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831
+```
+
+只使用该目录中的 `rk2206_db_loader.bin` 和 `Firmware.img`。当前包的
+`Firmware.img` MD5 为 `5d5360c5bcea67ec33f0c30924e27f4a`，Loader MD5 为
+`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须核对这两个值，不能使用初始包或
+上面的作废重试包。
 
 ## 独立构建和烧录
 
@@ -156,11 +167,12 @@ hb build
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-当前重试包烧录时只使用
-`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_retry_20260831` 中的
+当前 `PULL_UP` 包烧录时只使用
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831` 中的
 `rk2206_db_loader.bin` 和 `Firmware.img`，按 PDF 使用
 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
-UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的 MD5。
+UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的当前包
+MD5；烧录后应先看到 `lab02_key_lcd: K3=RELEASED`，再按住和松开 K3 验证状态。
 
 ## 验收清单
 
@@ -170,4 +182,4 @@ UART 使用 `115200 8N1`。烧录前核对 `records/2026-08-31-build.md5` 中的
 - [ ] 电机保持静止，没有重复启动或异常抖动；
 - [ ] 实际 UART 输出保存到 `records/2026-08-31-uart.txt` 后再提交验收记录。
 
-当前仅完成源码、自动化测试和固件构建；上板验收仍待实际烧录后确认。
+当前已完成源码、自动化测试和 `PULL_UP` 固件构建；上板验收仍待实际烧录后确认。

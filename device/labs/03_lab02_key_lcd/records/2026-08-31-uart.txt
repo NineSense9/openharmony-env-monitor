@@ -1,6 +1,26 @@
 实验：4.6 lab02_key_lcd
-状态：physical test pending
+状态：旧 PULL_KEEP 包实物失败；PULL_UP 包待烧录验收
 串口配置：115200 8N1
+
+本次用户截图中的实际 UART（对应已作废的 `lab03_lab02_key_lcd_retry_20260831`
+包）：
+
+```text
+lab02_key_lcd: LCD_INIT_BEGIN
+lab02_key_lcd: K3 pinctrl failed ret=1
+lab02_key_lcd: tx_key_init failed(1)
+```
+
+结论：失败发生在 K3 pinctrl 初始化阶段，程序没有进入 K3 轮询，所以按 K3 不会
+产生状态日志。该包的 `Firmware.img` MD5 为
+`df7f5e3fbb3926bcbc08e3d657453a59`，不能作为当前验收包。
+
+当前待验收包：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pullup_20260831\Firmware.img
+MD5: 5d5360c5bcea67ec33f0c30924e27f4a
+```
 
 预期启动与操作序列：
 lab02_key_lcd: LCD_INIT_BEGIN
