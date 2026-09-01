@@ -4,7 +4,10 @@
   },
   "targets": [
     {
-      "name": "default"
+      "name": "default",
+      "applyToProducts": [
+        "default"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@ohos/hvigor-ohos-plugin": "3.1.2"
+    "@ohos/hvigor-ohos-plugin": "6.24.4"
   },
   "execution": {
     "daemon": true

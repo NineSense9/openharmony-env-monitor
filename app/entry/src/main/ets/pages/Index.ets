@@ -9,6 +9,7 @@ import { EventLogView } from '../components/EventLogView';
 /**
  * 鸿蒙太空空间站掌上测控终端主页面
  */
+@Preview
 @Entry
 @Component
 struct Index {
