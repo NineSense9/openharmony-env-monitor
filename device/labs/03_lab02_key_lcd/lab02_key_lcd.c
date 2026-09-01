@@ -6,6 +6,14 @@
 #include "lcd.h"
 #include "tx_key.h"
 
+#define LCD_TEXT_X 10
+#define LCD_TITLE_TEXT_Y 40
+#define LCD_OK_TEXT_Y 80
+#define LCD_OPENHARMONY_TEXT_Y 120
+#define LCD_K3_STATUS_TEXT_Y 160
+#define LCD_STATUS_CLEAR_Y0 152
+#define LCD_STATUS_CLEAR_Y1 184
+
 static void lab02_key_lcd_task(void *arg)
 {
     unsigned int ret;
@@ -29,22 +37,22 @@ static void lab02_key_lcd_task(void *arg)
     }
 
     lcd_fill(0, 0, LCD_W, LCD_H, LCD_WHITE);
-    lcd_show_string(10, 40, "TX-SMART-R Lab01", LCD_RED, LCD_WHITE, 16, 0);
-    lcd_show_string(10, 80, "LCD OK", LCD_BLUE, LCD_WHITE, 16, 0);
-    lcd_show_string(10, 120, "OpenHarmony", LCD_BLACK, LCD_WHITE, 16, 0);
+    lcd_show_string(LCD_TEXT_X, LCD_TITLE_TEXT_Y, "TX-SMART-R Lab01", LCD_RED, LCD_WHITE, 16, 0);
+    lcd_show_string(LCD_TEXT_X, LCD_OK_TEXT_Y, "LCD OK", LCD_BLUE, LCD_WHITE, 16, 0);
+    lcd_show_string(LCD_TEXT_X, LCD_OPENHARMONY_TEXT_Y, "OpenHarmony", LCD_BLACK, LCD_WHITE, 16, 0);
 
     ret = tx_key_read_level(&raw_level);
     if (ret != LZ_HARDWARE_SUCCESS) {
         /* Keep the task alive so a transient GPIO read failure is observable. */
         last_pressed = 2U;
         diagnostic_elapsed_ms = 0U;
-        lcd_show_string(10, 96, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
+        lcd_show_string(LCD_TEXT_X, LCD_K3_STATUS_TEXT_Y, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
         printf("lab02_key_lcd: initial K3 read failed(%u)\r\n", ret);
     } else {
         pressed = (raw_level == LZGPIO_LEVEL_LOW) ? 1U : 0U;
         last_pressed = pressed;
         diagnostic_elapsed_ms = 0U;
-        lcd_show_string(10, 96, pressed ? "K3: PRESSED" : "K3: RELEASED",
+        lcd_show_string(LCD_TEXT_X, LCD_K3_STATUS_TEXT_Y, pressed ? "K3: PRESSED" : "K3: RELEASED",
                         LCD_BLUE, LCD_WHITE, 16, 0);
         printf("lab02_key_lcd: K3 raw=%u pressed=%u\r\n",
                (unsigned int)raw_level, (unsigned int)pressed);
@@ -55,8 +63,8 @@ static void lab02_key_lcd_task(void *arg)
         ret = tx_key_read_level(&raw_level);
         if (ret != LZ_HARDWARE_SUCCESS) {
             if (last_pressed != 2U) {
-                lcd_fill(10, 90, 300, 120, LCD_WHITE);
-                lcd_show_string(10, 96, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
+                lcd_fill(LCD_TEXT_X, LCD_STATUS_CLEAR_Y0, 300, LCD_STATUS_CLEAR_Y1, LCD_WHITE);
+                lcd_show_string(LCD_TEXT_X, LCD_K3_STATUS_TEXT_Y, "K3: READ ERR", LCD_RED, LCD_WHITE, 16, 0);
                 last_pressed = 2U;
             }
             printf("lab02_key_lcd: K3 read failed(%u)\r\n", ret);
@@ -67,8 +75,8 @@ static void lab02_key_lcd_task(void *arg)
         pressed = (raw_level == LZGPIO_LEVEL_LOW) ? 1U : 0U;
         if (pressed != last_pressed) {
             last_pressed = pressed;
-            lcd_fill(10, 90, 300, 120, LCD_WHITE);
-            lcd_show_string(10, 96, pressed ? "K3: PRESSED" : "K3: RELEASED",
+            lcd_fill(LCD_TEXT_X, LCD_STATUS_CLEAR_Y0, 300, LCD_STATUS_CLEAR_Y1, LCD_WHITE);
+            lcd_show_string(LCD_TEXT_X, LCD_K3_STATUS_TEXT_Y, pressed ? "K3: PRESSED" : "K3: RELEASED",
                             LCD_BLUE, LCD_WHITE, 16, 0);
             printf("lab02_key_lcd: K3=%s\r\n",
                    pressed ? "PRESSED" : "RELEASED");

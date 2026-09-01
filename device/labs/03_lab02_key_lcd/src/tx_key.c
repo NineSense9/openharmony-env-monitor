@@ -7,11 +7,17 @@
 unsigned int tx_key_init(void)
 {
     unsigned int ret;
+    unsigned int pinctrl_ret;
 
     ret = LzGpioInit(TX_KEY_K3);
     if (ret != LZ_HARDWARE_SUCCESS) {
         printf("lab02_key_lcd: K3 init failed ret=%u\r\n", ret);
         return ret;
+    }
+
+    pinctrl_ret = PinctrlSet(TX_KEY_K3, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL0);
+    if (pinctrl_ret != LZ_HARDWARE_SUCCESS) {
+        printf("lab02_key_lcd: K3 pinctrl warn ret=%u\r\n", pinctrl_ret);
     }
 
     ret = LzGpioSetDir(TX_KEY_K3, LZGPIO_DIR_IN);

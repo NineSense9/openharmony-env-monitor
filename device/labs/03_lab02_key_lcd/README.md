@@ -2,10 +2,16 @@
 
 ## 状态
 
-已完成源码、契约测试和独立构建。用户上板反馈 LCD 已正常显示 `LCD OK` 和
-`K3: PRESSED`，但继续操作 K3-K6 没有状态变化；当前原始 GPIO 电平诊断持续得到
-`K3 raw=0 pressed=1`。此前的 `PULL_KEEP` 和 `PULL_UP` 包都已确认会在 K3 的额外
-pinctrl 配置阶段失败，不能继续烧录。
+已完成源码、契约测试、Ubuntu 独立工程集成、Pin Sniffer 诊断和 PC7 正式版构建。
+此前用户上板反馈 LCD 已正常显示 `LCD OK` 和 `K3: PRESSED`，但 K3-K6 操作没有变化；
+旧 GPIO 诊断包持续得到 `K3 raw=0 pressed=1`。2026-09-01 使用 UART-only
+Pin Sniffer 后，实物 K3 按下/松开确认 `GPIO0_PC7` 出现 `1->0` 和 `0->1`，
+与授课文档 4.6 的 `K3=GPIO0_PC7`、低电平按下相符。
+
+当前正式版已改为对 `GPIO0_PC7` 先尝试 `PinctrlSet(..., MUX_FUNC0, PULL_KEEP,
+DRIVE_LEVEL0)`，但该返回值只作为 warning 记录，不再阻断后续 `LzGpioSetDir` 和
+`LzGpioGetVal`。用户已上板确认 K3 能在 `RELEASED` 和 `PRESSED` 间切换；随后发现
+状态刷新区域覆盖了 `LCD OK` 底部，已将状态行下移并生成新的布局修正版烧录包。
 
 ## 课程依据
 
@@ -80,7 +86,8 @@ lab02_key_lcd: K3=RELEASED
 cloud_ecs\.venv\Scripts\python.exe -m pytest device\labs\03_lab02_key_lcd\tests -q
 ```
 
-当前源码契约测试结果：`9 passed`（包含 3 项 ADC5 诊断契约测试）。
+当前源码契约测试覆盖正式 LCD+K3、ADC5+PC7 双通道诊断和 Pin Sniffer 诊断，结果为
+`15 passed`。
 
 ## 构建记录
 
@@ -153,7 +160,7 @@ D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_no_pinctrl_20260831
 `LzGpioSetDir(..., LZGPIO_DIR_IN)`，不对 K3 额外调用 `PinctrlSet`。新 ELF 和
 `Firmware.img` 中均已确认不存在 `K3 pinctrl failed` 字符串。
 
-## 当前诊断构建和烧录
+## 诊断构建和实物结论
 
 Ubuntu 工程：
 
@@ -172,7 +179,7 @@ hb env
 hb build
 ```
 
-只启用 `lab02_key_lcd_adc_diagnostic`：
+ADC5+PC7 输入矩阵诊断曾只启用 `lab02_key_lcd_adc_diagnostic`：
 
 - samples 的 GN 特性加入
   `"./lab02_key_lcd/diagnostics/adc5_key_lcd:lab02_key_lcd_adc_diagnostic",`；
@@ -186,31 +193,81 @@ hb build
 D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_20260831
 ```
 
-当前唯一推荐烧录的是诊断包，只使用
-`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831` 中的
-`rk2206_db_loader.bin` 和 `Firmware.img`。该目录已同步到 2026-09-01 最新构建，按 PDF 使用
-`K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET` 重启。
-UART 使用 `115200 8N1`。烧录前核对 `records/2026-09-01-build.md5` 中诊断包
-MD5。重启后先确保 K3 松开，再观察至少 2 秒的 `K3 raw=...`；随后按住、松开
-K3，各保持约 2 秒并保存完整 UART。不要用 K1 做按键测试，K1 是 RESET。
+双通道输入矩阵诊断包保留在：
 
-2026-09-01 曾出现一次“服务器已重新构建，但本地仍烧录旧诊断包”的同步问题：
-旧目录中的 `Firmware.img` 时间为 23:44，新目录文件已替换为 01:28 构建产物。
-当前诊断包的 `Firmware.img` MD5 为
-`35a412a1ef7e220efbf14bbc843994af`，Loader MD5 为
-`5f2ea974b0e1df5564a8e1ee910627bb`。烧录前必须用当前目录文件并核对这两个值，
-不能仅凭文件名判断是否为最新包。
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_input_matrix_20260901
+```
+
+- `Firmware.img` MD5：`ab8ee95e8d116c0705a46409baba77b0`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`。
+
+该 `Firmware.img` 已在 Ubuntu 和 Windows 两侧确认包含
+`K3_GPIO=GPIO0_PC7`、`ADC5 raw=`、`PC7 raw=`，且不包含旧
+`key=KEY_UNKNOWN`。旧目录
+`D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_diagnostic_20260831` 的
+`Firmware.img` MD5 为 `35a412a1ef7e220efbf14bbc843994af`，只作为历史错误同步记录保留，
+不要继续烧录。
+
+Pin Sniffer UART-only 诊断包保留在：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pin_sniffer_20260901
+```
+
+- `Firmware.img` MD5：`4824acbf9b81ae8b37cf6fcceb1e499a`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`。
+
+实物 UART 已确认：不按键时 `ADC3` 有约 `410-458` raw 的持续噪声，不能作为按键依据；
+K3 按下/松开时 `GPIO0_PC7` 出现 `1->0` 与 `0->1`，因此 K3 正式逻辑仍按 PDF 使用
+`GPIO0_PC7`。K4、K5、K6 的截图中也出现过 `GPIO0_PA3` 或 `GPIO0_PC7` 边沿，但当前
+4.6 实验只验收 K3，这些多按键线索先记录，不固化进正式业务。
+
+## 当前正式构建和烧录
+
+此前已验证 K3 可切换的正式包保留在：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pc7_pinctrl_20260901
+```
+
+- `Firmware.img` MD5：`9e5424c182a0f2e5fa8d488587edc987`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`。
+
+该 `Firmware.img` 已在 Ubuntu 和 Windows 两侧确认包含
+`lab02_key_lcd: K3 raw=`、`lab02_key_lcd: K3=`、`lab02_key_lcd: K3 pinctrl warn`，
+且不包含 `PIN_SNIFFER_READY`、`ADC5 raw` 和 `key=KEY_UNKNOWN`。构建和同步记录见
+[2026-09-01-pc7-formal-build.md](records/2026-09-01-pc7-formal-build.md)。
+
+当前唯一推荐烧录的是新的 LCD 布局修正版，只使用以下目录中的两个文件：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pc7_layout_20260901
+```
+
+- `Firmware.img` MD5：`483bf670889e886a2ce373ccf0b3aa53`；
+- `rk2206_db_loader.bin` MD5：`5f2ea974b0e1df5564a8e1ee910627bb`。
+
+布局修正版将 `K3` 状态行下移到 `y=160`，擦除区改为 `y=152-184`，不再覆盖
+`LCD OK` 和 `OpenHarmony`。该 `Firmware.img` 已确认包含正式 K3 字符串，且不包含
+Pin Sniffer 或 ADC5 诊断签名。构建和同步记录见
+[2026-09-01-pc7-layout-build.md](records/2026-09-01-pc7-layout-build.md)。
+
+按 PDF 使用 `K2=MASKROM` 进入下载模式；完成后退出下载模式，再使用 `K1=RESET`
+重启。UART 使用 `115200 8N1`。重启后先确保 K3 松开，观察 `K3: RELEASED` 与
+`K3 raw=1 pressed=0`；随后按住 K3 约 2 秒，应变为 `K3: PRESSED` 与
+`K3 raw=0 pressed=1`；松开后应恢复。不要用 K1 做按键测试，K1 是 RESET。
 
 ## 验收清单
 
-- [ ] UART 出现 LCD 初始化成功和原始 `K3 raw=...` 诊断输出；
+- [ ] UART 出现 LCD 初始化成功和原始 `K3 raw=... pressed=...` 诊断输出；
 - [ ] 按住 K3 后 UART 和 LCD 显示 `K3=PRESSED`；
 - [ ] 松开 K3 后 UART 和 LCD 恢复 `K3=RELEASED`；
-- [ ] 原始 GPIO 电平随 K3 操作在高低电平之间变化；
+- [ ] 原始 PC7 电平随 K3 操作在 `1` 和 `0` 之间变化；
 - [ ] 电机保持静止，没有重复启动或异常抖动；
-- [ ] 实际 UART 输出保存到 `records/2026-08-31-uart.txt` 后再提交验收记录。
+- [ ] 实际 UART 输出保存到 `records/2026-09-01-pc7-formal-uart.txt` 后再提交验收记录。
 
-当前已完成源码、自动化测试和诊断固件构建；最终 K3 修复仍待原始电平诊断结果确认。
-本次复测记录见 [2026-08-31-uart.txt](records/2026-08-31-uart.txt)；下一步只需在所有按键
-完全松开后复位并观察 `raw` 是否回到 `1`，再按住和松开 K3。若始终为 `0`，应把问题交给
-老师核对板级原理图、PC7 复用和实体按键连线，不能继续凭猜测改代码。
+当前已完成源码、自动化测试和布局修正版正式固件构建；最终布局仍待用户烧录
+`lab03_lab02_key_lcd_pc7_layout_20260901` 后确认 `LCD OK` 不再被状态行影响。
+本次 Pin Sniffer 复测记录见
+[2026-09-01-pin-sniffer-build.md](records/2026-09-01-pin-sniffer-build.md)。

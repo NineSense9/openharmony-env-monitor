@@ -25,7 +25,12 @@ def test_key_driver_uses_pdf_k3_gpio_contract():
     assert "LZGPIO_DIR_IN" in driver
     assert "LzGpioGetVal" in driver
     assert "LZGPIO_LEVEL_LOW" in driver
-    assert "PinctrlSet" not in driver
+    assert "PinctrlSet" in driver
+    assert "MUX_FUNC0" in driver
+    assert "PULL_KEEP" in driver
+    assert "DRIVE_LEVEL0" in driver
+    assert "K3 pinctrl warn" in driver
+    assert "return pinctrl_ret" not in driver
     assert "pressed" in driver
     assert "GPIO0_PC6" not in driver
     assert "LzSaradcReadValue" not in driver
@@ -43,7 +48,12 @@ def test_key_lcd_task_reports_only_changed_k3_state():
     assert "K3: PRESSED" in source
     assert "K3: RELEASED" in source
     assert "if (pressed != last_pressed)" in source
-    assert "lcd_fill(10, 90, 300, 120, LCD_WHITE);" in source
+    assert "#define LCD_OK_TEXT_Y 80" in source
+    assert "#define LCD_OPENHARMONY_TEXT_Y 120" in source
+    assert "#define LCD_K3_STATUS_TEXT_Y 160" in source
+    assert "lcd_show_string(LCD_TEXT_X, LCD_K3_STATUS_TEXT_Y" in source
+    assert "lcd_fill(LCD_TEXT_X, LCD_STATUS_CLEAR_Y0, 300, LCD_STATUS_CLEAR_Y1, LCD_WHITE);" in source
+    assert "lcd_fill(10, 90, 300, 120, LCD_WHITE);" not in source
     assert "LOS_Msleep(30);" in source
     assert "APP_FEATURE_INIT(lab02_key_lcd_example)" in source
 

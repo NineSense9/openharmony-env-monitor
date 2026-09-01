@@ -1,0 +1,23 @@
+# 4.6 Pin Sniffer 诊断校验值（2026-09-01）
+
+来源：Ubuntu `hb build -f` 输出与 Windows 独立烧录目录，算法为 MD5。
+
+| 文件 | 大小 | MD5 |
+| --- | ---: | --- |
+| `Firmware.img` | 2,097,152 bytes | `4824acbf9b81ae8b37cf6fcceb1e499a` |
+| `rk2206_db_loader.bin` | 35,093 bytes | `5f2ea974b0e1df5564a8e1ee910627bb` |
+| Ubuntu `liteos.bin` | 538,696 bytes | `8cf0ddf9ba8c512d7d53cc06c6cb805c` |
+| Ubuntu `liteos.elf` | 1,426,116 bytes | `2942e371d0903d5ea3999a8902c1fabd` |
+
+Windows 烧录目录：
+
+```text
+D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pin_sniffer_20260901
+```
+
+烧录前核对：
+
+```powershell
+Get-FileHash D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pin_sniffer_20260901\Firmware.img -Algorithm MD5
+Get-FileHash D:\实习\tmp\rk2206_images\lab03_lab02_key_lcd_pin_sniffer_20260901\rk2206_db_loader.bin -Algorithm MD5
+```

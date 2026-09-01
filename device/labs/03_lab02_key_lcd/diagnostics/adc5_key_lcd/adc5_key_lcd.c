@@ -7,6 +7,7 @@
 
 #define ADC_CHANNEL 5
 #define USER_KEY_ADC GPIO0_PC5
+#define K3_GPIO GPIO0_PC7
 #define ADC_SAMPLE_INTERVAL_MS 100
 
 static DevIo m_user_key_adc = {
@@ -63,11 +64,37 @@ static unsigned int adc5_key_read(unsigned int *raw, float *voltage)
     return LZ_HARDWARE_SUCCESS;
 }
 
+static unsigned int k3_gpio_init(void)
+{
+    unsigned int ret;
+
+    ret = LzGpioInit(K3_GPIO);
+    printf("lab02_key_lcd_adc: K3_GPIO=GPIO0_PC7 LzGpioInit ret=%u\r\n", ret);
+    if (ret != LZ_HARDWARE_SUCCESS) {
+        return ret;
+    }
+
+    ret = LzGpioSetDir(K3_GPIO, LZGPIO_DIR_IN);
+    printf("lab02_key_lcd_adc: K3_GPIO=GPIO0_PC7 LzGpioSetDir ret=%u\r\n", ret);
+    return ret;
+}
+
+static unsigned int k3_gpio_read(LzGpioValue *level)
+{
+    if (level == NULL) {
+        return LZ_HARDWARE_FAILURE;
+    }
+
+    return LzGpioGetVal(K3_GPIO, level);
+}
+
 static void adc5_key_lcd_task(void *arg)
 {
     unsigned int ret;
     unsigned int raw;
     float voltage;
+    unsigned int k3_ret;
+    LzGpioValue k3_level = LZGPIO_LEVEL_HIGH;
     char raw_text[48];
     char voltage_text[48];
 
@@ -85,21 +112,31 @@ static void adc5_key_lcd_task(void *arg)
         return;
     }
 
+    k3_ret = k3_gpio_init();
+    if (k3_ret != LZ_HARDWARE_SUCCESS) {
+        lcd_show_string(10, 88, "K3 GPIO INIT ERROR", LCD_RED, LCD_WHITE, 16, 0);
+    }
+
     lcd_fill(0, 0, LCD_W, LCD_H, LCD_WHITE);
     lcd_show_string(10, 40, "TX-SMART-R Lab02", LCD_RED, LCD_WHITE, 16, 0);
     lcd_show_string(10, 64, "ADC5 USER KEY", LCD_BLUE, LCD_WHITE, 16, 0);
-    lcd_show_string(10, 88, "KEY_UNKNOWN", LCD_BLACK, LCD_WHITE, 16, 0);
+    lcd_show_string(10, 88, "K3 PC7 + ADC5", LCD_BLACK, LCD_WHITE, 16, 0);
 
     while (1) {
+        k3_ret = k3_gpio_read(&k3_level);
+        if (k3_ret != LZ_HARDWARE_SUCCESS) {
+            printf("lab02_key_lcd_adc: PC7 read failed ret=%u\r\n", k3_ret);
+        }
+
         ret = adc5_key_read(&raw, &voltage);
         lcd_fill(10, 112, 300, 152, LCD_WHITE);
         if (ret != LZ_HARDWARE_SUCCESS) {
             printf("lab02_key_lcd_adc: ADC read failed ret=%u\r\n", ret);
             lcd_show_string(10, 112, "ADC READ ERROR", LCD_RED, LCD_WHITE, 16, 0);
         } else {
-            printf("lab02_key_lcd_adc: USER_KEY_ADC=GPIO0_PC5 raw=%u "
-                   "voltage=%.3fV key=KEY_UNKNOWN\r\n",
-                   raw, voltage);
+            printf("lab02_key_lcd_adc: ADC5 raw=%u voltage=%.3fV "
+                   "PC7 raw=%u\r\n",
+                   raw, voltage, (unsigned int)k3_level);
             snprintf(raw_text, sizeof(raw_text), "RAW: %u", raw);
             snprintf(voltage_text, sizeof(voltage_text), "V: %.3fV", voltage);
             lcd_show_string(10, 112, raw_text, LCD_BLACK, LCD_WHITE, 16, 0);

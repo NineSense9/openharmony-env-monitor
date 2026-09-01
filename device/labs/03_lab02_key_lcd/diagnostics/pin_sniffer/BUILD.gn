@@ -1,0 +1,15 @@
+static_library("lab02_key_pin_sniffer") {
+    sources = [
+        "pin_sniffer.c",
+    ]
+
+    include_dirs = [
+        "//utils/native/lite/include",
+        "//device/lockzhiner/rk2206/adapter/include",
+        "../../include",
+    ]
+
+    deps = [
+        "//device/rockchip/hardware:hardware",
+    ]
+}
