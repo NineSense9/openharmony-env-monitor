@@ -1,0 +1,12 @@
+# 04_lab03_light_key_lcd 构建产物 MD5
+
+## Windows 烧录目录
+路径: `D:\实习\tmp\rk2206_images\lab04_lab03_light_key_lcd_20260901`
+
+- `Firmware.img`: `bf891d8f00f72c5cd82af3b0abc91845`
+- `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## Ubuntu 产物
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `bf891d8f00f72c5cd82af3b0abc91845`
+- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `e2e6e1910c250b67bf0525749e1ec333`
+- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `f2fed55c7b9a3f954cd667dfb8c728eb`
