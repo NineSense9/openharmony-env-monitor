@@ -11,6 +11,9 @@ export struct ControlSection {
   public onToggleMotor: (turnOn: boolean) => void = () => {};
   public onMuteAlarm: () => void = () => {};
 
+  @State pendingActionTitle: string = '执行控制指令';
+  private pendingActionType: string = 'motor_on';
+
   private pinDialogController: CustomDialogController = new CustomDialogController({
     builder: PinVerifyDialog({
       actionTitle: this.pendingActionTitle,
@@ -22,10 +25,7 @@ export struct ControlSection {
     customStyle: true
   });
 
-  @State pendingActionTitle: string = '';
-  private pendingActionType: 'motor_on' | 'motor_off' | 'mute' = 'motor_on';
-
-  private executePendingAction() {
+  private executePendingAction(): void {
     if (this.pendingActionType === 'motor_on') {
       this.onToggleMotor(true);
     } else if (this.pendingActionType === 'motor_off') {
@@ -35,7 +35,7 @@ export struct ControlSection {
     }
   }
 
-  private requestAction(type: 'motor_on' | 'motor_off' | 'mute', title: string) {
+  private requestAction(type: string, title: string): void {
     this.pendingActionType = type;
     this.pendingActionTitle = title;
     this.pinDialogController.open();

@@ -1,4 +1,5 @@
 {
+  "modelVersion": "6.1.1",
   "name": "entry",
   "version": "1.0.0",
   "description": "Space Station Monitor Entry Module",

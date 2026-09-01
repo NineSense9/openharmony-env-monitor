@@ -1,4 +1,6 @@
 import UIAbility from '@ohos.app.ability.UIAbility';
+import AbilityConstant from '@ohos.app.ability.AbilityConstant';
+import Want from '@ohos.app.ability.Want';
 import window from '@ohos.window';
 import hilog from '@ohos.hilog';
 
@@ -6,15 +8,15 @@ import hilog from '@ohos.hilog';
  * 鸿蒙太空测控应用生命周期入口
  */
 export default class EntryAbility extends UIAbility {
-  onCreate(want, launchParam) {
+  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
   }
 
-  onDestroy() {
+  onDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage) {
+  onWindowStageCreate(windowStage: window.WindowStage): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
     // 加载主页面
@@ -27,15 +29,15 @@ export default class EntryAbility extends UIAbility {
     });
   }
 
-  onWindowStageDestroy() {
+  onWindowStageDestroy(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
   }
 
-  onForeground() {
+  onForeground(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onForeground');
   }
 
-  onBackground() {
+  onBackground(): void {
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onBackground');
   }
 }
