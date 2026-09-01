@@ -31,7 +31,7 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState }) => {
       <div className="flex-1 relative flex items-center justify-center bg-radial-gradient py-2">
         <AirflowCanvas isRunning={systemState.isMotorRunning} isAlarm={systemState.isAlarmActive} />
 
-        {/* Space Cabin Isometric Vector Blueprint - Perfectly Centered and Scaled */}
+        {/* Space Cabin Isometric Vector Blueprint */}
         <svg className="w-full h-full max-h-[290px] z-10 filter drop-shadow-[0_0_10px_rgba(0,240,255,0.15)]" viewBox="0 0 640 250" fill="none" preserveAspectRatio="xMidYMid meet">
           {/* Outer Shell */}
           <rect x="50" y="20" width="540" height="205" rx="32" stroke="rgba(0, 240, 255, 0.35)" strokeWidth="1.5" fill="rgba(8, 14, 30, 0.45)" />
@@ -41,10 +41,10 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState }) => {
           <line x1="230" y1="20" x2="230" y2="225" stroke="rgba(0, 240, 255, 0.12)" strokeDasharray="4 4" />
           <line x1="410" y1="20" x2="410" y2="225" stroke="rgba(0, 240, 255, 0.12)" strokeDasharray="4 4" />
 
-          {/* Module Section Labels */}
-          <text x="85" y="48" fill="#64748B" fontSize="10" fontFamily="Orbitron" letterSpacing="1">SEC-A: CREW HABITAT</text>
-          <text x="255" y="48" fill="#64748B" fontSize="10" fontFamily="Orbitron" letterSpacing="1">SEC-B: SCIENCE LAB</text>
-          <text x="435" y="48" fill="#64748B" fontSize="10" fontFamily="Orbitron" letterSpacing="1">SEC-C: AIR VENTILATION</text>
+          {/* Module Section Labels - Properly fitted within chambers */}
+          <text x="85" y="48" fill="#64748B" fontSize="9" fontFamily="Orbitron" letterSpacing="0.5">SEC-A: HABITAT</text>
+          <text x="260" y="48" fill="#64748B" fontSize="9" fontFamily="Orbitron" letterSpacing="0.5">SEC-B: SCIENCE LAB</text>
+          <text x="440" y="48" fill="#64748B" fontSize="9" fontFamily="Orbitron" letterSpacing="0.5">SEC-C: AIR VENT</text>
 
           {/* Sensor 1: SHT30 Node */}
           <g>

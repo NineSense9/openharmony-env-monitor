@@ -40,7 +40,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
       setIsAuthorized(true);
       setShowPinModal(false);
       playClick();
-      addLog('[AUTH SUCCESS] 控制指令安全密钥验证通过 (PIN: 123456)', 'info');
+      addLog('[AUTH SUCCESS] 控制指令安全密钥验证通过', 'info');
       if (pendingAction) {
         pendingAction();
         setPendingAction(null);
@@ -181,8 +181,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
                   setPinInput(e.target.value);
                   setPinError(false);
                 }}
-                placeholder="默认 PIN: 123456"
-                className={`w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border font-code text-center text-lg tracking-[0.3em] text-[#00F0FF] focus:outline-none ${
+                placeholder="••••••"
+                className={`w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border font-code text-center text-lg tracking-[0.3em] text-[#00F0FF] focus:outline-none placeholder:tracking-normal placeholder:text-slate-600 ${
                   pinError 
                     ? 'border-rose-500 bg-rose-950/20' 
                     : 'border-slate-700 focus:border-[#00F0FF]'
