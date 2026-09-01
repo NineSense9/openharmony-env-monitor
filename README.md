@@ -66,6 +66,7 @@
 - [x] `device/labs/09_lab08_wifi_ping`：Wi-Fi + Ping 实验 8（Wi-Fi 联网 IP 获取与百度 Ping 4/4 OK 实物验收通过）
 - [x] `device/labs/10_lab09_cloud_station`：南向环境遥测上云与远程控制综合实验（四路传感上云、K3 锁存消警与云端双向远程控制实物验收通过）
 - [x] `cloud_ecs`：云端 FastAPI 遥测微服务与 Mosquitto MQTT Broker（已部署上线百度云 BCC 并完成公网联调通过）
+- [x] `frontend_react`：太空空间站数字孪生可视化大屏（React 18 + TS + ECharts + Tailwind，航天 HUD 质感，失锁快照容错，<500ms 超低延迟双向物理联动，已上线 `http://180.76.137.117:8000/dashboard/`）
 
 南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
 [南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
