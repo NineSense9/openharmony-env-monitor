@@ -1,0 +1,6 @@
+[wifi] connected, IP=192.168.9.51
+[ping] reply from 124.237.178.212 seq=1, rtt=35 ms
+[ping] reply from 124.237.178.212 seq=2, rtt=32 ms
+[ping] reply from 124.237.178.212 seq=3, rtt=34 ms
+[ping] reply from 124.237.178.212 seq=4, rtt=36 ms
+===== lab08_wifi_ping OK (Summary: 4/4 OK) =====

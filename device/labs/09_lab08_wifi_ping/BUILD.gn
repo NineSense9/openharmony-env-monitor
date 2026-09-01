@@ -1,0 +1,31 @@
+# Copyright (c) 2022 FuZhou Lockzhiner Electronic Co., Ltd. All rights reserved.
+
+import("//drivers/adapter/khdf/liteos_m/hdf.gni")
+import("//device/rockchip/rk2206/sdk_liteos/board.gni")
+
+static_library("lab08_wifi_ping") {
+    sources = [
+        "lab08_wifi_ping.c",
+        "src/lcd.c",
+        "src/ping.c",
+    ]
+
+    include_dirs = [
+        "include",
+        "//utils/native/lite/include",
+        "//device/rockchip/hardware/project/rk2206/src",
+        "//device/rockchip/hardware/lib/hal/inc/",
+        "//device/rockchip/rk2206/adapter/include",
+        "//device/rockchip/rk2206/adapter/include/lz_hardware/",
+        "//device/rockchip/rk2206/sdk_liteos/board/include",
+        "//kernel/liteos_m/kal/posix/include",
+        "//kernel/liteos_m/components/net/lwip-2.1/porting/include",
+        "//third_party/lwip/src/include",
+        "//third_party/lwip/src/include/lwip",
+    ]
+
+    deps = [
+        "//device/rockchip/hardware:hardware",
+        "//kernel/liteos_m/kal/posix",
+    ]
+}

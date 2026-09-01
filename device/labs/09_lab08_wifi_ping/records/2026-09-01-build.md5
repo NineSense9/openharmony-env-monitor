@@ -1,0 +1,12 @@
+# 09_lab08_wifi_ping 构建产物 MD5
+
+## Windows 烧录目录
+路径: `D:\实习\tmp\rk2206_images\lab09_lab08_wifi_ping_20260901`
+
+- `Firmware.img`: `a20764a68dc114bcb59c46242e5a9a2e`
+- `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## Ubuntu 产物
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `a20764a68dc114bcb59c46242e5a9a2e`
+- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `da58660dbf0b0ffc60433cbc7b8d9932`
+- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `1a5011d3437339b52400c294d0a39731`
