@@ -1,81 +1,110 @@
 # 太空空间站内部环境监测端云一体化系统
 
-沈阳航空航天大学生产实习项目(软通动力方向,2026.08.31 – 2026.09.11)。
-基于 **OpenHarmony 南北向全栈**:RK2206 开发板采集舱内环境数据 → Wi-Fi/HTTP 上云 → 鸿蒙 APP 实时可视化与远程管控。
+沈阳航空航天大学生产实习项目（软通动力方向，2026.08.31 – 2026.09.11）。
+基于 **OpenHarmony 南北向全栈**：RK2206 开发板采集舱内环境数据 → Wi-Fi/HTTP 上云 → 鸿蒙原生 ArkTS APP & 数字孪生大屏实时可视化与远程双向管控。
 
-## 系统链路
+---
 
-```
-感知层(传感器) → 鸿蒙终端层(RK2206) → 网络层(Wi-Fi)
-  → 云端服务层(FastAPI/SQLite) → 鸿蒙APP应用层(ArkTS/ArkUI)
-```
-
-## 技术栈
-
-| 层 | 技术 |
-|---|---|
-| 北向 APP | ArkTS / ArkUI(DevEco Studio)、环境数据可视化、HTTP API |
-| 南向设备 | RK2206 + C 语言、GPIO/I2C/SPI、传感器驱动、Wi-Fi 上云、低功耗 |
-| 云端 | FastAPI、SQLAlchemy、SQLite、历史数据和远程指令 |
-
-## 目录结构
+## 🚀 系统全链路架构
 
 ```
-├── app/       # 北向:鸿蒙监测 APP(ArkTS/ArkUI,Day1–Day6)
-├── device/    # 南向:RK2206 底层工程与驱动(Day7–Day9)
-└── docs/      # 全套文档:实训方案梳理、需求、实验记录、测试报告等
+[感知层 / 传感器]
+   ├── SHT30 温湿度传感器 (I2C0 @ 0x44)
+   ├── BH1750 环境光照传感器 (I2C0 @ 0x23)
+   └── MQ-2 烟雾气体传感器 (SARADC @ CH4)
+         │
+         ▼
+[鸿蒙终端层 / 南向设备]
+   └── 小凌派 RK2206 (OpenHarmony 3.0 LTS / LiteOS-M)
+         ├── 2.4寸 SPI TFT-LCD 高清屏 (180° 正向对齐 / 60 汉字防残影字库)
+         ├── 硬件级按键防抖与边沿检测 (K3 最高中断优先级)
+         ├── 声光联动 (PWM 无源蜂鸣器 + PA5 告警灯) 与执行机构 (排风电机)
+         └── 500ms 极速遥测上报与 200ms 远程指令轮询
+         │
+         ▼ (Wi-Fi 局域网 / TCP Socket)
+[云端服务层 / 百度云 BCC]
+   └── 180.76.137.117:8000 (FastAPI + SQLAlchemy + SQLite + Mosquitto MQTT)
+         ├── /api/telemetry (最新遥测获取 / 历史时序查询 / 硬件心跳失锁检测)
+         └── /api/command (指令下发 / 待执行查询 / ACK 闭环应答)
+         │
+         ├──► [Web 北向 / 数字孪生大屏] (React 18 + TS + ECharts 5 + Tailwind)
+         │       └── http://180.76.137.117:8000/dashboard/
+         │
+         └──► [鸿蒙北向 / 掌上测控终端 APP] (ArkTS Stage 模型 / DevEco Studio 6.1)
+                 └── 纯矢量航天工程 HUD、360° 旋转涡轮风扇、示波走势、PIN 免密授权
 ```
 
-## 核心功能
+---
 
-- 多传感器数据采集(滤波、误差校准)
-- 本地自动控制(SPI 屏显、阈值调控、声光告警、低功耗休眠)
-- Wi-Fi-MQTT 双向通信(数据上传、远程指令、断网缓存)
-- 鸿蒙 APP 可视化(实时卡片、历史曲线、异常标红、告警弹窗)
-- 远程管控(自定义阈值、远程启停、操作日志)
+## 🛠️ 技术栈与工程结构
 
-## 技术指标
+| 层次 | 核心技术 | 成果与运行环境 |
+|---|---|---|
+| **鸿蒙北向 APP** | ArkTS、ArkUI (Stage 模型)、`@ohos.net.http`、Canvas 示波器、纯矢量 SVG 资产 | DevEco Studio 6.1 (Release HAP 打包完毕，支持模拟器/真机) |
+| **Web 孪生大屏** | React 18、TypeScript、Vite、Tailwind CSS、ECharts 5、Framer Motion | 百度云 BCC 线上部署 (`/dashboard/`)，<240ms 极速双向响应 |
+| **云端微服务** | Python 3.10、FastAPI、Pydantic、SQLAlchemy、SQLite3、Mosquitto | 百度云 BCC (180.76.137.117:8000) 高并发服务 |
+| **南向嵌入式** | C 语言、LiteOS-M、GPIO、I2C、SPI、SARADC、PWM、lwIP、Wi-Fi | RK2206 (`Firmware.img` 2MB，支持停止电机自动恢复监测) |
 
-| 指标 | 目标 |
-|---|---|
-| 传感器采集误差 | < 3% |
-| 远程指令响应 | < 500 ms |
-| 断网缓存 | ≥ 24 h 历史数据 |
+### 📂 仓库目录
 
-## 进度(10 天计划)
+```
+├── app/                  # 北向: 鸿蒙 ArkTS 空间站掌上测控 APP (Stage 模型)
+│   ├── AppScope/         # 全局应用配置与图标
+│   ├── entry/            # 核心业务模块 (Components / Pages / ViewModel / Resources)
+│   │   └── src/main/
+│   │       ├── ets/
+│   │       │   ├── common/      # 常量配置 (Constants.ets) 与 HTTP 工具 (HttpUtil.ets)
+│   │       │   ├── components/  # 航天 HUD 组件 (Header, SensorCard, Control, Chart, Splash)
+│   │       │   ├── model/       # 数据模型 (TelemetryData, CommandPayload, EventLogItem)
+│   │       │   ├── pages/       # 主页面 (Index.ets)
+│   │       │   └── viewmodel/   # 状态管理机 (StationViewModel.ets)
+│   │       └── resources/       # 11 组纯矢量 SVG 图标与主题配置
+│   └── build-profile.json5
+├── cloud_ecs/            # 云端: FastAPI 遥测微服务与 SQLite 数据库
+├── frontend_react/       # Web: 太空空间站数字孪生可视化大屏
+├── device/               # 南向: RK2206 底层工程与独立实验 (Lab01 ~ Lab09)
+│   ├── images/           # 编译生成的最终烧录镜像 (Firmware.img)
+│   └── labs/             # 10 组逐步递进的南向实验源码与独立 README
+└── docs/                 # 全套文档: 实习方案梳理、架构设计、技术方案与每日校友邦日志
+```
 
-- [ ] **北向阶段** Day1–6(8/31–9/7):环境搭建与需求 → 可视化界面 → MQTT 云端对接 → 远程控制与告警 → 优化与阶段验收
-- [ ] **南向阶段** Day7–9(9/8–9/10):RK2206 环境 → 传感器驱动与校准 → 本地控制/上云/低功耗
-- [ ] **整合答辩** Day10(9/11):全链路联调、文档、答辩
+---
 
-> 详细逐日计划见 [docs/生产实习流程梳理.md](docs/生产实习流程梳理.md)
+## 🌟 核心系统特性与创新亮点
 
-## 当前实际进度 (2026-09-01)
+1. **纯矢量航天工程 HUD（Zero Emoji）**：
+   - 彻底告别廉价 Emoji 符号，自研 11 组高精度纯矢量 SVG 图标（卫星、高精水银温标、湿度水滴、光学聚焦光照度、气体流场微粒、6叶涡轮风机等）；
+   - 360° 激光雷达同心扫描自检开屏画面（`SplashScreen`），展现太空站航电系统冷启动仪式感。
+2. **60fps 动态旋转涡轮风机动画**：
+   - 手机端与 Web 端风机动画与开发板电机物理转速 100% 孪生映射；
+   - 启动时风扇飞速旋转并散发赛博青色高光，待机时平滑减速降频。
+3. **Canvas 示波器级温湿度时序走势**：
+   - 细密经纬网格线、双色平滑面积渐变阴影（Area Gradient Fill）、最新数据点发光雷达圆环。
+4. **会话级 PIN 码（123456）免密授权记忆**：
+   - 首次点击控制输入一次 PIN 码即锁定授权，后续启动/停止电机或一键消警免密毫秒级直发。
+5. **南向嵌入式状态自动恢复机制**：
+   - 手机停止电机时，板端自动解除远程强制覆盖模式（`g_remote_override = false`），屏幕秒级自动恢复为“正常监测”，无需手动点按 K3 按键。
+6. **失锁快照容错与超低时延链路**：
+   - 硬件掉电 6 秒后自动打标 `[CACHED]` 快照并记录失锁时间；端云双向物理控制响应延迟 `< 240ms`。
 
-- [x] 南向源码准备、`hb` 安装、基础固件编译
-- [x] RKDevTool 烧录验证
-- [x] UART 启动日志验证
-- [x] `device/labs/01_hello_world` 独立实验
-- [x] `device/labs/02_lab01_lcd`：LCD 实验 1（功能基线可运行，LCD 欢迎文字点亮）
-- [x] `device/labs/03_lab02_key_lcd`：按键 + LCD 实验 2（K3=PC7 实物验收通过，LCD 布局修正完成）
-- [x] `device/labs/04_lab03_light_key_lcd`：告警灯 + 按键 + LCD 实验 3（K3 翻转 PA5 告警灯与屏幕 Light: ON/OFF 状态同步实物验收通过）
-- [x] `device/labs/05_lab04_mq2_key_lcd`：MQ2 气体传感器 + K3 校准 + LCD 实验 4（Gas PPM 采样与 K3 校准实物验收通过）
-- [x] `device/labs/06_lab05_sht30_key_lcd`：SHT30 温湿度传感器 + K3 冻结 + LCD 实验 5（SHT30 温湿度采样与 K3 冻结实物验收通过）
-- [x] `device/labs/07_lab06_multitask_lcd`：多任务 + LCD 实验 6（3s 采样与 200ms UI 多任务调度实物验收通过）
-- [x] `device/labs/08_lab07_cabin_station`：舱内环境监测站 实验 7（四路传感、声光电机联动与消警实物验收通过）
-- [x] `device/labs/09_lab08_wifi_ping`：Wi-Fi + Ping 实验 8（Wi-Fi 联网 IP 获取与百度 Ping 4/4 OK 实物验收通过）
-- [x] `device/labs/10_lab09_cloud_station`：南向环境遥测上云与远程控制综合实验（四路传感上云、K3 锁存消警与云端双向远程控制实物验收通过）
-- [x] `cloud_ecs`：云端 FastAPI 遥测微服务与 Mosquitto MQTT Broker（已部署上线百度云 BCC 并完成公网联调通过）
-- [x] `frontend_react`：太空空间站数字孪生可视化大屏（React 18 + TS + ECharts + Tailwind，航天 HUD 质感，失锁快照容错，<500ms 超低延迟双向物理联动，已上线 `http://180.76.137.117:8000/dashboard/`）
-- [x] `app`：OpenHarmony 原生 ArkTS 空间站掌上测控终端 APP（Stage 模型，2x2 拟态毛玻璃，原生 Canvas 双轴曲线，6 位 PIN 码安全授权，支持 DevEco Studio 模拟器 / Previewer 运行）
+---
 
-南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
-[南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
-当前基线见 [00_bringup](device/labs/00_bringup/README.md)，当前最新实验见
-[10_lab09_cloud_station](device/labs/10_lab09_cloud_station/README.md)。
+## 📊 生产实习实训进度全览 (2026.08.31 – 2026.09.01)
 
-## 团队分工
+- [x] **南向基础环境**：Ubuntu 编译环境搭建、`hb` 工具链、RKDevTool 烧录与 UART 日志调通
+- [x] **Lab01 ~ Lab03**：SPI TFT-LCD 屏幕驱动、180° 正向对齐、60 汉字字库、K3 按键硬件边沿检测与 PA5 告警灯联动
+- [x] **Lab04 ~ Lab06**：MQ-2 气体传感器采样与 K3 校准、SHT30 I2C 温湿度采样与数据冻结、LiteOS-M 多任务并发调度
+- [x] **Lab07 ~ Lab08**：四路传感声光电机舱内联动控制站、Wi-Fi 驱动移植与公网 IP Ping 连通
+- [x] **Lab09 综合实验**：端云遥测上报、K3 锁存消警与双向远程控制闭环
+- [x] **云端微服务**：FastAPI 遥测中枢与 SQLite 历史存储部署至百度云 BCC (180.76.137.117:8000)
+- [x] **Web 北向孪生**：React 18 + TS + ECharts 5 航天数字孪生大屏开发上线 (`/dashboard/`)
+- [x] **鸿蒙北向 APP**：ArkTS Stage 原生 APP 全量研发，通过 DevEco Studio 6.1 编译验证并完成 HAP 打包
 
-4–6 人分组,角色:项目经理 / 鸿蒙应用工程师(北向)/ 鸿蒙嵌入式工程师(南向)/ 物联网测试工程师 / 文档工程师。
+---
 
-> 成员名单与定岗确定后在此更新。
+## 📝 实习日志归档
+
+- 📄 [2026-08-31 校友邦实习日志（第1篇：南向环境与基础外设实验）](docs/logs/2026-08-31-校友邦实习日志.md)
+- 📄 [2026-09-01 校友邦实习日志（第2篇：多传感器调度与Wi-Fi端云通信）](docs/logs/2026-09-01-校友邦实习日志-第2篇.md)
+- 📄 [2026-09-01 校友邦实习日志（第3篇：太空空间站数字孪生大屏与极速低延迟优化）](docs/logs/2026-09-01-校友邦实习日志-第3篇.md)
+- 📄 [2026-09-01 校友邦实习日志（第4篇：OpenHarmony 原生 ArkTS 掌上终端研发与全栈闭环）](docs/logs/2026-09-01-校友邦实习日志-第4篇.md)

@@ -1,5 +1,6 @@
 # ===== 北向:DevEco Studio / ArkTS =====
 app/build/
+app/**/build/
 app/.preview/
 app/.hvigor/
 app/.cxx/
@@ -9,6 +10,8 @@ app/.idea/
 *.hap
 *.hsp
 *.har
+*.msgpack
+*.protoBin
 
 # ===== 南向:嵌入式编译产物 =====
 device/**/build/

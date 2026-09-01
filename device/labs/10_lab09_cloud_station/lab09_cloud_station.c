@@ -272,14 +272,22 @@ static void *CommandTask(void *arg)
 
             if (strcmp(cmd.target, "motor") == 0) {
                 bool turn_on = (strcmp(cmd.action, "on") == 0);
-                g_remote_override = true;
-                g_remote_motor_on = turn_on;
-                SmartHome_SetMotor(turn_on);
+                if (turn_on) {
+                    g_remote_override = true;
+                    g_remote_motor_on = true;
+                    SmartHome_SetMotor(true);
+                } else {
+                    // 停止电机：自动解除远程强制覆盖，恢复正常监测模式
+                    g_remote_override = false;
+                    g_remote_motor_on = false;
+                    SmartHome_SetMotor(false);
+                }
             } else if (strcmp(cmd.target, "led") == 0) {
                 bool turn_on = (strcmp(cmd.action, "on") == 0);
                 SmartHome_SetAlarmLight(turn_on);
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
                 g_remote_override = false;
+                g_remote_motor_on = false;
                 g_k3_muted_latch = true;
                 SmartHome_ResetAlarmState();
             }
