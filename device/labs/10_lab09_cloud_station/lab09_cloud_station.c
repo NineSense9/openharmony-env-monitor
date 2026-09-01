@@ -23,9 +23,12 @@ static int g_cloud_upload_count = 0;
 static int g_cloud_fail_count = 0;
 static bool g_wifi_ready = false;
 
-// 远程手动覆盖标志 (若远程手动开启，则不被传感器恢复覆盖)
-static bool g_remote_motor_override = false;
-static bool g_remote_motor_state = false;
+// K3 本地消警锁存：一旦按下 K3，保持静音，直到环境完全恢复正常后才自动解除静音
+static bool g_k3_muted_latch = false;
+
+// 云端远程手动控制电机标志 (true 表示云端强制开启/关闭，不受传感器自动联动打断)
+static bool g_remote_override = false;
+static bool g_remote_motor_on = false;
 
 // 1. 传感器周期采集任务 (2s 周期)
 static void *SensorTask(void *arg)
@@ -34,15 +37,33 @@ static void *SensorTask(void *arg)
     while (1) {
         SmartHome_ReadSensors(&g_report);
 
-        if (g_report.alarm_active) {
-            // 越限异常：启动声光报警与排风电机
-            SmartHome_SetAlarmLight(true);
-            SmartHome_SetMotor(true);
+        // 检查环境是否恢复正常：若已恢复，自动解除 K3 静音锁存
+        if (!g_report.alarm_active) {
+            if (g_k3_muted_latch) {
+                printf("[alarm] environment recovered normal -> K3 mute latch cleared\n");
+                g_k3_muted_latch = false;
+            }
+        }
+
+        // 决定告警声光与电机动作
+        if (g_remote_override) {
+            // 云端远程手动模式优先
+            SmartHome_SetMotor(g_remote_motor_on);
         } else {
-            // 恢复正常：熄灭告警灯
-            SmartHome_SetAlarmLight(false);
-            // 若没有远程手动保持开启，则正常停止电机
-            if (!g_remote_motor_override || !g_remote_motor_state) {
+            // 自动监测模式
+            if (g_report.alarm_active) {
+                if (g_k3_muted_latch) {
+                    // 已被 K3 本地消警静音：保持灯灭、电机停转
+                    SmartHome_SetAlarmLight(false);
+                    SmartHome_SetMotor(false);
+                } else {
+                    // 告警生效：开启声光与电机排风
+                    SmartHome_SetAlarmLight(true);
+                    SmartHome_SetMotor(true);
+                }
+            } else {
+                // 环境正常：灯灭、电机停转
+                SmartHome_SetAlarmLight(false);
                 SmartHome_SetMotor(false);
             }
         }
@@ -79,8 +100,13 @@ static void *UiTask(void *arg)
         uint16_t lg_color = (g_report.lux < ALARM_LUX_THRESHOLD || g_report.gas_ppm > ALARM_GAS_THRESHOLD) ? LCD_RED : LCD_WHITE;
         lcd_show_string(10, 85, line_buf, lg_color, LCD_BLACK, 16, 0);
 
-        // Line 5: Alarm Status
-        if (g_report.alarm_active) {
+        // Line 5: Alarm / Control Status
+        if (g_remote_override) {
+            snprintf(line_buf, sizeof(line_buf), "Status: [REMOTE %s]", g_remote_motor_on ? "ON" : "OFF");
+            lcd_show_string(10, 110, line_buf, LCD_MAGENTA, LCD_BLACK, 16, 0);
+        } else if (g_k3_muted_latch) {
+            lcd_show_string(10, 110, "Status: [MUTED]", LCD_CYAN, LCD_BLACK, 16, 0);
+        } else if (g_report.alarm_active) {
             lcd_show_string(10, 110, "Status: [ALARM]", LCD_RED, LCD_BLACK, 16, 0);
         } else {
             lcd_show_string(10, 110, "Status: [NORMAL]", LCD_GREEN, LCD_BLACK, 16, 0);
@@ -116,8 +142,8 @@ static void *CloudTask(void *arg)
         LOS_Msleep(500);
     }
 
-    // 等待网络网关路由稳定
-    LOS_Msleep(2000);
+    // 等待网络网关稳定
+    LOS_Msleep(1500);
 
     while (1) {
         // 1. 上报遥测
@@ -136,7 +162,7 @@ static void *CloudTask(void *arg)
             printf("[cloud] telemetry upload failed\n");
         }
 
-        // 短暂延迟释放 socket 资源
+        // 短暂休眠释放 TCP socket
         LOS_Msleep(200);
 
         // 2. 轮询拉取待执行远程指令
@@ -149,20 +175,20 @@ static void *CloudTask(void *arg)
 
             if (strcmp(cmd.target, "motor") == 0) {
                 bool turn_on = (strcmp(cmd.action, "on") == 0);
-                g_remote_motor_override = true;
-                g_remote_motor_state = turn_on;
+                g_remote_override = true;
+                g_remote_motor_on = turn_on;
                 SmartHome_SetMotor(turn_on);
             } else if (strcmp(cmd.target, "led") == 0) {
                 bool turn_on = (strcmp(cmd.action, "on") == 0);
                 SmartHome_SetAlarmLight(turn_on);
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
-                g_remote_motor_override = false;
-                g_remote_motor_state = false;
+                g_remote_override = false;
+                g_k3_muted_latch = true;
                 SmartHome_ResetAlarmState();
             }
 
             LOS_Msleep(100);
-            HttpClient_AckCommand(cmd.command_id, "done", "executed successfully on rk2206");
+            HttpClient_AckCommand(cmd.command_id, "done", "executed on rk2206");
         }
 
         LOS_Msleep(CLOUD_UPLOAD_INTERVAL_MS);
@@ -178,9 +204,9 @@ static void *KeyTask(void *arg)
         if (SmartHome_IsK3Pressed()) {
             LOS_Msleep(20); // 消抖
             if (SmartHome_IsK3Pressed()) {
-                printf("[key] K3 pressed -> reset alarm & stop motor\n");
-                g_remote_motor_override = false;
-                g_remote_motor_state = false;
+                printf("[key] K3 pressed -> latch mute alarm & stop motor\n");
+                g_k3_muted_latch = true;
+                g_remote_override = false;
                 SmartHome_ResetAlarmState();
                 while (SmartHome_IsK3Pressed()) {
                     LOS_Msleep(50);

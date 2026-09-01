@@ -29,7 +29,7 @@ static int create_connected_socket(void)
     }
 
     struct timeval tv;
-    tv.tv_sec = 3;
+    tv.tv_sec = 4;
     tv.tv_usec = 0;
     lwip_setsockopt(sfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
     lwip_setsockopt(sfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
@@ -47,6 +47,25 @@ static int create_connected_socket(void)
     }
 
     return sfd;
+}
+
+// 循环读取完整的 HTTP 响应，避免 TCP 分包导致 JSON body 丢失
+static int recv_full_http_response(int sfd, char *buf, int max_len)
+{
+    int total = 0;
+    while (total < max_len - 1) {
+        int n = lwip_recv(sfd, buf + total, max_len - 1 - total, 0);
+        if (n <= 0) {
+            break;
+        }
+        total += n;
+        // 如果已经收到了完整的 JSON 结尾 '}' 并且在 headers 之后，可提前结束
+        if (strstr(buf, "\r\n\r\n") != NULL && strchr(buf, '}') != NULL) {
+            break;
+        }
+    }
+    buf[total] = '\0';
+    return total;
 }
 
 int HttpClient_PostTelemetry(const TelemetryData *data)
@@ -79,14 +98,11 @@ int HttpClient_PostTelemetry(const TelemetryData *data)
     }
 
     char resp[256];
-    int recvd = lwip_recv(sfd, resp, sizeof(resp) - 1, 0);
+    int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
 
-    if (recvd > 0) {
-        resp[recvd] = '\0';
-        if (strstr(resp, "200 OK") != NULL || strstr(resp, "HTTP/1.1 200") != NULL) {
-            return 0; // Success
-        }
+    if (recvd > 0 && (strstr(resp, "200 OK") != NULL || strstr(resp, "HTTP/1.1 200") != NULL)) {
+        return 0; // Success
     }
 
     return -1;
@@ -108,28 +124,26 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
 
     lwip_send(sfd, req, strlen(req), 0);
 
-    char resp[512];
-    int recvd = lwip_recv(sfd, resp, sizeof(resp) - 1, 0);
+    char resp[1024];
+    int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
 
     if (recvd <= 0) return -1;
-    resp[recvd] = '\0';
 
+    // 如果返回 null，说明当前没有待执行指令
     if (strstr(resp, "null") != NULL) {
-        return 0; // No pending command
-    }
-
-    // Check if HTTP 200
-    if (strstr(resp, "200 OK") == NULL && strstr(resp, "HTTP/1.1 200") == NULL) {
         return 0;
     }
 
-    // Locate JSON body: find '{'
+    // 寻找 JSON 正文起始位置
     char *json_body = strchr(resp, '{');
-    if (!json_body) return 0;
+    if (!json_body) {
+        return 0;
+    }
 
-    printf("[http] pending command body: %s\n", json_body);
+    printf("[http] pending command raw: %s\n", json_body);
 
+    // 解析 id、target、action
     char *id_ptr = strstr(json_body, "\"id\":");
     char *target_ptr = strstr(json_body, "\"target\":\"");
     char *action_ptr = strstr(json_body, "\"action\":\"");
@@ -155,7 +169,7 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
             cmd->action[len] = '\0';
         }
 
-        printf("[http] successfully parsed command id=%d, target=%s, action=%s\n",
+        printf("[http] parsed command id=%d, target=%s, action=%s\n",
                cmd->command_id, cmd->target, cmd->action);
         return 1;
     }
@@ -186,9 +200,9 @@ int HttpClient_AckCommand(int command_id, const char *status, const char *note)
     lwip_send(sfd, req, strlen(req), 0);
 
     char resp[256];
-    int recvd = lwip_recv(sfd, resp, sizeof(resp) - 1, 0);
+    int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
 
-    printf("[http] command id=%d ack response recvd=%d\n", command_id, recvd);
+    printf("[http] ack command id=%d response len=%d\n", command_id, recvd);
     return (recvd > 0) ? 0 : -1;
 }
