@@ -1,0 +1,10 @@
+lab04_mq2_key_lcd: create task success tid=2
+lab04_mq2_key_lcd: process start
+mq2: dev init success on ADC port 4
+mq2: calibrated v=0.285 V, rs=16.544, r0=25.102
+lab04_mq2_key_lcd: loop ready, K3 recalibrates MQ2 gas baseline
+lab04_mq2_key_lcd: Gas PPM = 20.00
+lab04_mq2_key_lcd: Gas PPM = 20.15
+lab04_mq2_key_lcd: K3 clicked -> recalibrating...
+mq2: calibrated v=0.284 V, rs=16.606, r0=25.196
+lab04_mq2_key_lcd: Gas PPM = 20.00
