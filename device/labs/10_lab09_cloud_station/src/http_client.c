@@ -49,7 +49,7 @@ static int create_connected_socket(void)
     return sfd;
 }
 
-// 循环读取完整的 HTTP 响应，避免 TCP 分包导致 JSON body 丢失
+// 循环读取完整 HTTP 响应
 static int recv_full_http_response(int sfd, char *buf, int max_len)
 {
     int total = 0;
@@ -59,7 +59,7 @@ static int recv_full_http_response(int sfd, char *buf, int max_len)
             break;
         }
         total += n;
-        // 如果已经收到了完整的 JSON 结尾 '}' 并且在 headers 之后，可提前结束
+        // 如果已经读取到了完整 JSON 正文的结束符 '}'，可提前退出
         if (strstr(buf, "\r\n\r\n") != NULL && strchr(buf, '}') != NULL) {
             break;
         }
@@ -130,15 +130,10 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
 
     if (recvd <= 0) return -1;
 
-    // 如果返回 null，说明当前没有待执行指令
-    if (strstr(resp, "null") != NULL) {
-        return 0;
-    }
-
-    // 寻找 JSON 正文起始位置
+    // 寻找 JSON 正文起始大括号 '{'，只有存在 '{' 才是有待执行指令
     char *json_body = strchr(resp, '{');
     if (!json_body) {
-        return 0;
+        return 0; // 没有待执行指令 (即响应为 null)
     }
 
     printf("[http] pending command raw: %s\n", json_body);
@@ -169,7 +164,7 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
             cmd->action[len] = '\0';
         }
 
-        printf("[http] parsed command id=%d, target=%s, action=%s\n",
+        printf("[http] successfully parsed command id=%d, target=%s, action=%s\n",
                cmd->command_id, cmd->target, cmd->action);
         return 1;
     }

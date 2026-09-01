@@ -84,36 +84,36 @@ static void *UiTask(void *arg)
 
     while (1) {
         // Line 1: Title
-        lcd_show_string(10, 10, "Space Station Cloud", LCD_YELLOW, LCD_BLACK, 16, 0);
+        lcd_show_string(10, 10, "Space Station Cloud    ", LCD_YELLOW, LCD_BLACK, 16, 0);
 
         // Line 2: WiFi IP
-        snprintf(line_buf, sizeof(line_buf), "IP: %s", g_ip_str);
+        snprintf(line_buf, sizeof(line_buf), "IP: %-19s", g_ip_str);
         lcd_show_string(10, 35, line_buf, g_wifi_ready ? LCD_GREEN : LCD_RED, LCD_BLACK, 16, 0);
 
         // Line 3: Temp & Humi
-        snprintf(line_buf, sizeof(line_buf), "T:%.1f C  H:%.1f %%", g_report.temperature, g_report.humidity);
+        snprintf(line_buf, sizeof(line_buf), "T:%-4.1fC H:%-4.1f%%       ", g_report.temperature, g_report.humidity);
         uint16_t th_color = (g_report.temperature > ALARM_TEMP_THRESHOLD || g_report.humidity > ALARM_HUMI_THRESHOLD) ? LCD_RED : LCD_WHITE;
         lcd_show_string(10, 60, line_buf, th_color, LCD_BLACK, 16, 0);
 
-        // Line 4: Lux & Gas
-        snprintf(line_buf, sizeof(line_buf), "Lux:%.0f  Gas:%.1f", g_report.lux, g_report.gas_ppm);
+        // Line 4: Lux & Gas (填充空格避免残余字符)
+        snprintf(line_buf, sizeof(line_buf), "Lux:%-4.0f Gas:%-5.1f    ", g_report.lux, g_report.gas_ppm);
         uint16_t lg_color = (g_report.lux < ALARM_LUX_THRESHOLD || g_report.gas_ppm > ALARM_GAS_THRESHOLD) ? LCD_RED : LCD_WHITE;
         lcd_show_string(10, 85, line_buf, lg_color, LCD_BLACK, 16, 0);
 
-        // Line 5: Alarm / Control Status
+        // Line 5: Alarm / Control Status (等长填充 20 字符，杜绝残余括号)
         if (g_remote_override) {
-            snprintf(line_buf, sizeof(line_buf), "Status: [REMOTE %s]", g_remote_motor_on ? "ON" : "OFF");
+            snprintf(line_buf, sizeof(line_buf), "Status: [REMOTE %s]  ", g_remote_motor_on ? "ON " : "OFF");
             lcd_show_string(10, 110, line_buf, LCD_MAGENTA, LCD_BLACK, 16, 0);
         } else if (g_k3_muted_latch) {
-            lcd_show_string(10, 110, "Status: [MUTED]", LCD_CYAN, LCD_BLACK, 16, 0);
+            lcd_show_string(10, 110, "Status: [MUTED]     ", LCD_CYAN, LCD_BLACK, 16, 0);
         } else if (g_report.alarm_active) {
-            lcd_show_string(10, 110, "Status: [ALARM]", LCD_RED, LCD_BLACK, 16, 0);
+            lcd_show_string(10, 110, "Status: [ALARM]     ", LCD_RED, LCD_BLACK, 16, 0);
         } else {
-            lcd_show_string(10, 110, "Status: [NORMAL]", LCD_GREEN, LCD_BLACK, 16, 0);
+            lcd_show_string(10, 110, "Status: [NORMAL]    ", LCD_GREEN, LCD_BLACK, 16, 0);
         }
 
         // Line 6: Cloud Upload Stats
-        snprintf(line_buf, sizeof(line_buf), "Cloud: OK=%d Err=%d", g_cloud_upload_count, g_cloud_fail_count);
+        snprintf(line_buf, sizeof(line_buf), "Cloud: OK=%-4d Err=%-3d ", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(10, 135, line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_BLACK, 16, 0);
 
         LOS_Msleep(UI_REFRESH_INTERVAL_MS);
