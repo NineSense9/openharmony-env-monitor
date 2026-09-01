@@ -18,14 +18,13 @@
 
 void HttpClient_Init(void)
 {
-    // lwIP socket is initialized by system stack
 }
 
 static int create_connected_socket(void)
 {
     int sfd = lwip_socket(AF_INET, SOCK_STREAM, 0);
     if (sfd < 0) {
-        printf("[http] create socket failed\n");
+        printf("[http] socket create failed\n");
         return -1;
     }
 
@@ -120,10 +119,20 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
         return 0; // No pending command
     }
 
-    // Parse simple JSON: {"id":1,"target":"motor","action":"on",...}
-    char *id_ptr = strstr(resp, "\"id\":");
-    char *target_ptr = strstr(resp, "\"target\":\"");
-    char *action_ptr = strstr(resp, "\"action\":\"");
+    // Check if HTTP 200
+    if (strstr(resp, "200 OK") == NULL && strstr(resp, "HTTP/1.1 200") == NULL) {
+        return 0;
+    }
+
+    // Locate JSON body: find '{'
+    char *json_body = strchr(resp, '{');
+    if (!json_body) return 0;
+
+    printf("[http] pending command body: %s\n", json_body);
+
+    char *id_ptr = strstr(json_body, "\"id\":");
+    char *target_ptr = strstr(json_body, "\"target\":\"");
+    char *action_ptr = strstr(json_body, "\"action\":\"");
 
     if (id_ptr && target_ptr && action_ptr) {
         cmd->command_id = atoi(id_ptr + 5);
@@ -146,7 +155,7 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
             cmd->action[len] = '\0';
         }
 
-        printf("[http] received command id=%d, target=%s, action=%s\n",
+        printf("[http] successfully parsed command id=%d, target=%s, action=%s\n",
                cmd->command_id, cmd->target, cmd->action);
         return 1;
     }
@@ -180,5 +189,6 @@ int HttpClient_AckCommand(int command_id, const char *status, const char *note)
     int recvd = lwip_recv(sfd, resp, sizeof(resp) - 1, 0);
     lwip_close(sfd);
 
+    printf("[http] command id=%d ack response recvd=%d\n", command_id, recvd);
     return (recvd > 0) ? 0 : -1;
 }

@@ -14,10 +14,10 @@
 #define MOTOR_PIN_COMPAT_PC6    GPIO0_PC6
 #define MOTOR_PIN_COMPAT_PA2    GPIO0_PA2
 
-// 告警阈值定义
-#define ALARM_TEMP_THRESHOLD    35.0f
-#define ALARM_HUMI_THRESHOLD    80.0f
-#define ALARM_LUX_THRESHOLD     50.0f
+// 告警阈值定义 (更适合真实室内环境，避免误报)
+#define ALARM_TEMP_THRESHOLD    38.0f
+#define ALARM_HUMI_THRESHOLD    85.0f
+#define ALARM_LUX_THRESHOLD     20.0f
 #define ALARM_GAS_THRESHOLD     100.0f
 
 // 云端服务器配置

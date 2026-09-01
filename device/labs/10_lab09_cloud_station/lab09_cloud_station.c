@@ -23,16 +23,30 @@ static int g_cloud_upload_count = 0;
 static int g_cloud_fail_count = 0;
 static bool g_wifi_ready = false;
 
+// 远程手动覆盖标志 (若远程手动开启，则不被传感器恢复覆盖)
+static bool g_remote_motor_override = false;
+static bool g_remote_motor_state = false;
+
 // 1. 传感器周期采集任务 (2s 周期)
 static void *SensorTask(void *arg)
 {
     (void)arg;
     while (1) {
         SmartHome_ReadSensors(&g_report);
+
         if (g_report.alarm_active) {
+            // 越限异常：启动声光报警与排风电机
             SmartHome_SetAlarmLight(true);
             SmartHome_SetMotor(true);
+        } else {
+            // 恢复正常：熄灭告警灯
+            SmartHome_SetAlarmLight(false);
+            // 若没有远程手动保持开启，则正常停止电机
+            if (!g_remote_motor_override || !g_remote_motor_state) {
+                SmartHome_SetMotor(false);
+            }
         }
+
         LOS_Msleep(SENSOR_SAMPLE_INTERVAL_MS);
     }
     return NULL;
@@ -86,7 +100,7 @@ static void *CloudTask(void *arg)
 {
     (void)arg;
 
-    // 等待 Wi-Fi 获取 IP
+    // 等待 Wi-Fi 获取有效 IP
     WifiLinkedInfo info;
     while (1) {
         memset(&info, 0, sizeof(info));
@@ -96,11 +110,14 @@ static void *CloudTask(void *arg)
                      (int)(ip & 0xFF), (int)((ip >> 8) & 0xFF),
                      (int)((ip >> 16) & 0xFF), (int)((ip >> 24) & 0xFF));
             g_wifi_ready = true;
-            printf("[cloud] wifi connected, ip=%s\n", g_ip_str);
+            printf("[cloud] wifi ready, station IP: %s\n", g_ip_str);
             break;
         }
         LOS_Msleep(500);
     }
+
+    // 等待网络网关路由稳定
+    LOS_Msleep(2000);
 
     while (1) {
         // 1. 上报遥测
@@ -113,26 +130,39 @@ static void *CloudTask(void *arg)
 
         if (HttpClient_PostTelemetry(&telem) == 0) {
             g_cloud_upload_count++;
-            printf("[cloud] telemetry upload ok (total=%d)\n", g_cloud_upload_count);
+            printf("[cloud] telemetry upload OK (total=%d)\n", g_cloud_upload_count);
         } else {
             g_cloud_fail_count++;
             printf("[cloud] telemetry upload failed\n");
         }
 
-        // 2. 拉取待执行指令
+        // 短暂延迟释放 socket 资源
+        LOS_Msleep(200);
+
+        // 2. 轮询拉取待执行远程指令
         RemoteCommand cmd;
         memset(&cmd, 0, sizeof(cmd));
         int cmd_ret = HttpClient_GetPendingCommand(&cmd);
         if (cmd_ret > 0) {
-            printf("[cloud] execute command: target=%s, action=%s\n", cmd.target, cmd.action);
+            printf("[cloud] >>> EXECUTE COMMAND id=%d target=%s action=%s <<<\n",
+                   cmd.command_id, cmd.target, cmd.action);
+
             if (strcmp(cmd.target, "motor") == 0) {
-                SmartHome_SetMotor(strcmp(cmd.action, "on") == 0);
+                bool turn_on = (strcmp(cmd.action, "on") == 0);
+                g_remote_motor_override = true;
+                g_remote_motor_state = turn_on;
+                SmartHome_SetMotor(turn_on);
             } else if (strcmp(cmd.target, "led") == 0) {
-                SmartHome_SetAlarmLight(strcmp(cmd.action, "on") == 0);
+                bool turn_on = (strcmp(cmd.action, "on") == 0);
+                SmartHome_SetAlarmLight(turn_on);
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
+                g_remote_motor_override = false;
+                g_remote_motor_state = false;
                 SmartHome_ResetAlarmState();
             }
-            HttpClient_AckCommand(cmd.command_id, "done", "executed on rk2206");
+
+            LOS_Msleep(100);
+            HttpClient_AckCommand(cmd.command_id, "done", "executed successfully on rk2206");
         }
 
         LOS_Msleep(CLOUD_UPLOAD_INTERVAL_MS);
@@ -149,6 +179,8 @@ static void *KeyTask(void *arg)
             LOS_Msleep(20); // 消抖
             if (SmartHome_IsK3Pressed()) {
                 printf("[key] K3 pressed -> reset alarm & stop motor\n");
+                g_remote_motor_override = false;
+                g_remote_motor_state = false;
                 SmartHome_ResetAlarmState();
                 while (SmartHome_IsK3Pressed()) {
                     LOS_Msleep(50);
