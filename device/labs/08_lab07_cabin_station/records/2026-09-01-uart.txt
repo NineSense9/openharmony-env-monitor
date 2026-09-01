@@ -1,0 +1,13 @@
+smart_home: init complete (I2C sensors, Motors on GPIO1_PD0, PC6, PA2)
+mq2: adc dev init success on SARADC_CH4
+mq2: calibrated R0 = 10.25 kOhm
+lab07_cabin_station: created sample(tid=2) and ctrl_ui(tid=3)
+lab07_cabin_station: sample_task start
+lab07_cabin_station: control_ui_task start
+lab07_cabin_station: [sample] T=26.2 C, H=54.8 %, Lux=115.3, Gas=18.5 ppm
+lab07_cabin_station: [sample] T=26.2 C, H=54.9 %, Lux=114.7, Gas=18.6 ppm
+lab07_cabin_station: [sample] T=26.3 C, H=55.0 %, Lux=8.2, Gas=19.1 ppm
+lab07_cabin_station: K3 clicked -> ALARM ACK (all outputs muted)
+lab07_cabin_station: all sensors normalized -> re-armed
+lab07_cabin_station: [sample] T=36.4 C, H=78.5 %, Lux=112.0, Gas=20.3 ppm
+lab07_cabin_station: K3 clicked -> ALARM ACK (all outputs muted)

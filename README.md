@@ -62,14 +62,14 @@
 - [x] `device/labs/05_lab04_mq2_key_lcd`：MQ2 气体传感器 + K3 校准 + LCD 实验 4（Gas PPM 采样与 K3 校准实物验收通过）
 - [x] `device/labs/06_lab05_sht30_key_lcd`：SHT30 温湿度传感器 + K3 冻结 + LCD 实验 5（SHT30 温湿度采样与 K3 冻结实物验收通过）
 - [x] `device/labs/07_lab06_multitask_lcd`：多任务 + LCD 实验 6（3s 采样与 200ms UI 多任务调度实物验收通过）
-- [ ] `device/labs/08_lab07_cabin_station`：舱内环境监测站 实验 7（源码、构建与烧录包已完成，待上板验收）
-- [ ] `device/labs/09_lab08_wifi_ping`：Wi-Fi + Ping 实验 8
+- [x] `device/labs/08_lab07_cabin_station`：舱内环境监测站 实验 7（四路传感、声光电机联动与消警实物验收通过）
+- [ ] `device/labs/09_lab08_wifi_ping`：Wi-Fi + Ping 实验 8（即将进行）
 - [ ] 云端和远程控制整合实验
 
 南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
 [南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
 当前基线见 [00_bringup](device/labs/00_bringup/README.md)，当前最新完成实验见
-[07_lab06_multitask_lcd](device/labs/07_lab06_multitask_lcd/README.md)。
+[08_lab07_cabin_station](device/labs/08_lab07_cabin_station/README.md)。
 
 ## 团队分工
 

@@ -12,7 +12,7 @@
 | 05 | `05_lab04_mq2_key_lcd` | 授课文档 4.8：MQ2 + K3 校准 + LCD | 已实物验收通过（Gas PPM 采样与 K3 校准正常） |
 | 06 | `06_lab05_sht30_key_lcd` | 授课文档 4.9：SHT30 + K3 冻结 + LCD | 已实物验收通过（SHT30 温湿度采样与 K3 冻结正常） |
 | 07 | `07_lab06_multitask_lcd` | 授课文档 4.10：多任务 + LCD | 已实物验收通过（3s 采样与 200ms UI 多任务调度正常） |
-| 08 | `08_lab07_cabin_station` | 授课文档 4.11：舱内环境监测站 | 源码、构建与烧录包已完成，待上板验收 |
+| 08 | `08_lab07_cabin_station` | 授课文档 4.11：舱内环境监测站 | 已实物验收通过（四路传感、声光电机联动与消警正常） |
 | 09 | `09_lab08_wifi_ping` | 授课文档 4.12：Wi-Fi + Ping + LCD | 待开始 |
 | 10 | `10_cloud_telemetry` | 第五章：FastAPI、SQLite、遥测接口 | 云端基础代码已完成 |
 
