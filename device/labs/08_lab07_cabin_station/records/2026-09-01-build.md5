@@ -1,0 +1,12 @@
+# 08_lab07_cabin_station 构建产物 MD5
+
+## Windows 烧录目录
+路径: `D:\实习\tmp\rk2206_images\lab08_lab07_cabin_station_20260901`
+
+- `Firmware.img`: `ee5fbf0a2c88886593b81b32ade73222`
+- `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## Ubuntu 产物
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `ee5fbf0a2c88886593b81b32ade73222`
+- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `588ece5691eb11e1b5643596aa884ab3`
+- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `c5238c1415c7528ded9e45f58e3a633b`

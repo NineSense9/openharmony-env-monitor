@@ -1,0 +1,20 @@
+import("//build/lite/config/component/lite_component.gni")
+
+lite_library("lab07_cabin_station") {
+    target_type = "static_library"
+
+    sources = [
+        "lab07_cabin_station.c",
+        "src/lcd.c",
+        "src/tx_key.c",
+        "src/tx_light.c",
+        "src/mq2.c",
+        "src/smart_home.c",
+    ]
+
+    include_dirs = [
+        "include",
+        "//device/rockchip/rk2206/adapter/include",
+        "//device/rockchip/rk2206/sdk_liteos/include",
+    ]
+}
