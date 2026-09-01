@@ -145,10 +145,11 @@ static void *UiTask(void *arg)
         // 第二行：IP 与联网状态
         snprintf(line_buf, sizeof(line_buf), "IP: %-15s", g_ip_str);
         lcd_show_string(8, 28, (uint8_t *)line_buf, g_wifi_ready ? LCD_GREEN : LCD_RED, LCD_BLACK, 16, 0);
+        lcd_fill(200, 28, 310, 44, LCD_BLACK);
         if (g_wifi_ready) {
             lcd_show_chinese(200, 28, (uint8_t *)"网络正常", LCD_GREEN, LCD_BLACK, 16, 0);
         } else {
-            lcd_show_chinese(200, 28, (uint8_t *)"网络连接中", LCD_RED, LCD_BLACK, 16, 0);
+            lcd_show_chinese(200, 28, (uint8_t *)"正在联网", LCD_RED, LCD_BLACK, 16, 0);
         }
 
         // 双列仪表边框 (Y: 48 ~ 116)
@@ -180,6 +181,7 @@ static void *UiTask(void *arg)
         // 第五行：系统工作状态
         lcd_show_chinese(8, 126, (uint8_t *)"系统状态", LCD_WHITE, LCD_BLACK, 16, 0);
         lcd_show_string(74, 126, (uint8_t *)":", LCD_WHITE, LCD_BLACK, 16, 0);
+        lcd_fill(86, 126, 180, 142, LCD_BLACK);
         if (g_remote_override) {
             lcd_show_chinese(86, 126, (uint8_t *)"远程控制", LCD_MAGENTA, LCD_BLACK, 16, 0);
         } else if (g_k3_muted_latch) {
@@ -194,6 +196,7 @@ static void *UiTask(void *arg)
         bool real_motor_on = g_remote_override ? g_remote_motor_on : (g_report.alarm_active && !g_k3_muted_latch);
         lcd_show_chinese(8, 156, (uint8_t *)"排风电机", LCD_WHITE, LCD_BLACK, 16, 0);
         lcd_show_string(74, 156, (uint8_t *)":", LCD_WHITE, LCD_BLACK, 16, 0);
+        lcd_fill(86, 156, 260, 172, LCD_BLACK);
         if (real_motor_on) {
             lcd_show_chinese(86, 156, (uint8_t *)"高速运转", LCD_CYAN, LCD_BLACK, 16, 0);
             lcd_show_string(156, 156, (uint8_t *)"(6000RPM)", LCD_CYAN, LCD_BLACK, 16, 0);
