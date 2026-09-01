@@ -241,7 +241,7 @@ static void lcd_show_chinese_16x16(uint16_t x, uint16_t y, uint8_t *s, uint16_t 
     
     for (k = 0; k < HZnum; k++) 
     {
-        if ((tfont16[k].Index[0] == *(s)) && (tfont16[k].Index[1] == *(s+1)) && (tfont16[k].Index[1] == *(s+2)))
+        if ((tfont16[k].Index[0] == *(s)) && (tfont16[k].Index[1] == *(s+1)) && (tfont16[k].Index[2] == *(s+2)))
         {
             lcd_address_set(x, y, x+sizey-1, y+sizey-1);
             for (i = 0; i < TypefaceNum; i++)
@@ -842,7 +842,7 @@ void lcd_show_chinese(uint16_t x, uint16_t y, uint8_t *s, uint16_t fc, uint16_t 
     /* utf8格式汉字转化为ascii格式 */
     chinese_utf8_to_ascii(s, strlen(s), buffer, &buffer_len);
 
-    for (uint32_t i = 0; i < buffer_len; i += 2, x += sizey)
+    for (uint32_t i = 0; i < buffer_len; i += 3, x += sizey)
     {
         if (sizey == 12)
         {

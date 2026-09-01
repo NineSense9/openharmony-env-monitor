@@ -5,6 +5,8 @@ export interface TelemetryData {
   humidity: number;
   lux: number;
   gas_ppm: number;
+  motor_on?: boolean;
+  alarm_on?: boolean;
   created_at: string;
 }
 

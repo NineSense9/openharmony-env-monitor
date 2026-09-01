@@ -11,12 +11,14 @@ export function useTelemetry() {
     humidity: 50.0,
     lux: 300.0,
     gas_ppm: 8.0,
+    motor_on: false,
+    alarm_on: false,
     created_at: ''
   });
 
   const [history, setHistory] = useState<TelemetryHistoryItem[]>([]);
   const [logs, setLogs] = useState<{ id: string; time: string; msg: string; type: 'info' | 'alarm' | 'cmd' }[]>([
-    { id: '1', time: new Date().toTimeString().split(' ')[0], msg: '太空地面控制中心数字孪生引擎启动...', type: 'info' }
+    { id: '1', time: new Date().toTimeString().split(' ')[0], msg: '太空地面控制中心数字孪生引擎启动 (300ms 极速遥测流)...', type: 'info' }
   ]);
 
   const [systemState, setSystemState] = useState<SystemState>({
@@ -43,7 +45,7 @@ export function useTelemetry() {
     ]);
   };
 
-  // 1. Polling Latest Telemetry with Heartbeat Timeout Check (1.5s interval)
+  // 1. Ultra-fast 300ms Polling for Real-Time Telemetry & True Hardware Motor Sync
   useEffect(() => {
     let isMounted = true;
 
@@ -52,25 +54,22 @@ export function useTelemetry() {
       if (!isMounted) return;
 
       if (data && data.created_at) {
-        // 计算数据上报时间戳与当前时间的差距 (秒)
-        // 支持 ISO 格式解析
         const dataTime = new Date(data.created_at.endsWith('Z') ? data.created_at : data.created_at + 'Z').getTime();
         const nowTime = Date.now();
-        // 允许时区偏移计算：如果最新报文距今超过 12 秒，判定为硬件离线 (开发板每 3 秒上传一次)
+        // 允许时区偏移计算：如果最新报文距今超过 6 秒，判定为硬件离线 (开发板每 500ms 上传一次)
         const ageSec = Math.abs(nowTime - dataTime) / 1000;
         
-        // 格式化最后同步时间 (UTC -> Local String)
         const syncTimeStr = new Date(dataTime).toTimeString().split(' ')[0] || '--:--:--';
-
-        // 判断硬件是否在线 (报文必须在 12 秒内生成)
-        const isOnline = (ageSec <= 12);
+        const isOnline = (ageSec <= 6);
 
         // 告警阈值判定
         const isAlarm = (
-          data.temperature > 38.0 ||
-          data.humidity > 85.0 ||
-          data.lux < 20.0 ||
-          data.gas_ppm > 100.0
+          data.alarm_on ?? (
+            data.temperature > 38.0 ||
+            data.humidity > 85.0 ||
+            data.lux < 20.0 ||
+            data.gas_ppm > 100.0
+          )
         );
 
         setTelemetry(data);
@@ -82,33 +81,40 @@ export function useTelemetry() {
             addLog(`[RECOVERY] 舱内环境恢复正常安全阈值`, 'info');
           }
 
+          // 物理硬件真实电机状态直接驱动大屏动画
+          const realMotorRunning = (isOnline && data.motor_on !== undefined) 
+            ? Boolean(data.motor_on) 
+            : prev.isMotorRunning;
+
           return {
             ...prev,
             isConnected: isOnline,
             isCachedSnapshot: !isOnline,
             lastSyncTime: syncTimeStr,
             totalPackets: data.id || prev.totalPackets,
-            isAlarmActive: isOnline ? isAlarm : false
+            isAlarmActive: isOnline ? isAlarm : false,
+            isMotorRunning: isOnline ? realMotorRunning : false
           };
         });
       } else {
         setSystemState(prev => ({
           ...prev,
           isConnected: false,
-          isCachedSnapshot: true
+          isCachedSnapshot: true,
+          isMotorRunning: false
         }));
       }
     };
 
     poll();
-    const interval = setInterval(poll, 1500);
+    const interval = setInterval(poll, 300);
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
   }, []);
 
-  // 2. Polling History Curves (3.5s interval)
+  // 2. Polling History Curves (2000ms interval)
   useEffect(() => {
     let isMounted = true;
 
@@ -129,7 +135,7 @@ export function useTelemetry() {
     };
 
     pollHistory();
-    const interval = setInterval(pollHistory, 3500);
+    const interval = setInterval(pollHistory, 2000);
     return () => {
       isMounted = false;
       clearInterval(interval);

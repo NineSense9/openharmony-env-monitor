@@ -10,6 +10,8 @@ typedef struct {
     float humidity;
     float lux;
     float gas_ppm;
+    int motor_on;
+    int alarm_on;
 } TelemetryData;
 
 // 远程指令结构

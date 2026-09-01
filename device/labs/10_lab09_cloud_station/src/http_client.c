@@ -29,8 +29,8 @@ static int create_connected_socket(void)
     }
 
     struct timeval tv;
-    tv.tv_sec = 4;
-    tv.tv_usec = 0;
+    tv.tv_sec = 1;
+    tv.tv_usec = 200000;
     lwip_setsockopt(sfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
     lwip_setsockopt(sfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
 
@@ -75,12 +75,14 @@ int HttpClient_PostTelemetry(const TelemetryData *data)
     int sfd = create_connected_socket();
     if (sfd < 0) return -1;
 
-    char body[192];
+    char body[256];
     snprintf(body, sizeof(body),
-             "{\"device_id\":\"%s\",\"temperature\":%.1f,\"humidity\":%.1f,\"lux\":%.1f,\"gas_ppm\":%.1f}",
-             data->device_id, data->temperature, data->humidity, data->lux, data->gas_ppm);
+             "{\"device_id\":\"%s\",\"temperature\":%.1f,\"humidity\":%.1f,\"lux\":%.1f,\"gas_ppm\":%.1f,\"motor_on\":%s,\"alarm_on\":%s}",
+             data->device_id, data->temperature, data->humidity, data->lux, data->gas_ppm,
+             data->motor_on ? "true" : "false",
+             data->alarm_on ? "true" : "false");
 
-    char req[384];
+    char req[448];
     snprintf(req, sizeof(req),
              "POST /api/telemetry HTTP/1.1\r\n"
              "Host: %s:%d\r\n"

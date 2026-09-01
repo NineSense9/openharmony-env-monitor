@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import DateTime, Float, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from cloud_ecs.app.database import Base
@@ -15,6 +15,8 @@ class Telemetry(Base):
     humidity: Mapped[float] = mapped_column(Float, nullable=True)
     lux: Mapped[float] = mapped_column(Float, nullable=True)
     gas_ppm: Mapped[float] = mapped_column(Float, nullable=True)
+    motor_on: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    alarm_on: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
 

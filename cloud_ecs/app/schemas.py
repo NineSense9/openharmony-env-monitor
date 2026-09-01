@@ -15,6 +15,8 @@ class TelemetryCreate(BaseModel):
     humidity: float | None = None
     lux: float | None = None
     gas_ppm: float | None = None
+    motor_on: bool | None = False
+    alarm_on: bool | None = False
 
 
 class TelemetryRead(TelemetryCreate):
