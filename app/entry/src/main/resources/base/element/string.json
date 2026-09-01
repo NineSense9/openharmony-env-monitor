@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "太空空间站舱内环境监测掌上测控终端"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "天宫测控主界面"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "天宫测控"
+    },
+    {
+      "name": "internet_permission_reason",
+      "value": "需要连接空间站云端微服务拉取实时遥测数据与下发控制指令"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#0A0E1A"
+    },
+    {
+      "name": "primary_cyan",
+      "value": "#00F0FF"
+    },
+    {
+      "name": "alarm_red",
+      "value": "#FF3B30"
+    },
+    {
+      "name": "safe_green",
+      "value": "#00E676"
+    },
+    {
+      "name": "card_bg",
+      "value": "#161F30"
+    },
+    {
+      "name": "card_border",
+      "value": "#1E293B"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "spacestation_monitor",
+  "version": "1.0.0",
+  "description": "Space Station Cabin Environment Monitor ArkTS App",
+  "main": "",
+  "author": "OpenHarmony Team",
+  "license": "Apache-2.0",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hypium": "1.0.11"
+  }
+}
