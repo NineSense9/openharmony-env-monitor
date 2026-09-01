@@ -11,7 +11,7 @@ export function useTelemetry() {
     humidity: 50.0,
     lux: 300.0,
     gas_ppm: 8.0,
-    created_at: new Date().toISOString()
+    created_at: ''
   });
 
   const [history, setHistory] = useState<TelemetryHistoryItem[]>([]);
@@ -21,7 +21,7 @@ export function useTelemetry() {
 
   const [systemState, setSystemState] = useState<SystemState>({
     isConnected: false,
-    isCachedSnapshot: false,
+    isCachedSnapshot: true,
     lastSyncTime: '--:--:--',
     totalPackets: 0,
     isAlarmActive: false,
@@ -30,7 +30,6 @@ export function useTelemetry() {
   });
 
   const { playAlarm } = useAudioFeedback();
-  const failCountRef = useRef(0);
 
   const addLog = (msg: string, type: 'info' | 'alarm' | 'cmd' = 'info') => {
     setLogs(prev => [
@@ -44,7 +43,7 @@ export function useTelemetry() {
     ]);
   };
 
-  // 1. Polling Latest Telemetry (1.5s interval)
+  // 1. Polling Latest Telemetry with Heartbeat Timeout Check (1.5s interval)
   useEffect(() => {
     let isMounted = true;
 
@@ -52,9 +51,19 @@ export function useTelemetry() {
       const data = await fetchLatestTelemetry();
       if (!isMounted) return;
 
-      if (data) {
-        failCountRef.current = 0;
-        const nowTime = new Date().toTimeString().split(' ')[0];
+      if (data && data.created_at) {
+        // 计算数据上报时间戳与当前时间的差距 (秒)
+        // 支持 ISO 格式解析
+        const dataTime = new Date(data.created_at.endsWith('Z') ? data.created_at : data.created_at + 'Z').getTime();
+        const nowTime = Date.now();
+        // 允许时区偏移计算：如果最新报文距今超过 12 秒，判定为硬件离线 (开发板每 3 秒上传一次)
+        const ageSec = Math.abs(nowTime - dataTime) / 1000;
+        
+        // 格式化最后同步时间 (UTC -> Local String)
+        const syncTimeStr = new Date(dataTime).toTimeString().split(' ')[0] || '--:--:--';
+
+        // 判断硬件是否在线 (报文必须在 12 秒内生成)
+        const isOnline = (ageSec <= 12);
 
         // 告警阈值判定
         const isAlarm = (
@@ -66,7 +75,7 @@ export function useTelemetry() {
 
         setTelemetry(data);
         setSystemState(prev => {
-          if (isAlarm && !prev.isAlarmActive) {
+          if (isOnline && isAlarm && !prev.isAlarmActive) {
             playAlarm();
             addLog(`[ALERT] 舱内环境越限告警触发 (T:${data.temperature}°C Gas:${data.gas_ppm}ppm)`, 'alarm');
           } else if (!isAlarm && prev.isAlarmActive) {
@@ -75,23 +84,19 @@ export function useTelemetry() {
 
           return {
             ...prev,
-            isConnected: true,
-            isCachedSnapshot: false,
-            lastSyncTime: nowTime,
-            totalPackets: data.id || prev.totalPackets + 1,
-            isAlarmActive: isAlarm
+            isConnected: isOnline,
+            isCachedSnapshot: !isOnline,
+            lastSyncTime: syncTimeStr,
+            totalPackets: data.id || prev.totalPackets,
+            isAlarmActive: isOnline ? isAlarm : false
           };
         });
       } else {
-        failCountRef.current += 1;
-        // 连续 2 次失败进入 Snapshot 状态
-        if (failCountRef.current >= 2) {
-          setSystemState(prev => ({
-            ...prev,
-            isConnected: false,
-            isCachedSnapshot: true
-          }));
-        }
+        setSystemState(prev => ({
+          ...prev,
+          isConnected: false,
+          isCachedSnapshot: true
+        }));
       }
     };
 
