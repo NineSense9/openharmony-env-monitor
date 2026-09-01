@@ -1,0 +1,18 @@
+import("//build/lite/config/component/lite_component.gni")
+
+lite_library("lab05_sht30_key_lcd") {
+    target_type = "static_library"
+
+    sources = [
+        "lab05_sht30_key_lcd.c",
+        "src/lcd.c",
+        "src/tx_key.c",
+        "src/sht30.c",
+    ]
+
+    include_dirs = [
+        "include",
+        "//device/rockchip/rk2206/adapter/include",
+        "//device/rockchip/rk2206/sdk_liteos/include",
+    ]
+}
