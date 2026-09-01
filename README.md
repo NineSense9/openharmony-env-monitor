@@ -64,7 +64,7 @@
 - [x] `device/labs/07_lab06_multitask_lcd`：多任务 + LCD 实验 6（3s 采样与 200ms UI 多任务调度实物验收通过）
 - [x] `device/labs/08_lab07_cabin_station`：舱内环境监测站 实验 7（四路传感、声光电机联动与消警实物验收通过）
 - [x] `device/labs/09_lab08_wifi_ping`：Wi-Fi + Ping 实验 8（Wi-Fi 联网 IP 获取与百度 Ping 4/4 OK 实物验收通过）
-- [ ] 云端和远程控制整合实验
+- [x] `cloud_ecs`：云端 FastAPI 遥测微服务与 Mosquitto MQTT Broker（已部署上线百度云 BCC 并完成公网联调通过）
 
 南向实验按独立目录保存，完成一个实验后更新 Markdown、验证并单独提交。规则见
 [南向实验独立保存与协同记录设计](docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md)，
