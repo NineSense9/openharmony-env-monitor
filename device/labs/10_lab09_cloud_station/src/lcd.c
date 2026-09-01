@@ -288,6 +288,11 @@ static void lcd_show_chinese_16x16(uint16_t x, uint16_t y, uint8_t *s, uint16_t 
             break; //查找到对应点阵字库立即退出，防止多个汉字重复取模带来影响
         }
     }
+
+    if (k >= HZnum && !mode)
+    {
+        lcd_fill(x, y, x + sizey - 1, y + sizey - 1, bc);
+    }
 } 
 
 
