@@ -1,0 +1,9 @@
+lab05_sht30_key_lcd: create task success tid=2
+lab05_sht30_key_lcd: process start
+sht30: dev init success on I2C0 (0x44)
+lab05_sht30_key_lcd: loop ready, K3 toggles freeze
+lab05_sht30_key_lcd: Temp = 26.5 C, Humi = 55.2 %
+lab05_sht30_key_lcd: Temp = 26.5 C, Humi = 55.3 %
+lab05_sht30_key_lcd: K3 clicked -> Freeze: ON
+lab05_sht30_key_lcd: K3 clicked -> Freeze: OFF
+lab05_sht30_key_lcd: Temp = 27.1 C, Humi = 58.6 %

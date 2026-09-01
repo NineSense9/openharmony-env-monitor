@@ -10,7 +10,7 @@
 | 03 | `03_lab02_key_lcd` | 授课文档 4.6：K3 按键 + LCD | K3=PC7 已实物验证，已生成 LCD 布局修正版 |
 | 04 | `04_lab03_light_key_lcd` | 授课文档 4.7：告警灯 + K3 + LCD | 已实物验收通过（PA5 灯与 LCD 状态同步正常） |
 | 05 | `05_lab04_mq2_key_lcd` | 授课文档 4.8：MQ2 + K3 校准 + LCD | 已实物验收通过（Gas PPM 采样与 K3 校准正常） |
-| 06 | `06_lab05_sht30_key_lcd` | 授课文档 4.9：SHT30 + K3 冻结 + LCD | 源码、构建与烧录包已完成，待上板验收 |
+| 06 | `06_lab05_sht30_key_lcd` | 授课文档 4.9：SHT30 + K3 冻结 + LCD | 已实物验收通过（SHT30 温湿度采样与 K3 冻结正常） |
 | 07 | `07_lab06_multitask_lcd` | 授课文档 4.10：多任务 + LCD | 待开始 |
 | 08 | `08_lab07_cabin_station` | 授课文档 4.11：舱内环境监测站 | 待开始 |
 | 09 | `09_lab08_wifi_ping` | 授课文档 4.12：Wi-Fi + Ping + LCD | 待开始 |

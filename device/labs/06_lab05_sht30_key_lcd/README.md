@@ -15,3 +15,10 @@
 - `src/lcd.c`: 液晶屏底层驱动与字符绘制
 - `src/tx_key.c`: K3 按键初始化与 `tx_key_click` 单击边沿判定
 - `src/sht30.c`: SHT30 I2C 通信、CRC8 校验、温湿度数据解析
+
+## 4. 验证与产物
+- 烧录目录: `D:\实习\tmp\rk2206_images\lab06_lab05_sht30_key_lcd_20260901`
+- `Firmware.img` MD5: `3f18a1654466fcc7b3ade57780c06273`
+- `rk2206_db_loader.bin` MD5: `5f2ea974b0e1df5564a8e1ee910627bb`
+- **实物验收结果**: 【验收通过】用户实测温湿度动态采样真实准确，捂传感器温湿度快速响应上升，K3 短按成功冻结/解冻屏幕刷新。
+
