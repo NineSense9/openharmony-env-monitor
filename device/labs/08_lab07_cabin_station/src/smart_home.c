@@ -48,13 +48,23 @@ unsigned int smart_home_init(void)
     LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_power_on, 1);
     LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_cont_mode, 1);
 
-    /* 3. 初始化 电机 (GPIO0_PD0) */
-    PinctrlSet(MOTOR_PIN, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
-    LzGpioInit(MOTOR_PIN);
-    LzGpioSetDir(MOTOR_PIN, LZGPIO_DIR_OUT);
-    LzGpioSetVal(MOTOR_PIN, LZGPIO_LEVEL_LOW);
+    /* 3. 初始化电机引脚 (GPIO1_PD0 与 GPIO0_PC6 / GPIO0_PA2 均配置为输出) */
+    PinctrlSet(MOTOR_PIN_PD0, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
+    LzGpioInit(MOTOR_PIN_PD0);
+    LzGpioSetDir(MOTOR_PIN_PD0, LZGPIO_DIR_OUT);
+    LzGpioSetVal(MOTOR_PIN_PD0, LZGPIO_LEVEL_LOW);
 
-    printf("smart_home: init complete (I2C sensors, Motor on GPIO0_PD0)\n");
+    PinctrlSet(MOTOR_PIN_PC6, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
+    LzGpioInit(MOTOR_PIN_PC6);
+    LzGpioSetDir(MOTOR_PIN_PC6, LZGPIO_DIR_OUT);
+    LzGpioSetVal(MOTOR_PIN_PC6, LZGPIO_LEVEL_LOW);
+
+    PinctrlSet(MOTOR_PIN_PA2, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
+    LzGpioInit(MOTOR_PIN_PA2);
+    LzGpioSetDir(MOTOR_PIN_PA2, LZGPIO_DIR_OUT);
+    LzGpioSetVal(MOTOR_PIN_PA2, LZGPIO_LEVEL_LOW);
+
+    printf("smart_home: init complete (I2C sensors, Motors on GPIO1_PD0, PC6, PA2)\n");
     return LZ_HARDWARE_SUCCESS;
 }
 
@@ -108,7 +118,9 @@ float bh1750_read_lux(void)
 void motor_set_state(int on)
 {
     LzGpioValue val = on ? LZGPIO_LEVEL_HIGH : LZGPIO_LEVEL_LOW;
-    LzGpioSetVal(MOTOR_PIN, val);
+    LzGpioSetVal(MOTOR_PIN_PD0, val);
+    LzGpioSetVal(MOTOR_PIN_PC6, val);
+    LzGpioSetVal(MOTOR_PIN_PA2, val);
 }
 
 void outputs_all_off(void)

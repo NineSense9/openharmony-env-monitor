@@ -23,7 +23,7 @@ def test_board_pins():
     content = (LAB_DIR / "include" / "board_pins.h").read_text(encoding="utf-8")
     assert "GPIO0_PC7" in content
     assert "TX_GPIO_ALARM_LIGHT" in content
-    assert "MOTOR_PIN" in content
+    assert "MOTOR_PIN_PD0" in content
 
 def test_smart_home_driver():
     h_content = (LAB_DIR / "include" / "smart_home.h").read_text(encoding="utf-8")

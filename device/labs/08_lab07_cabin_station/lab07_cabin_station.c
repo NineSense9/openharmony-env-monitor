@@ -21,11 +21,11 @@
 #define LAB07_CTRL_PRIORITY     25
 #define LAB07_CTRL_PERIOD_MS    100
 
-/* 告警阈值定义（更贴合实际环境测试） */
-#define TH_LIGHT_LOW  20.0f   /* 遮光测试：暗于 20 Lux 触发环境告警 */
+/* 告警阈值定义 */
+#define TH_LIGHT_LOW  20.0f   /* 遮光测试：低于 20 Lux 触发环境告警 */
 #define TH_GAS_HIGH   80.0f   /* 气体测试：高于 80 ppm 触发环境告警 */
 #define TH_TEMP_HIGH  35.0f   /* 温度测试：高于 35.0 C 触发热湿告警 */
-#define TH_HUMI_HIGH  75.0f   /* 湿度测试：高于 75.0 % 触发热湿告警 */
+#define TH_HUMI_HIGH  70.0f   /* 湿度测试：捂手湿度 > 70% 触发热湿告警 */
 
 #define TITLE_ROW_Y    25
 #define TH_ROW_Y       55

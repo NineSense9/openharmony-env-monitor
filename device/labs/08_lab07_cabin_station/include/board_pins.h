@@ -9,8 +9,14 @@
 /* User Alarm LED (PA5) */
 #define TX_GPIO_ALARM_LIGHT     GPIO0_PA5
 
-/* E53 Intelligent Agriculture Motor pin on RK2206: GPIO0_PD0 */
-#define MOTOR_PIN               GPIO0_PD0
+/* E53 Intelligent Agriculture & Smart Home Motor pins:
+ * 1. E53_IA Motor Pin: GPIO1_PD0 (active high)
+ * 2. PWM6 / Smart Home Motor Pin: GPIO0_PC6
+ * 3. Auxiliary Fan/Light Pin: GPIO0_PA2
+ */
+#define MOTOR_PIN_PD0           GPIO1_PD0
+#define MOTOR_PIN_PC6           GPIO0_PC6
+#define MOTOR_PIN_PA2           GPIO0_PA2
 
 /* SHT30 & BH1750 I2C0 */
 #define SHT30_BH1750_I2C_PORT   0

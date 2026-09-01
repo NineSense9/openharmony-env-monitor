@@ -3,10 +3,10 @@
 ## Windows 烧录目录
 路径: `D:\实习\tmp\rk2206_images\lab08_lab07_cabin_station_20260901`
 
-- `Firmware.img`: `8864b0b72eb17b0273a7f00efe135629`
+- `Firmware.img`: `ba3e8586c15e7f9a3b7f6f1beab758aa`
 - `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
 
 ## Ubuntu 产物
-- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `8864b0b72eb17b0273a7f00efe135629`
-- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `cd75346571b7f6e6fffa2fce99ee8c57`
-- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `db96ea2c02f5ea187c802ef386bd85a3`
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `ba3e8586c15e7f9a3b7f6f1beab758aa`
+- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `82d53008486c41dcc45fb7d9d9fe068a`
+- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `e070cc254d9b346b37f75db9aa480bcf`
