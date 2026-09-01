@@ -1,0 +1,18 @@
+import("//build/lite/config/component/lite_component.gni")
+
+lite_library("lab06_multitask_lcd") {
+    target_type = "static_library"
+
+    sources = [
+        "lab06_multitask_lcd.c",
+        "src/lcd.c",
+        "src/tx_key.c",
+        "src/sht30.c",
+    ]
+
+    include_dirs = [
+        "include",
+        "//device/rockchip/rk2206/adapter/include",
+        "//device/rockchip/rk2206/sdk_liteos/include",
+    ]
+}

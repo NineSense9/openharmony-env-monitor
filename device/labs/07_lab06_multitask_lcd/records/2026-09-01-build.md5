@@ -1,0 +1,12 @@
+# 07_lab06_multitask_lcd 构建产物 MD5
+
+## Windows 烧录目录
+路径: `D:\实习\tmp\rk2206_images\lab07_lab06_multitask_lcd_20260901`
+
+- `Firmware.img`: `6bab15719f7e847f1d1951a83e308f12`
+- `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## Ubuntu 产物
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `6bab15719f7e847f1d1951a83e308f12`
+- `out/rk2206/lockzhiner-rk2206/liteos.bin`: `64d502e8dd607b200d190d4fb743ab92`
+- `out/rk2206/lockzhiner-rk2206/liteos.elf`: `2c1e32fb3d086491144c98039e7bf860`
