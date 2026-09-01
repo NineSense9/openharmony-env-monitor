@@ -36,35 +36,25 @@ static uint8_t sht30_check_crc(uint8_t *data, uint8_t nbrOfBytes, uint8_t checks
 unsigned int smart_home_init(void)
 {
     uint8_t sht30_cmd[2] = {0x22, 0x36};
-    uint8_t bh1750_cmd = 0x01;
-    uint8_t bh1750_start_cmd = 0x10;
+    uint8_t bh1750_power_on = 0x01;
+    uint8_t bh1750_cont_mode = 0x10;
 
     /* 1. 初始化 I2C0 */
     I2cIoInit(m_i2c0);
     LzI2cInit(SHT30_BH1750_I2C_PORT, 100000);
 
-    /* 2. 初始化 SHT30 与 BH1750 */
+    /* 2. 初始化 SHT30 与 BH1750 (持续测量模式 0x10) */
     LzI2cWrite(SHT30_BH1750_I2C_PORT, SHT30_I2C_ADDR, sht30_cmd, 2);
-    LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_cmd, 1);
-    LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_start_cmd, 1);
+    LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_power_on, 1);
+    LzI2cWrite(SHT30_BH1750_I2C_PORT, BH1750_I2C_ADDR, &bh1750_cont_mode, 1);
 
-    /* 3. 初始化 RGB LED */
-    LzGpioInit(RGB_LED_R_PIN);
-    LzGpioInit(RGB_LED_G_PIN);
-    LzGpioInit(RGB_LED_B_PIN);
-    LzGpioSetDir(RGB_LED_R_PIN, LZGPIO_DIR_OUT);
-    LzGpioSetDir(RGB_LED_G_PIN, LZGPIO_DIR_OUT);
-    LzGpioSetDir(RGB_LED_B_PIN, LZGPIO_DIR_OUT);
-    LzGpioSetVal(RGB_LED_R_PIN, LZGPIO_LEVEL_LOW);
-    LzGpioSetVal(RGB_LED_G_PIN, LZGPIO_LEVEL_LOW);
-    LzGpioSetVal(RGB_LED_B_PIN, LZGPIO_LEVEL_LOW);
-
-    /* 4. 初始化 电机 */
+    /* 3. 初始化 电机 (GPIO0_PD0) */
+    PinctrlSet(MOTOR_PIN, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
     LzGpioInit(MOTOR_PIN);
     LzGpioSetDir(MOTOR_PIN, LZGPIO_DIR_OUT);
     LzGpioSetVal(MOTOR_PIN, LZGPIO_LEVEL_LOW);
 
-    printf("smart_home: init complete (I2C sensors, RGB, Motor)\n");
+    printf("smart_home: init complete (I2C sensors, Motor on GPIO0_PD0)\n");
     return LZ_HARDWARE_SUCCESS;
 }
 
@@ -115,14 +105,6 @@ float bh1750_read_lux(void)
     return (float)raw / 1.2f;
 }
 
-void rgb_led_set_white(int on)
-{
-    LzGpioValue val = on ? LZGPIO_LEVEL_HIGH : LZGPIO_LEVEL_LOW;
-    LzGpioSetVal(RGB_LED_R_PIN, val);
-    LzGpioSetVal(RGB_LED_G_PIN, val);
-    LzGpioSetVal(RGB_LED_B_PIN, val);
-}
-
 void motor_set_state(int on)
 {
     LzGpioValue val = on ? LZGPIO_LEVEL_HIGH : LZGPIO_LEVEL_LOW;
@@ -132,6 +114,5 @@ void motor_set_state(int on)
 void outputs_all_off(void)
 {
     tx_light_set(TX_GPIO_ALARM_LIGHT, 0);
-    rgb_led_set_white(0);
     motor_set_state(0);
 }

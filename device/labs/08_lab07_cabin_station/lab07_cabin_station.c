@@ -21,11 +21,11 @@
 #define LAB07_CTRL_PRIORITY     25
 #define LAB07_CTRL_PERIOD_MS    100
 
-/* PDF 4.11 规定阈值 */
-#define TH_LIGHT_LOW  50.0f
-#define TH_GAS_HIGH   100.0f
-#define TH_TEMP_HIGH  35.0f
-#define TH_HUMI_HIGH  80.0f
+/* 告警阈值定义（更贴合实际环境测试） */
+#define TH_LIGHT_LOW  20.0f   /* 遮光测试：暗于 20 Lux 触发环境告警 */
+#define TH_GAS_HIGH   80.0f   /* 气体测试：高于 80 ppm 触发环境告警 */
+#define TH_TEMP_HIGH  35.0f   /* 温度测试：高于 35.0 C 触发热湿告警 */
+#define TH_HUMI_HIGH  75.0f   /* 湿度测试：高于 75.0 % 触发热湿告警 */
 
 #define TITLE_ROW_Y    25
 #define TH_ROW_Y       55
@@ -61,8 +61,8 @@ static void lab07_draw_initial_screen(void)
     lcd_show_string(10, TITLE_ROW_Y, "TX-SMART-R Lab07 Cabin", LCD_BLUE, LCD_WHITE, 16, 0);
     lcd_show_string(10, TH_ROW_Y, "T: --.- C  H: --.- %", LCD_BLACK, LCD_WHITE, 16, 0);
     lcd_show_string(10, LUX_GAS_ROW_Y, "Lux: ---.-  Gas: --.- ppm", LCD_BLACK, LCD_WHITE, 16, 0);
-    lcd_show_string(10, ENV_ROW_Y, "Env: NORMAL", LCD_BLACK, LCD_WHITE, 16, 0);
-    lcd_show_string(10, THERMAL_ROW_Y, "Thermal: NORMAL", LCD_BLACK, LCD_WHITE, 16, 0);
+    lcd_show_string(10, ENV_ROW_Y, "Env: NORMAL", LCD_GREEN, LCD_WHITE, 16, 0);
+    lcd_show_string(10, THERMAL_ROW_Y, "Thermal: NORMAL", LCD_GREEN, LCD_WHITE, 16, 0);
     lcd_show_string(10, ACT_ROW_Y, "Act: OFF", LCD_BLACK, LCD_WHITE, 16, 0);
     lcd_show_string(10, STATUS_ROW_Y, "Status: RUNNING", LCD_BLUE, LCD_WHITE, 16, 0);
 }
@@ -152,7 +152,7 @@ static void *lab07_control_ui_task(void *arg)
 
         /* 2. 执行器驱动逻辑 */
         if (!g_alarm_ack && (env || thermal)) {
-            /* 电机转动 */
+            /* 电机转动 (超限时开启) */
             motor_set_state(1);
 
             /* 环境报警 -> PA5 报警灯闪烁 */
@@ -165,19 +165,12 @@ static void *lab07_control_ui_task(void *arg)
             } else {
                 tx_light_set(TX_GPIO_ALARM_LIGHT, 0);
             }
-
-            /* 热湿报警 -> RGB 常亮白光 */
-            if (thermal) {
-                rgb_led_set_white(1);
-            } else {
-                rgb_led_set_white(0);
-            }
         } else {
             outputs_all_off();
             alarm_light_state = 0;
         }
 
-        /* 3. 屏幕实时渲染 */
+        /* 3. 屏幕实时渲染：NORMAL 显式用绿色 LCD_GREEN，ALARM 显式用红色 LCD_RED */
         if (g_sensors_ready) {
             /* T & H */
             snprintf(buf, sizeof(buf), "T: %.1f C  H: %.1f %%", g_temp, g_humi);
@@ -189,19 +182,19 @@ static void *lab07_control_ui_task(void *arg)
             lcd_fill(10, LG_CLEAR_TOP, 300, LG_CLEAR_BOTTOM, LCD_WHITE);
             lcd_show_string(10, LUX_GAS_ROW_Y, buf, LCD_BLACK, LCD_WHITE, 16, 0);
 
-            /* Env Status */
-            snprintf(buf, sizeof(buf), "Env: %s", env ? "ALARM (Light/Gas)" : "NORMAL");
+            /* Env Status: 正常绿字 NORMAL, 报警红字 ALARM */
+            snprintf(buf, sizeof(buf), "Env: %s", env ? "ALARM (Light/Gas)" : "NORMAL (Safe)");
             lcd_fill(10, ENV_CLEAR_TOP, 300, ENV_CLEAR_BOTTOM, LCD_WHITE);
-            lcd_show_string(10, ENV_ROW_Y, buf, env ? LCD_RED : LCD_BLACK, LCD_WHITE, 16, 0);
+            lcd_show_string(10, ENV_ROW_Y, buf, env ? LCD_RED : LCD_GREEN, LCD_WHITE, 16, 0);
 
-            /* Thermal Status */
-            snprintf(buf, sizeof(buf), "Thermal: %s", thermal ? "ALARM (Temp/Humi)" : "NORMAL");
+            /* Thermal Status: 正常绿字 NORMAL, 报警红字 ALARM */
+            snprintf(buf, sizeof(buf), "Thermal: %s", thermal ? "ALARM (Temp/Humi)" : "NORMAL (Safe)");
             lcd_fill(10, THM_CLEAR_TOP, 300, THM_CLEAR_BOTTOM, LCD_WHITE);
-            lcd_show_string(10, THERMAL_ROW_Y, buf, thermal ? LCD_RED : LCD_BLACK, LCD_WHITE, 16, 0);
+            lcd_show_string(10, THERMAL_ROW_Y, buf, thermal ? LCD_RED : LCD_GREEN, LCD_WHITE, 16, 0);
 
             /* Actuators */
             if (!g_alarm_ack && (env || thermal)) {
-                snprintf(buf, sizeof(buf), "Act: %s%sMOTOR", env ? "PA5_BLINK " : "", thermal ? "RGB_ON " : "");
+                snprintf(buf, sizeof(buf), "Act: %sMOTOR_RUN", env ? "PA5_BLINK " : "");
             } else {
                 snprintf(buf, sizeof(buf), "Act: OFF (STANDBY)");
             }

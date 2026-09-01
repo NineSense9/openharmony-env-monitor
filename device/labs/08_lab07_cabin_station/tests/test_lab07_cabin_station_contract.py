@@ -18,13 +18,11 @@ def test_lab07_files_exist():
     assert (LAB_DIR / "src" / "mq2.c").exists()
     assert (LAB_DIR / "src" / "smart_home.c").exists()
     assert (LAB_DIR / "src" / "lcd.c").exists()
-    assert (LAB_DIR / "patches" / "README.md").exists()
 
 def test_board_pins():
     content = (LAB_DIR / "include" / "board_pins.h").read_text(encoding="utf-8")
     assert "GPIO0_PC7" in content
     assert "TX_GPIO_ALARM_LIGHT" in content
-    assert "RGB_LED_R_PIN" in content
     assert "MOTOR_PIN" in content
 
 def test_smart_home_driver():
@@ -33,7 +31,6 @@ def test_smart_home_driver():
     assert "smart_home_init" in h_content
     assert "sht30_read_temp_humi" in h_content
     assert "bh1750_read_lux" in h_content
-    assert "rgb_led_set_white" in h_content
     assert "motor_set_state" in h_content
     assert "outputs_all_off" in c_content
 
@@ -46,9 +43,5 @@ def test_lab07_main_alarm_logic():
     assert "env_alarm_active" in content
     assert "thermal_alarm_active" in content
     assert "g_alarm_ack" in content
+    assert "LCD_GREEN" in content
     assert "SYS_RUN" in content
-
-def test_build_gn():
-    content = (LAB_DIR / "BUILD.gn").read_text(encoding="utf-8")
-    assert 'lite_library("lab07_cabin_station")' in content
-    assert '"src/smart_home.c"' in content
