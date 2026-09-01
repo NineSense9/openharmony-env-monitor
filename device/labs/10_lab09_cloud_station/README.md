@@ -11,21 +11,27 @@
    - 正常状态：绿字（`NORMAL`），PA5 熄灭，电机停止
    - 告警状态：红字（`ALARM`），PA5 闪烁，电机旋转排风
    - 屏幕同步显示：IP、温湿度、光照、烟雾、告警状态、上云成功计数（`Cloud: OK=N Err=N`）
-4. **云端遥测上报与双向控制闭环**：
-   - 每 3 秒通过 lwIP 原生 TCP Socket 直连百度云微服务 `http://180.76.137.117:8000/api/telemetry` 发送 HTTP POST 遥测 JSON；
-   - 轮询拉取云端远程指令（`GET /api/command/pending`），若有指令（如电机启动/停止、告警确认）则执行并上报回执（`POST /api/command/{id}/ack`）；
-5. **K3 键本地安全复位**：
-   - 短按 K3（`GPIO0_PC7`）执行本地一键消警、电机停转与传感器安全复位。
+4. **云端极速低延迟遥测与双向控制闭环（<500ms）**：
+   - 每 500ms 通过 lwIP 原生 TCP Socket 直连百度云微服务 `http://180.76.137.117:8000/api/telemetry` 发送 HTTP POST 极速遥测 JSON（携带 `motor_on`/`alarm_on` 物理状态）；
+   - 每 200ms 轮询拉取云端远程指令（`GET /api/command/pending`），收到电机启停/消警指令后 ~50ms 内完成 GPIO 驱动并上报回执（`POST /api/command/{id}/ack`），端到端控制延迟仅 ~240ms；
+5. **K3 键本地安全复位与极致灵敏度优化**：
+   - 短按 K3（`GPIO0_PC7`）执行本地一键消警、电机停转与传感器安全复位；
+   - 任务提权至最高用户优先级（`usTaskPrio = 3`），引入硬件级边沿检测状态机（Edge-Triggered）与 15ms 采样消抖，轻触即按即响、毫秒级响应；
+6. **2.4 寸 LCD 航天动效与中文科技感 HUD 升级**：
+   - 开机 3 秒自检动效与 OpenHarmony 3.0 LTS 徽章、分步自检与动态进度条；
+   - 注入 59 个 16x16 常用中文字模，支持中文双列科技线框与心跳符；
+   - 屏幕扫描方向切换为 `0xA0`（`USE_HORIZONTAL 3`），与主板硬件白字丝印 100% 正向对齐；
+   - 状态字符严格规范为 4 字符定长并加入局部显存像素擦除（`lcd_fill`），彻底杜绝字符残影。
 
 ## 2. 硬件引脚与外设分配
 - 告警指示灯: `GPIO0_PA5`（`TX_GPIO_ALARM_LIGHT`）
-- 矩阵按键 K3: `GPIO0_PC7`（`TX_GPIO_KEY_K3`）
+- 矩阵按键 K3: `GPIO0_PC7`（`TX_GPIO_KEY_K3`，优先级 Prio 3 边沿检测）
 - MQ2 烟雾传感器: `SARADC_CH4`（`GPIO0_PC4`）
 - SHT30 & BH1750: `I2C0`（SCL: `GPIO0_PA1`, SDA: `GPIO0_PA0`）
 - 电机驱动引脚: `GPIO1_PD0` / `GPIO0_PC6` / `GPIO0_PA2`（全引脚兼容驱动）
-- 屏幕显示: 2.4 寸 SPI LCD，分辨率 320x240
+- 屏幕显示: 2.4 寸 SPI LCD，分辨率 320x240，180° 正向横屏（`0xA0`）
 
 ## 3. 产物与烧录
-- **Windows 烧录目录**: `D:\实习\tmp\rk2206_images\lab10_lab09_cloud_station_20260901`
-- `Firmware.img` MD5: `3218b8a754c6e22b69d1166428b8b1d0`
+- **Windows 烧录目录**: `workspace\device\images\10_lab09_cloud_station`
+- `Firmware.img` MD5: `74e7c712fd0eb32187422aac1fdae4e4`
 - `rk2206_db_loader.bin` MD5: `5f2ea974b0e1df5564a8e1ee910627bb`
