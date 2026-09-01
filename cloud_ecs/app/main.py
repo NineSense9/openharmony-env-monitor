@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+
 from datetime import datetime, timezone
 from collections.abc import Generator
 from pathlib import Path
@@ -57,6 +61,18 @@ def create_app(database_url: str | None = None) -> FastAPI:
             Path(sqlite_path).expanduser().parent.mkdir(parents=True, exist_ok=True)
 
     app = FastAPI(title="OpenHarmony Env Monitor Cloud", version="0.1.0")
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/")
+    def root():
+        return RedirectResponse(url="/dashboard/")
     engine = build_engine(db_url)
     session_factory = build_session_factory(engine)
     create_schema(engine)
@@ -189,6 +205,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
         query = query.order_by(desc(Command.created_at), desc(Command.id)).limit(limit)
         return list(db.execute(query).scalars().all())
 
+    static_dir = Path("/opt/openharmony-env-monitor/cloud_ecs/static")
+    if static_dir.exists():
+        app.mount("/dashboard", StaticFiles(directory=str(static_dir), html=True), name="dashboard")
     return app
 
 
