@@ -1,0 +1,6 @@
+lab03_light_key_lcd: create task success tid=2
+lab03_light_key_lcd: process start
+lab03_light_key_lcd: loop ready, K3 toggles Alarm Light (PA5)
+lab03_light_key_lcd: K3 clicked -> Light: ON
+lab03_light_key_lcd: K3 clicked -> Light: OFF
+lab03_light_key_lcd: K3 clicked -> Light: ON
