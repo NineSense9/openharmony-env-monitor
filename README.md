@@ -59,7 +59,7 @@
 - [x] `device/labs/02_lab01_lcd`：LCD 实验 1（功能基线可运行，LCD 欢迎文字点亮）
 - [x] `device/labs/03_lab02_key_lcd`：按键 + LCD 实验 2（K3=PC7 实物验收通过，LCD 布局修正完成）
 - [x] `device/labs/04_lab03_light_key_lcd`：告警灯 + 按键 + LCD 实验 3（K3 翻转 PA5 告警灯与屏幕 Light: ON/OFF 状态同步实物验收通过）
-- [ ] `device/labs/05_lab04_mq2_key_lcd`：MQ2 气体传感器 + K3 校准 + LCD 实验 4（即将进行）
+- [ ] `device/labs/05_lab04_mq2_key_lcd`：MQ2 气体传感器 + K3 校准 + LCD 实验 4（源码、构建与烧录包已完成，待上板验收）
 - [ ] `device/labs/06_lab05_sht30_key_lcd` 至 `09_lab08_wifi_ping`
 - [ ] 云端和远程控制整合实验
 
