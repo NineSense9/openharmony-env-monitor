@@ -313,24 +313,28 @@ static void *NetMonitorTask(void *arg)
     return NULL;
 }
 
-// 6. K3 按键消警任务 (50ms 轮询)
+// 6. K3 按键消警任务 (极速边沿检测，100% 灵敏即按即响)
 static void *KeyTask(void *arg)
 {
     (void)arg;
+    uint8_t last_state = 0;
     while (1) {
-        if (SmartHome_IsK3Pressed()) {
-            LOS_Msleep(20); // 消抖
+        uint8_t cur_state = SmartHome_IsK3Pressed() ? 1 : 0;
+        // 检测到按下动作 (上升/按下边沿)
+        if (cur_state && !last_state) {
+            LOS_Msleep(10); // 10ms 快速硬件消抖
             if (SmartHome_IsK3Pressed()) {
-                printf("[key] K3 pressed -> latch mute alarm & stop motor\n");
+                printf("[key] >>> K3 INSTANT TRIGGER -> Mute Alarm, Stop Motor, Reset Remote <<<\n");
                 g_k3_muted_latch = true;
                 g_remote_override = false;
+                g_remote_motor_on = false;
+                SmartHome_SetMotor(false);
+                SmartHome_SetAlarmLight(false);
                 SmartHome_ResetAlarmState();
-                while (SmartHome_IsK3Pressed()) {
-                    LOS_Msleep(50);
-                }
             }
         }
-        LOS_Msleep(50);
+        last_state = cur_state;
+        LOS_Msleep(15);
     }
     return NULL;
 }
@@ -348,7 +352,15 @@ static void *MainStationTask(void *arg)
     UINT32 task_id;
     TSK_INIT_PARAM_S task_param;
 
-    // 1. 启动 UiTask (优先启动展示开机动画)
+    // 1. 启动 KeyTask (最高优先级 3，按键极速响应，绝不丢事件)
+    memset(&task_param, 0, sizeof(task_param));
+    task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)KeyTask;
+    task_param.uwStackSize = 2048;
+    task_param.pcName = "KeyTask";
+    task_param.usTaskPrio = 3;
+    LOS_TaskCreate(&task_id, &task_param);
+
+    // 2. 启动 UiTask (优先启动展示开机动画)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)UiTask;
     task_param.uwStackSize = 4096;
@@ -356,7 +368,7 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 7;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 2. 启动 NetMonitorTask
+    // 3. 启动 NetMonitorTask
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)NetMonitorTask;
     task_param.uwStackSize = 3072;
@@ -364,7 +376,7 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 9;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 3. 启动 SensorTask
+    // 4. 启动 SensorTask
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)SensorTask;
     task_param.uwStackSize = 4096;
@@ -372,7 +384,7 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 6;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 4. 启动 TelemetryTask (500ms 极速上报)
+    // 5. 启动 TelemetryTask (500ms 极速上报)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)TelemetryTask;
     task_param.uwStackSize = 6144;
@@ -380,20 +392,12 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 5;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 5. 启动 CommandTask (200ms 极速指令响应)
+    // 6. 启动 CommandTask (200ms 极速指令响应)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)CommandTask;
     task_param.uwStackSize = 6144;
     task_param.pcName = "CommandTask";
     task_param.usTaskPrio = 5;
-    LOS_TaskCreate(&task_id, &task_param);
-
-    // 6. 启动 KeyTask
-    memset(&task_param, 0, sizeof(task_param));
-    task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)KeyTask;
-    task_param.uwStackSize = 2048;
-    task_param.pcName = "KeyTask";
-    task_param.usTaskPrio = 8;
     LOS_TaskCreate(&task_id, &task_param);
 
     return NULL;
