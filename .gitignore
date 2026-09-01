@@ -32,6 +32,7 @@ __pycache__/
 .venv/
 cloud_ecs/data/
 cloud_ecs/.venv/
+cloud_ecs/*.db
 
 # ===== 日志 / 系统文件 =====
 *.log
