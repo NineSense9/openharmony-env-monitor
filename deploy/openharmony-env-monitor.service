@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenHarmony Env Monitor Cloud
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=envmonitor
+Group=envmonitor
+WorkingDirectory=/opt/openharmony-env-monitor
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/openharmony-env-monitor/cloud_ecs/.venv/bin/uvicorn cloud_ecs.app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

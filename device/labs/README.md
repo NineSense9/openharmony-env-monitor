@@ -14,12 +14,13 @@
 | 07 | `07_lab06_multitask_lcd` | 授课文档 4.10：多任务 + LCD | 已实物验收通过（3s 采样与 200ms UI 多任务调度正常） |
 | 08 | `08_lab07_cabin_station` | 授课文档 4.11：舱内环境监测站 | 已实物验收通过（四路传感、声光电机联动与消警正常） |
 | 09 | `09_lab08_wifi_ping` | 授课文档 4.12：Wi-Fi + Ping + LCD | 已实物验收通过（Wi-Fi 联网 IP 获取与百度 Ping 4/4 OK） |
-| 10 | `cloud_ecs` | 第五章：FastAPI、SQLite、MQTT 遥测微服务 | 已部署上线百度云 BCC 并完成公网联调通过 |
+| 10 | `10_lab09_cloud_station` | 综合实验：环境遥测上云 + 远程控制 | 已完成编译，固件已生成，待上板烧录验证 |
+| 11 | `cloud_ecs` | 第五章：FastAPI、SQLite、MQTT 遥测微服务 | 已部署上线百度云 BCC 并完成公网联调通过 |
 
 完整的目录、记录和提交规则见：
 
 `docs/superpowers/specs/2026-08-31-device-experiment-recording-design.md`
 
 授课文档第四章的实验目录以 `02_lab01_lcd` 至
-`09_lab08_wifi_ping` 保存；`01_hello_world` 是第三章 3.10 的通链路
+`10_lab09_cloud_station` 保存；`01_hello_world` 是第三章 3.10 的通链路
 例程，单独保留。

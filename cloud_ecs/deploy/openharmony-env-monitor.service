@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenHarmony Env Monitor Telemetry Cloud Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/openharmony-env-monitor
+ExecStart=/opt/openharmony-env-monitor/cloud_ecs/.venv/bin/uvicorn cloud_ecs.app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=3
+Environment="PYTHONPATH=/opt/openharmony-env-monitor"
+
+[Install]
+WantedBy=multi-user.target

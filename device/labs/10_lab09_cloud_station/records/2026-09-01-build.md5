@@ -1,0 +1,10 @@
+# 10_lab09_cloud_station 构建产物 MD5
+
+## Windows 烧录目录
+路径: `D:\实习\tmp\rk2206_images\lab10_lab09_cloud_station_20260901`
+
+- `Firmware.img`: `3218b8a754c6e22b69d1166428b8b1d0`
+- `rk2206_db_loader.bin`: `5f2ea974b0e1df5564a8e1ee910627bb`
+
+## Ubuntu 产物
+- `out/rk2206/lockzhiner-rk2206/images/Firmware.img`: `3218b8a754c6e22b69d1166428b8b1d0`
