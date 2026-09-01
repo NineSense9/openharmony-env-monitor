@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空空间站舱内环境监测数字孪生大屏 - CSS-CABIN-01</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <!-- ECharts 5 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.294.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <!-- Background Elements -->
+    <canvas id="stars-canvas"></canvas>
+    <div id="alarm-overlay"></div>
+    <div id="toast-container"></div>
+
+    <div class="app-container">
+        <!-- 1. Top HUD Header -->
+        <header class="hud-header">
+            <div class="brand-area">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="#00F0FF"></polygon>
+                        <polyline points="2 17 12 22 22 17" stroke="#00F0FF"></polyline>
+                        <polyline points="2 12 12 17 22 12" stroke="#00F0FF"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">CSS-CABIN DIGITAL TWIN</h1>
+                    <div class="brand-subtitle">太空空间站内部环境监测与闭环控制系统 · 任务代号 CSS-01</div>
+                </div>
+            </div>
+
+            <div class="header-center-info">
+                <div class="info-badge">
+                    <span class="info-label">北京时间 (BJT)</span>
+                    <span class="info-val" id="clock-beijing">--:--:--</span>
+                </div>
+                <div class="info-badge">
+                    <span class="info-label">标准时间 (UTC)</span>
+                    <span class="info-val" id="clock-utc">--:--:--</span>
+                </div>
+                <div class="info-badge">
+                    <span class="info-label">南向终端 IP</span>
+                    <span class="info-val" id="board-ip">192.168.9.51</span>
+                </div>
+                <div class="info-badge">
+                    <span class="info-label">遥测报文统计</span>
+                    <span class="info-val" id="packet-count">0 PKTS</span>
+                </div>
+            </div>
+
+            <div class="header-status-area">
+                <div class="status-pill" id="conn-status">
+                    <span class="status-dot"></span>
+                    <span>CONNECTING...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 2. Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- Left Column: Sensor Metric Cards -->
+            <section class="left-col sensor-metric-list">
+                
+                <!-- Card 1: Temperature -->
+                <div class="sensor-card" style="--card-color: #00F0FF;">
+                    <div class="sensor-header">
+                        <span class="sensor-name">
+                            <i data-lucide="thermometer" style="width:16px;height:16px;stroke:#00F0FF;"></i>
+                            舱内核心区温度
+                        </span>
+                        <span class="card-tag">SHT30</span>
+                    </div>
+                    <div class="sensor-val-area">
+                        <span class="sensor-val" id="val-temp">--.-</span>
+                        <span class="sensor-unit">°C</span>
+                    </div>
+                    <div class="sensor-range-bar">
+                        <div class="sensor-range-fill" id="bar-temp" style="width: 50%;"></div>
+                    </div>
+                    <div class="sensor-threshold-note">
+                        <span>标称范围: 18.0 ~ 28.0 °C</span>
+                        <span>越限: &gt;38.0 °C</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Humidity -->
+                <div class="sensor-card" style="--card-color: #3A86FF;">
+                    <div class="sensor-header">
+                        <span class="sensor-name">
+                            <i data-lucide="droplets" style="width:16px;height:16px;stroke:#3A86FF;"></i>
+                            舱内相对湿度
+                        </span>
+                        <span class="card-tag">SHT30</span>
+                    </div>
+                    <div class="sensor-val-area">
+                        <span class="sensor-val" id="val-humi">--.-</span>
+                        <span class="sensor-unit">% RH</span>
+                    </div>
+                    <div class="sensor-range-bar">
+                        <div class="sensor-range-fill" id="bar-humi" style="width: 40%;"></div>
+                    </div>
+                    <div class="sensor-threshold-note">
+                        <span>标称范围: 40.0 ~ 65.0 %</span>
+                        <span>越限: &gt;85.0 %</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: Light Lux -->
+                <div class="sensor-card" style="--card-color: #FF9900;">
+                    <div class="sensor-header">
+                        <span class="sensor-name">
+                            <i data-lucide="sun" style="width:16px;height:16px;stroke:#FF9900;"></i>
+                            舱内光照强度
+                        </span>
+                        <span class="card-tag">BH1750</span>
+                    </div>
+                    <div class="sensor-val-area">
+                        <span class="sensor-val" id="val-lux">---</span>
+                        <span class="sensor-unit">Lux</span>
+                    </div>
+                    <div class="sensor-range-bar">
+                        <div class="sensor-range-fill" id="bar-lux" style="width: 35%;"></div>
+                    </div>
+                    <div class="sensor-threshold-note">
+                        <span>标称范围: 100 ~ 800 Lux</span>
+                        <span>过暗: &lt;20 Lux</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Gas PPM -->
+                <div class="sensor-card" style="--card-color: #FF0055;">
+                    <div class="sensor-header">
+                        <span class="sensor-name">
+                            <i data-lucide="flame" style="width:16px;height:16px;stroke:#FF0055;"></i>
+                            烟雾与可燃气体
+                        </span>
+                        <span class="card-tag">MQ2 / SARADC</span>
+                    </div>
+                    <div class="sensor-val-area">
+                        <span class="sensor-val" id="val-gas">--.-</span>
+                        <span class="sensor-unit">PPM</span>
+                    </div>
+                    <div class="sensor-range-bar">
+                        <div class="sensor-range-fill" id="bar-gas" style="width: 10%;"></div>
+                    </div>
+                    <div class="sensor-threshold-note">
+                        <span>安全洁净: &lt;50.0 PPM</span>
+                        <span>告警越限: &gt;100.0 PPM</span>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Center Column: Digital Twin & History Curves -->
+            <section class="center-col">
+                
+                <!-- Twin Viewport -->
+                <div class="glass-card twin-container">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <i data-lucide="box" style="width:18px;height:18px;stroke:#00F0FF;"></i>
+                            空间站核心舱数字孪生蓝图 (CSS-MODULE-01)
+                        </span>
+                        <span class="card-tag">2D/3D TWIN ENGINE</span>
+                    </div>
+                    <div class="twin-viewport">
+                        <canvas id="air-particle-canvas"></canvas>
+                        
+                        <!-- Space Station Blueprint SVG -->
+                        <svg class="cabin-blueprint" viewBox="0 0 640 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Main Cabin Outer Shell -->
+                            <rect x="80" y="40" width="480" height="240" rx="40" stroke="rgba(0,240,255,0.4)" stroke-width="2" fill="rgba(11,19,43,0.3)" />
+                            <line x1="80" y1="160" x2="560" y2="160" stroke="rgba(0,240,255,0.15)" stroke-dasharray="4 4" />
+                            <line x1="240" y1="40" x2="240" y2="280" stroke="rgba(0,240,255,0.15)" stroke-dasharray="4 4" />
+                            <line x1="400" y1="40" x2="400" y2="280" stroke="rgba(0,240,255,0.15)" stroke-dasharray="4 4" />
+                            
+                            <!-- Cabin Modules Labels -->
+                            <text x="130" y="70" fill="#8B949E" font-size="11" font-family="Orbitron">SECTION A: SLEEP QUARTER</text>
+                            <text x="270" y="70" fill="#8B949E" font-size="11" font-family="Orbitron">SECTION B: LAB WORKBENCH</text>
+                            <text x="430" y="70" fill="#8B949E" font-size="11" font-family="Orbitron">SECTION C: AIR VENTILATOR</text>
+
+                            <!-- Sensor Node 1: SHT30 -->
+                            <circle class="blueprint-sensor-node" cx="160" cy="160" r="10" fill="#00FF88" opacity="0.85" />
+                            <text x="135" y="195" fill="#00F0FF" font-size="10" font-family="JetBrains Mono">SHT30 (T/H)</text>
+
+                            <!-- Sensor Node 2: BH1750 -->
+                            <circle class="blueprint-sensor-node" cx="320" cy="120" r="10" fill="#00FF88" opacity="0.85" />
+                            <text x="290" y="150" fill="#FF9900" font-size="10" font-family="JetBrains Mono">BH1750 (LUX)</text>
+
+                            <!-- Sensor Node 3: MQ2 Gas -->
+                            <circle class="blueprint-sensor-node" cx="320" cy="220" r="10" fill="#00FF88" opacity="0.85" />
+                            <text x="290" y="250" fill="#FF0055" font-size="10" font-family="JetBrains Mono">MQ2 (GAS)</text>
+
+                            <!-- Air Ventilation Fan Motor in Section C -->
+                            <g id="twin-fan-element" class="twin-fan">
+                                <circle cx="520" cy="200" r="28" stroke="#00F0FF" stroke-width="2" fill="rgba(0,240,255,0.1)" />
+                                <path d="M 520 200 L 520 176 A 6 6 0 0 1 526 182 Z" fill="#00F0FF" />
+                                <path d="M 520 200 L 544 200 A 6 6 0 0 1 538 206 Z" fill="#00F0FF" />
+                                <path d="M 520 200 L 520 224 A 6 6 0 0 1 514 218 Z" fill="#00F0FF" />
+                                <path d="M 520 200 L 496 200 A 6 6 0 0 1 502 194 Z" fill="#00F0FF" />
+                                <circle cx="520" cy="200" r="6" fill="#FFF" />
+                            </g>
+                            <text x="475" y="250" fill="#3A86FF" font-size="10" font-family="JetBrains Mono">VENT FAN (RK2206)</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- ECharts History Trend Curves -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <i data-lucide="activity" style="width:18px;height:18px;stroke:#00F0FF;"></i>
+                            时序环境遥测多维走势分析
+                        </span>
+                        <div class="chart-tabs">
+                            <button class="chart-tab-btn active" data-mode="temp_humi">温湿度趋势</button>
+                            <button class="chart-tab-btn" data-mode="gas_lux">烟雾/光照走势</button>
+                        </div>
+                    </div>
+                    <div class="chart-container" id="history-chart"></div>
+                </div>
+
+            </section>
+
+            <!-- Right Column: Remote Controls & Live Logs -->
+            <section class="right-col">
+                
+                <!-- Remote Control Panel -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <i data-lucide="cpu" style="width:18px;height:18px;stroke:#00F0FF;"></i>
+                            执行器与闭环控制台
+                        </span>
+                        <span class="card-tag">BI-DIRECTIONAL</span>
+                    </div>
+
+                    <div class="control-grid">
+                        <!-- Switch 1: Ventilation Motor -->
+                        <div class="control-item">
+                            <div class="control-label-group">
+                                <span class="control-name">
+                                    <i data-lucide="wind" style="width:16px;height:16px;stroke:#00F0FF;"></i>
+                                    排风换气电机
+                                </span>
+                                <span class="control-desc" id="motor-status-text">停转 (待机)</span>
+                            </div>
+                            <label class="cyber-switch">
+                                <input type="checkbox" id="motor-toggle">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Emergency Mute / Ack Button -->
+                        <button class="btn-cyber btn-danger" id="btn-emergency-mute">
+                            <i data-lucide="bell-off" style="width:16px;height:16px;"></i>
+                            应急消警与静音 (K3 LATCH MUTE)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Event Log Stream -->
+                <div class="glass-card" style="flex:1;">
+                    <div class="card-header">
+                        <span class="card-title">
+                            <i data-lucide="terminal" style="width:18px;height:18px;stroke:#00F0FF;"></i>
+                            实时任务与告警日志流水
+                        </span>
+                        <span class="card-tag">LIVE STREAM</span>
+                    </div>
+                    <div class="log-feed" id="log-feed">
+                        <div class="log-entry">
+                            <span class="log-time">[INIT]</span>
+                            <span class="log-msg">空间站数字孪生系统就绪，开始拉取遥测数据...</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Lucide SVG Icons Auto Render
+        lucide.createIcons();
+    </script>
+</body>
+</html>

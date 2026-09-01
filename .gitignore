@@ -39,3 +39,6 @@ cloud_ecs/*.db
 .DS_Store
 Thumbs.db
 desktop.ini
+
+frontend_react/node_modules/
+frontend_react/dist/
