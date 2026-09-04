@@ -297,7 +297,7 @@ static void *UiTask(void *arg)
             lcd_show_string(kx + 8, 138, (uint8_t *)k_labels[k], k_act ? LCD_BLACK : LCD_CYAN, k_act ? LCD_YELLOW : LCD_DARKBLUE, 12, 0);
         }
 
-        snprintf(line_buf, sizeof(line_buf), "ADC5:%.2fV  KEY:%-4s", AdcKey_GetVoltage(), g_last_key_name);
+        snprintf(line_buf, sizeof(line_buf), "KEY: %-4s (PC7)", g_last_key_name);
         lcd_show_string(166, 154, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
 
         snprintf(line_buf, sizeof(line_buf), "I2C: %-15s", g_i2c_device_str);
@@ -311,11 +311,11 @@ static void *UiTask(void *arg)
         snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [FAST]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部按键提示胶囊 (K3单击调速/消警 / 长按1秒自检 / 长按3秒重扫)
+        // 底部按键提示胶囊 (K3/4/6短按单击调速消警 / 长按1.2秒自检 / 长按3秒重扫)
         lcd_fill(0, 216, LCD_W, LCD_H, LCD_BLACK);
-        lcd_show_string(4, 220, (uint8_t *)"[K3:FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
-        lcd_show_string(116, 220, (uint8_t *)"[HOLD 1s:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
-        lcd_show_string(232, 220, (uint8_t *)"[HOLD 3s:I2C]", LCD_GREEN, LCD_BLACK, 16, 0);
+        lcd_show_string(4, 220, (uint8_t *)"[FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
+        lcd_show_string(94, 220, (uint8_t *)"[HOLD 1s:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
+        lcd_show_string(214, 220, (uint8_t *)"[HOLD 3s:I2C]", LCD_GREEN, LCD_BLACK, 16, 0);
 
         LOS_Msleep(100);
     }
@@ -429,7 +429,7 @@ static void *CommandTask(void *arg)
             g_fast_telemetry_needed = true;
         }
 
-        LOS_Msleep(500);
+        LOS_Msleep(300);
     }
     return NULL;
 }

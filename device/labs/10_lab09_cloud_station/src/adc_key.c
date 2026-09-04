@@ -97,32 +97,40 @@ AdcKeyType AdcKey_Scan(void)
     AdcKeyType triggered = KEY_NONE;
     if (s_raw_stable_count >= 2) {
         if (current_raw != s_confirmed_key) {
-            // 按键初次按下边沿触发 (Leading Edge Trigger) - 零延迟响应！
-            if (current_raw != KEY_NONE && s_confirmed_key == KEY_NONE) {
-                triggered = current_raw;
+            if (current_raw == KEY_K3 && s_confirmed_key == KEY_NONE) {
+                // 物理按键刚按下 (K3/K4/K6 硬件并联于 PC7)
                 s_k3_press_ticks = 0;
                 s_k3_long_1s_fired = false;
                 s_k3_long_3s_fired = false;
-                printf("[adc_key] Press Triggered %s (voltage: %.2fV)\n", AdcKey_GetName(triggered), s_last_voltage);
+            } else if (current_raw == KEY_NONE && s_confirmed_key == KEY_K3) {
+                // 按键释放！若未触发长按，则判定为短按有效触发 (调速/消警)
+                if (!s_k3_long_1s_fired && !s_k3_long_3s_fired && s_k3_press_ticks >= 2) {
+                    triggered = KEY_K3;
+                    printf("[adc_key] Key Click Released -> Trigger K3 (Fan/Mute, ticks=%u)!\n", s_k3_press_ticks);
+                }
+            } else if (current_raw != KEY_NONE && current_raw != KEY_K3 && s_confirmed_key == KEY_NONE) {
+                // 外接分压按键直接边沿触发
+                triggered = current_raw;
+                printf("[adc_key] External ADC Key Triggered %s\n", AdcKey_GetName(triggered));
             }
             s_confirmed_key = current_raw;
         }
     }
 
-    // 板载按键长按检测逻辑 (针对单物理键实现多功能复用)
+    // 板载按键长按检测逻辑 (按住期间连续计时)
     if (s_confirmed_key == KEY_K3) {
         s_k3_press_ticks++;
         // 长按 > 1.2 秒：触发告警声光自检模式 (K5 功能)
         if (s_k3_press_ticks >= 120 && !s_k3_long_1s_fired) {
             s_k3_long_1s_fired = true;
             triggered = KEY_K5;
-            printf("[adc_key] K3 Hold > 1.2s -> Trigger K5 Alarm Test!\n");
+            printf("[adc_key] Key Hold > 1.2s -> Trigger K5 Alarm Test!\n");
         }
         // 长按 > 3.0 秒：触发 I2C 总线拓扑动态重扫 (K6 功能)
         else if (s_k3_press_ticks >= 300 && !s_k3_long_3s_fired) {
             s_k3_long_3s_fired = true;
             triggered = KEY_K6;
-            printf("[adc_key] K3 Hold > 3.0s -> Trigger K6 I2C Rescan!\n");
+            printf("[adc_key] Key Hold > 3.0s -> Trigger K6 I2C Rescan!\n");
         }
     } else {
         s_k3_press_ticks = 0;
