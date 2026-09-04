@@ -48,13 +48,17 @@ float AdcKey_GetVoltage(void)
 
 static AdcKeyType adc_voltage_to_key(float v)
 {
-    // 注意：未连接按键板时 ADC5 悬空读数为 0.0V 或 3.3V
-    // 只有在有效分压区间 (0.20V ~ 2.40V) 才识别为按键，防止 0.0V 导致 K3 持续锁死
-    if (v >= 0.20f && v < 0.50f) {
+    // 底板原理图梯形电阻分压基准 (R17=10K 上拉至 3.3V)：
+    // K3 (R18 22R):  理论 ~0.01V  -> 判定范围 [0.00V, 0.25V)
+    // K4 (R21 2K):   理论 ~0.55V  -> 判定范围 [0.35V, 0.80V)
+    // K5 (R19 4.7K): 理论 ~1.05V  -> 判定范围 [0.85V, 1.35V)
+    // K6 (R20 10K):  理论 ~1.65V  -> 判定范围 [1.45V, 2.20V)
+    // 未按下: 上拉 3.3V (>= 2.60V) -> KEY_NONE
+    if (v >= 0.00f && v < 0.25f) {
         return KEY_K3;
-    } else if (v >= 0.50f && v < 0.90f) {
+    } else if (v >= 0.35f && v < 0.80f) {
         return KEY_K4;
-    } else if (v >= 0.90f && v < 1.45f) {
+    } else if (v >= 0.85f && v < 1.35f) {
         return KEY_K5;
     } else if (v >= 1.45f && v <= 2.20f) {
         return KEY_K6;
@@ -66,24 +70,25 @@ AdcKeyType AdcKey_Scan(void)
 {
     AdcKeyType current_raw = KEY_NONE;
 
-    // 1. 优先检测底板真实物理按键 K3 (GPIO0_PC7 低电平有效)
-    LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
-    if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
-        if (pc7_val == LZGPIO_LEVEL_LOW) {
-            current_raw = KEY_K3;
-        }
+    // 1. 优先读取 SARADC5 梯形分压电压 (可明确区分 K3/K4/K5/K6 四个物理键)
+    unsigned int raw_data = 0;
+    if (LzSaradcReadValue(ADC_KEY_CHANNEL, &raw_data) == LZ_HARDWARE_SUCCESS) {
+        s_last_voltage = (float)(raw_data * 3.3f / 1024.0f);
+        current_raw = adc_voltage_to_key(s_last_voltage);
     }
 
-    // 2. 若物理 PC7 未按下，检查 SARADC5 梯形分压按键
+    // 2. 只有在 ADC5 未检测到按键 (电压 > 2.6V 处于释放态) 时，才检测独立数字引脚 PC7
+    // 这样可彻底杜绝 PC7 共享中断线路造成 K4/K5/K6 被误当成 K3 抢占的问题
     if (current_raw == KEY_NONE) {
-        unsigned int raw_data = 0;
-        if (LzSaradcReadValue(ADC_KEY_CHANNEL, &raw_data) == LZ_HARDWARE_SUCCESS) {
-            s_last_voltage = (float)(raw_data * 3.3f / 1024.0f);
-            current_raw = adc_voltage_to_key(s_last_voltage);
+        LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
+        if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
+            if (pc7_val == LZGPIO_LEVEL_LOW) {
+                current_raw = KEY_K3;
+            }
         }
     }
 
-    // 消抖逻辑：连续 2 次采集一致视为稳定
+    // 消抖逻辑：连续 2 次周期 (10ms * 2 = 20ms) 保持同一按键，视为有效
     if (current_raw == s_last_detected_raw) {
         s_raw_stable_count++;
     } else {
@@ -94,11 +99,10 @@ AdcKeyType AdcKey_Scan(void)
     AdcKeyType triggered = KEY_NONE;
     if (s_raw_stable_count >= 2) {
         if (current_raw != s_confirmed_key) {
-            // 发生按键状态改变
+            // 按键初次按下边沿触发 (Leading Edge Trigger) - 零延迟响应！
             if (current_raw != KEY_NONE && s_confirmed_key == KEY_NONE) {
-                // 单次按下上升沿触发
                 triggered = current_raw;
-                printf("[adc_key] Triggered %s (voltage: %.2fV)\n", AdcKey_GetName(triggered), s_last_voltage);
+                printf("[adc_key] Press Triggered %s (voltage: %.2fV)\n", AdcKey_GetName(triggered), s_last_voltage);
             }
             s_confirmed_key = current_raw;
         }
@@ -110,10 +114,10 @@ AdcKeyType AdcKey_Scan(void)
 const char *AdcKey_GetName(AdcKeyType key)
 {
     switch (key) {
-        case KEY_K3: return "KEY3";
-        case KEY_K4: return "KEY4";
-        case KEY_K5: return "KEY5";
-        case KEY_K6: return "KEY6";
+        case KEY_K3: return "K3";
+        case KEY_K4: return "K4";
+        case KEY_K5: return "K5";
+        case KEY_K6: return "K6";
         default:     return "NONE";
     }
 }

@@ -310,11 +310,12 @@ static void *UiTask(void *arg)
         snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [500ms]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部按键提示胶囊 (适配底板独立 K3 与分压 K4-K6)
+        // 底部按键提示胶囊 (K3消警复位 / K4极速调速 / K5告警自检 / K6拓扑重扫)
         lcd_fill(0, 216, LCD_W, LCD_H, LCD_BLACK);
-        lcd_show_string(4, 220, (uint8_t *)"[K3:FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
-        lcd_show_string(116, 220, (uint8_t *)"[HOLD:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
-        lcd_show_string(216, 220, (uint8_t *)"[ADC:K4-K6]", LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
+        lcd_show_string(4, 220, (uint8_t *)"[K3:MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
+        lcd_show_string(84, 220, (uint8_t *)"[K4:FAN]", LCD_GREEN, LCD_BLACK, 16, 0);
+        lcd_show_string(160, 220, (uint8_t *)"[K5:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
+        lcd_show_string(240, 220, (uint8_t *)"[K6:SCAN]", LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
 
         LOS_Msleep(200);
     }
@@ -443,86 +444,78 @@ static void *NetMonitorTask(void *arg)
     return NULL;
 }
 
-// 7. 按键检测与物理交互任务 (底板独立 K3 短按消警/调速，长按自检；同时兼容 ADC5 K4-K6)
+// 极速刷新风扇档位卡片与指示胶囊 (< 20ms 交互响应)
+void Ui_RefreshFanCardImmediate(void)
+{
+    int cur_speed = SmartHome_GetFanSpeed();
+    int cur_duty = SmartHome_GetFanDuty();
+    char line_buf[32];
+
+    // 1. 局部擦除并重绘档位与占空比行 (X: 8~155, Y: 138~154)
+    lcd_fill(8, 138, 155, 154, LCD_BLACK);
+    if (cur_speed == 4) {
+        snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
+    } else {
+        snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
+    }
+    lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+
+    // 2. 局部刷新五档微型交互胶囊指示 [0][1][2][3][A] (X: 10~155, Y: 156~168)
+    const char *caps[] = {"0", "1", "2", "3", "A"};
+    for (int c = 0; c < 5; c++) {
+        int cx = 10 + c * 29;
+        bool active = (cur_speed == c);
+        lcd_fill(cx, 156, cx + 24, 168, active ? LCD_GREEN : LCD_DARKBLUE);
+        lcd_draw_rectangle(cx, 156, cx + 24, 168, active ? LCD_WHITE : LCD_GRAY);
+        lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], active ? LCD_BLACK : LCD_WHITE, active ? LCD_GREEN : LCD_DARKBLUE, 12, 0);
+    }
+}
+
+// 7. 按键检测与物理交互任务 (极速按键检测与分工明确：K3消警复位 / K4风扇调速 / K5告警自检 / K6拓扑重扫)
 static void *KeyTask(void *arg)
 {
     (void)arg;
-    int k3_press_duration = 0;
-    bool k3_was_down = false;
 
     while (1) {
-        // 1. 优先检测物理按键 K3 (GPIO0_PC7 低电平有效)
-        bool k3_down = SmartHome_IsK3Pressed();
+        AdcKeyType k = AdcKey_Scan();
+        if (k != KEY_NONE) {
+            strncpy(g_last_key_name, AdcKey_GetName(k), sizeof(g_last_key_name) - 1);
 
-        if (k3_down) {
-            k3_press_duration++;
-            k3_was_down = true;
-
-            // 长按持续约 1 秒 (50 * 20ms) 触发声光自检测试
-            if (k3_press_duration == 50) {
-                strncpy(g_last_key_name, "K3-TEST", sizeof(g_last_key_name) - 1);
-                g_alarm_test_active = !g_alarm_test_active;
-                if (!g_alarm_test_active) {
-                    g_k3_muted_latch = false;
-                    SmartHome_ResetAlarmState();
-                }
-                printf("[key] >>> K3 Long-Press: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
-            }
-        } else {
-            if (k3_was_down) {
-                // 释放物理 K3：若此前为短按 (< 50 ticks 且 >= 2 ticks 防抖)
-                if (k3_press_duration < 50 && k3_press_duration >= 2) {
-                    strncpy(g_last_key_name, "K3", sizeof(g_last_key_name) - 1);
-                    if (g_report.alarm_active || g_alarm_test_active) {
-                        // 告警中短按：本地消警静音
-                        g_k3_muted_latch = true;
-                        g_alarm_test_active = false;
-                        g_remote_override = false;
-                        SmartHome_ResetAlarmState();
-                        printf("[key] >>> K3 Click: Mute Alarm / Reset State <<<\n");
-                    } else {
-                        // 正常状态短按：循环切换风扇档位 (0 -> 1 -> 2 -> 3 -> AUTO)
-                        g_remote_override = false;
-                        g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
-                        printf("[key] >>> K3 Click: Switch Fan Speed -> %d <<<\n", g_manual_fan_speed);
-                    }
-                }
-                k3_press_duration = 0;
-                k3_was_down = false;
-            }
-        }
-
-        // 2. 同时扫描 SARADC5 梯形分压外接按键板 (K4, K5, K6)
-        AdcKeyType adc_k = AdcKey_Scan();
-        if (adc_k != KEY_NONE) {
-            strncpy(g_last_key_name, AdcKey_GetName(adc_k), sizeof(g_last_key_name) - 1);
-
-            switch (adc_k) {
+            switch (k) {
                 case KEY_K3:
+                    // K3: 本地消警与安全复位 (MUTE & RESET)
                     g_k3_muted_latch = true;
                     g_alarm_test_active = false;
                     g_remote_override = false;
                     SmartHome_ResetAlarmState();
-                    printf("[adc_key] >>> K3: Mute Alarm <<<\n");
+                    printf("[key] >>> K3 Pressed: Mute Alarm / Reset State <<<\n");
                     break;
 
                 case KEY_K4:
+                    // K4: 循环切换风扇档位 (0 -> 1 -> 2 -> 3 -> AUTO) - 零延迟即时响应！
                     g_remote_override = false;
                     g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
-                    printf("[adc_key] >>> K4: Switch Fan Speed -> %d <<<\n", g_manual_fan_speed);
+                    SmartHome_SetFanSpeed(g_manual_fan_speed);
+                    Ui_RefreshFanCardImmediate(); // < 20ms 极速刷新 LCD 档位与胶囊！
+                    printf("[key] >>> K4 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
+                           g_manual_fan_speed, SmartHome_GetFanDuty());
                     break;
 
                 case KEY_K5:
+                    // K5: 模拟舱内告警声光与应急排烟自检测试 (TEST TOGGLE)
                     g_alarm_test_active = !g_alarm_test_active;
                     if (!g_alarm_test_active) {
                         g_k3_muted_latch = false;
                         SmartHome_ResetAlarmState();
+                    } else {
+                        g_k3_muted_latch = false;
                     }
-                    printf("[adc_key] >>> K5: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
+                    printf("[key] >>> K5 Pressed: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
                     break;
 
                 case KEY_K6:
-                    printf("[adc_key] >>> K6: Rescan I2C Bus... <<<\n");
+                    // K6: I2C 总线拓扑动态重扫 (SCAN BUS)
+                    printf("[key] >>> K6 Pressed: Rescan I2C Bus... <<<\n");
                     SmartHome_ScanI2cBus(g_i2c_device_str, sizeof(g_i2c_device_str));
                     break;
 
@@ -531,7 +524,7 @@ static void *KeyTask(void *arg)
             }
         }
 
-        LOS_Msleep(20);
+        LOS_Msleep(10);
     }
     return NULL;
 }
@@ -550,9 +543,6 @@ static void *MainStationTask(void *arg)
     Mpu6050_Init();
     SmartHome_InitWatchdog();
     HttpClient_Init();
-
-    // 启动 Wi-Fi 联网后台服务 (连接热点 Patient. / 88888888)
-    ExternalTaskConfigNetwork();
 
     // 启动初始 I2C 总线拓扑扫描
     SmartHome_ScanI2cBus(g_i2c_device_str, sizeof(g_i2c_device_str));
