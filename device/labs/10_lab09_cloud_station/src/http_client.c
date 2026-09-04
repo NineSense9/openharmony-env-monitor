@@ -75,14 +75,20 @@ int HttpClient_PostTelemetry(const TelemetryData *data)
     int sfd = create_connected_socket();
     if (sfd < 0) return -1;
 
-    char body[256];
+    char body[512];
     snprintf(body, sizeof(body),
-             "{\"device_id\":\"%s\",\"temperature\":%.1f,\"humidity\":%.1f,\"lux\":%.1f,\"gas_ppm\":%.1f,\"motor_on\":%s,\"alarm_on\":%s}",
+             "{\"device_id\":\"%s\",\"temperature\":%.1f,\"humidity\":%.1f,\"lux\":%.1f,\"gas_ppm\":%.1f,"
+             "\"motor_on\":%s,\"alarm_on\":%s,\"accel_x\":%.2f,\"accel_y\":%.2f,\"accel_z\":%.2f,"
+             "\"pitch\":%.1f,\"roll\":%.1f,\"fan_speed\":%d,\"wdt_alive\":%s,\"i2c_devices\":\"%s\",\"last_key\":\"%s\"}",
              data->device_id, data->temperature, data->humidity, data->lux, data->gas_ppm,
              data->motor_on ? "true" : "false",
-             data->alarm_on ? "true" : "false");
+             data->alarm_on ? "true" : "false",
+             data->accel_x, data->accel_y, data->accel_z,
+             data->pitch, data->roll, data->fan_speed,
+             data->wdt_alive ? "true" : "false",
+             data->i2c_devices, data->last_key);
 
-    char req[448];
+    char req[768];
     snprintf(req, sizeof(req),
              "POST /api/telemetry HTTP/1.1\r\n"
              "Host: %s:%d\r\n"

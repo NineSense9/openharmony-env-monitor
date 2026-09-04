@@ -17,6 +17,15 @@ class TelemetryCreate(BaseModel):
     gas_ppm: float | None = None
     motor_on: bool | None = False
     alarm_on: bool | None = False
+    accel_x: float | None = 0.0
+    accel_y: float | None = 0.0
+    accel_z: float | None = 1.0
+    pitch: float | None = 0.0
+    roll: float | None = 0.0
+    fan_speed: int | None = 0
+    wdt_alive: bool | None = True
+    i2c_devices: str | None = "SHT30,BH1750,MPU6050"
+    last_key: str | None = "NONE"
 
 
 class TelemetryRead(TelemetryCreate):

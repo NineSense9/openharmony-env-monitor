@@ -45,7 +45,9 @@ def _validate_command(target: str, action: str) -> None:
     allowed_actions = {
         "led": {"on", "off"},
         "motor": {"on", "off"},
+        "fan": {"on", "off", "speed_0", "speed_1", "speed_2", "speed_3", "auto"},
         "alarm": {"ack"},
+        "system": {"reboot"},
     }
     if target not in allowed_actions:
         raise HTTPException(status_code=400, detail="invalid target")
@@ -205,7 +207,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
         query = query.order_by(desc(Command.created_at), desc(Command.id)).limit(limit)
         return list(db.execute(query).scalars().all())
 
-    static_dir = Path("/opt/openharmony-env-monitor/cloud_ecs/static")
+    static_dir = Path(__file__).resolve().parent.parent / "static"
+    if not static_dir.exists():
+        static_dir = Path("/opt/openharmony-env-monitor/cloud_ecs/static")
     if static_dir.exists():
         app.mount("/dashboard", StaticFiles(directory=str(static_dir), html=True), name="dashboard")
     return app

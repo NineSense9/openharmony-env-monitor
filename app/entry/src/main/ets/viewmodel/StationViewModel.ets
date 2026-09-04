@@ -86,6 +86,34 @@ export class StationViewModel {
     return ok;
   }
 
+  public async sendFanSpeedCommand(speed: number): Promise<boolean> {
+    const actionMap: Record<number, string> = {
+      0: 'speed_0',
+      1: 'speed_1',
+      2: 'speed_2',
+      3: 'speed_3',
+      4: 'auto'
+    };
+    const action = actionMap[speed] || 'auto';
+    const ok = await HttpUtil.sendCommand('fan', action);
+    if (ok) {
+      this.addLog(`风机调速指令下发: 档位 ${speed} (${action})`, 'info');
+    } else {
+      this.addLog(`风机调速指令下发失败`, 'alarm');
+    }
+    return ok;
+  }
+
+  public async sendRebootCommand(): Promise<boolean> {
+    const ok = await HttpUtil.sendCommand('system', 'reboot');
+    if (ok) {
+      this.addLog('远程系统重启指令下发 (RebootDevice)', 'warn');
+    } else {
+      this.addLog('远程系统重启指令下发失败', 'alarm');
+    }
+    return ok;
+  }
+
   public async sendMuteCommand(): Promise<boolean> {
     const ok = await HttpUtil.sendCommand('alarm', 'ack');
     if (ok) {

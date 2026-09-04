@@ -10,6 +10,15 @@ export class TelemetryData {
   public gas_ppm: number = 8.0;
   public motor_on: boolean = false;
   public alarm_on: boolean = false;
+  public accel_x: number = 0.0;
+  public accel_y: number = 0.0;
+  public accel_z: number = 1.0;
+  public pitch: number = 0.0;
+  public roll: number = 0.0;
+  public fan_speed: number = 4;
+  public wdt_alive: boolean = true;
+  public i2c_devices: string = 'SHT30,BH1750,MPU6050';
+  public last_key: string = 'NONE';
   public created_at: string = '';
 
   constructor() {}

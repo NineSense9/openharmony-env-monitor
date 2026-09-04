@@ -9,6 +9,8 @@ static_library("lab09_cloud_station") {
         "src/lcd.c",
         "src/smart_home.c",
         "src/http_client.c",
+        "src/adc_key.c",
+        "src/mpu6050.c",
     ]
 
     include_dirs = [

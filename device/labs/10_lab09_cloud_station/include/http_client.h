@@ -12,6 +12,15 @@ typedef struct {
     float gas_ppm;
     int motor_on;
     int alarm_on;
+    float accel_x;
+    float accel_y;
+    float accel_z;
+    float pitch;
+    float roll;
+    int fan_speed;
+    int wdt_alive;
+    char i2c_devices[64];
+    char last_key[16];
 } TelemetryData;
 
 // 远程指令结构

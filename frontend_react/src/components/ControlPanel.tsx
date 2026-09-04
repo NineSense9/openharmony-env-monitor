@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Wind, BellOff, Loader2, ShieldCheck, Lock, X } from 'lucide-react';
+import { Cpu, Wind, BellOff, Loader2, ShieldCheck, Lock, X, RefreshCw } from 'lucide-react';
 import { sendRemoteCommand } from '../services/api';
 import { SystemState } from '../types/telemetry';
 import { useAudioFeedback } from '../hooks/useAudioFeedback';
@@ -13,6 +13,7 @@ interface ControlPanelProps {
 export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSystemState, addLog }) => {
   const [loadingMotor, setLoadingMotor] = useState(false);
   const [loadingMute, setLoadingMute] = useState(false);
+  const [loadingReboot, setLoadingReboot] = useState(false);
   
   // Security Modal State
   const [showPinModal, setShowPinModal] = useState(false);
@@ -51,21 +52,24 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
     }
   };
 
-  const executeToggleMotor = async () => {
-    const nextAction = systemState.isMotorRunning ? 'off' : 'on';
+  const executeSetFanSpeed = async (speedLevel: number, actionName: string) => {
     setLoadingMotor(true);
-    addLog(`[COMMAND] 发送远程电机控制指令 -> ${nextAction}`, 'cmd');
+    addLog(`[COMMAND] 发送风机档位调节指令 -> ${actionName}`, 'cmd');
 
     const res = await sendRemoteCommand({
       device_id: 'rk2206-station-01',
-      target: 'motor',
-      action: nextAction
+      target: 'fan',
+      action: actionName as any
     });
 
     setLoadingMotor(false);
     if (res.ok) {
-      setSystemState(prev => ({ ...prev, isMotorRunning: (nextAction === 'on') }));
-      addLog(`[COMMAND ACK] 电机指令已入库 (ID: ${res.id})，板端 2~3s 内响应`, 'cmd');
+      setSystemState(prev => ({
+        ...prev,
+        fanSpeed: speedLevel,
+        isMotorRunning: speedLevel > 0
+      }));
+      addLog(`[COMMAND ACK] 风机档位指令已生效 (ID: ${res.id})`, 'cmd');
     } else {
       addLog(`[COMMAND FAIL] 指令发送失败: ${res.msg}`, 'alarm');
     }
@@ -90,6 +94,26 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
     }
   };
 
+  const executeRemoteReboot = async () => {
+    setLoadingReboot(true);
+    addLog(`[COMMAND] 发送远程系统复位重启指令 (RebootDevice)`, 'cmd');
+
+    const res = await sendRemoteCommand({
+      device_id: 'rk2206-station-01',
+      target: 'system',
+      action: 'reboot'
+    });
+
+    setLoadingReboot(false);
+    if (res.ok) {
+      addLog(`[COMMAND ACK] 开发板系统重启指令已下发 (ID: ${res.id})，小凌派硬件重启中...`, 'alarm');
+    } else {
+      addLog(`[COMMAND FAIL] 重启指令发送失败: ${res.msg}`, 'alarm');
+    }
+  };
+
+  const curSpeed = systemState.fanSpeed ?? (systemState.isMotorRunning ? 3 : 0);
+
   return (
     <>
       <div className="glass-panel rounded-xl p-4 flex flex-col gap-3">
@@ -97,7 +121,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
           <div className="flex items-center gap-2">
             <Cpu className="w-4 h-4 text-[#00F0FF]" />
             <span className="font-hud text-sm font-bold text-slate-200 tracking-wider">
-              执行器与闭环控制台
+              执行器与多档闭环控制台
             </span>
           </div>
           <div className="flex items-center gap-1">
@@ -113,41 +137,65 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
           </div>
         </div>
 
-        {/* Control Switch: Motor */}
-        <div className="flex items-center justify-between p-3 rounded-lg bg-[#080E1E] border border-slate-800/80">
-          <div className="flex flex-col gap-0.5">
+        {/* 5-Speed Fan Selector */}
+        <div className="flex flex-col gap-2 p-3 rounded-lg bg-[#080E1E] border border-slate-800/80">
+          <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
               <Wind className="w-4 h-4 text-[#00F0FF]" />
-              舱内排风换气电机
+              舱内排风风机档位 (PWM 硬件调速)
             </span>
-            <span className="text-[10px] font-code text-slate-500">
-              {systemState.isMotorRunning ? '状态: 运转中 (6000 RPM)' : '状态: 待机停转'}
+            <span className="text-[10px] font-code text-cyan-400">
+              {curSpeed === 4 ? 'AUTO 温控' : (curSpeed === 0 ? '停机 (0%)' : `L${curSpeed} 档`)}
             </span>
           </div>
 
-          <button
-            onClick={() => requireAuth(executeToggleMotor)}
-            disabled={loadingMotor}
-            className={`px-4 py-1.5 rounded-lg text-xs font-hud tracking-wider transition-all flex items-center gap-1.5 ${
-              systemState.isMotorRunning
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:bg-emerald-500/30'
-                : 'bg-slate-800 text-slate-300 border border-slate-700 hover:border-slate-600'
-            }`}
-          >
-            {loadingMotor && <Loader2 className="w-3 h-3 animate-spin" />}
-            {systemState.isMotorRunning ? '停止电机' : '启动电机'}
-          </button>
+          {/* 5 档微调胶囊 */}
+          <div className="grid grid-cols-5 gap-1.5 mt-1">
+            {[
+              { id: 0, label: '0:停机', action: 'speed_0' },
+              { id: 1, label: '1:30%', action: 'speed_1' },
+              { id: 2, label: '2:65%', action: 'speed_2' },
+              { id: 3, label: '3:100%', action: 'speed_3' },
+              { id: 4, label: 'AUTO', action: 'auto' }
+            ].map(item => (
+              <button
+                key={item.id}
+                onClick={() => requireAuth(() => executeSetFanSpeed(item.id, item.action))}
+                disabled={loadingMotor}
+                className={`py-1.5 px-1 rounded text-center text-xs font-mono font-bold transition-all border ${
+                  curSpeed === item.id
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(0,240,255,0.3)]'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Emergency Mute Button */}
-        <button
-          onClick={() => requireAuth(executeEmergencyMute)}
-          disabled={loadingMute}
-          className="w-full py-2.5 px-4 rounded-lg bg-rose-500/15 border border-rose-500/40 hover:bg-rose-500/25 text-rose-400 font-hud text-xs font-bold tracking-wider transition-all shadow-[0_0_12px_rgba(244,63,94,0.15)] flex items-center justify-center gap-2"
-        >
-          {loadingMute ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BellOff className="w-3.5 h-3.5" />}
-          应急消警静音 (K3 LATCH MUTE)
-        </button>
+        {/* 下排操作按钮：应急消警 + 远程重启 */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* Emergency Mute Button */}
+          <button
+            onClick={() => requireAuth(executeEmergencyMute)}
+            disabled={loadingMute}
+            className="py-2.5 px-3 rounded-lg bg-rose-500/15 border border-rose-500/40 hover:bg-rose-500/25 text-rose-400 font-hud text-xs font-bold tracking-wider transition-all shadow-[0_0_12px_rgba(244,63,94,0.15)] flex items-center justify-center gap-1.5"
+          >
+            {loadingMute ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BellOff className="w-3.5 h-3.5" />}
+            应急消警 (K3 MUTE)
+          </button>
+
+          {/* Remote Reboot Button */}
+          <button
+            onClick={() => requireAuth(executeRemoteReboot)}
+            disabled={loadingReboot}
+            className="py-2.5 px-3 rounded-lg bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 text-amber-400 font-hud text-xs font-bold tracking-wider transition-all flex items-center justify-center gap-1.5"
+          >
+            {loadingReboot ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            远程系统重启
+          </button>
+        </div>
       </div>
 
       {/* Security PIN Modal */}
@@ -167,7 +215,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
               </div>
               <div>
                 <h3 className="font-hud text-sm font-bold text-slate-100">指令安全授权验证</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">请输入空间站硬件控制安全 PIN 码</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">请输入空间站硬件控制安全 PIN 码 (默认: 123456)</p>
               </div>
             </div>
 
@@ -191,7 +239,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
 
               {pinError && (
                 <p className="text-xs text-rose-400 font-code text-center">
-                  ⚠ 密钥错误，请重新输入
+                  密钥错误，请重新输入
                 </p>
               )}
 

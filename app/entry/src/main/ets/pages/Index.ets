@@ -1,6 +1,8 @@
 import { StationViewModel } from '../viewmodel/StationViewModel';
 import { StationHeader } from '../components/StationHeader';
 import { SensorCard } from '../components/SensorCard';
+import { AttitudeCard } from '../components/AttitudeCard';
+import { BoardDisplayCard } from '../components/BoardDisplayCard';
 import { ControlSection } from '../components/ControlSection';
 import { TrendChart } from '../components/TrendChart';
 import { EventLogView } from '../components/EventLogView';
@@ -42,7 +44,12 @@ struct Index {
               currentTimeStr: this.viewModel.currentTimeStr
             })
 
-            // 2. 2x2 拟态毛玻璃环境数据矩阵
+            // 2. 小凌派-RK2206 硬件数字孪生与 LCD 实时屏显镜面卡片
+            BoardDisplayCard({
+              telemetry: this.viewModel.telemetry
+            })
+
+            // 3. 2x2 拟态毛玻璃环境数据矩阵
             Column({ space: 10 }) {
               Row({ space: 10 }) {
                 SensorCard({
@@ -92,25 +99,37 @@ struct Index {
             }
             .width('100%')
 
-            // 3. 极速双向执行机构控制台 (纯矢量 360° 旋转风扇 + 防溢出)
+            // 4. MPU6050 姿态导航与微重力感知 HUD
+            AttitudeCard({
+              telemetry: this.viewModel.telemetry
+            })
+
+            // 5. 极速双向多档执行机构控制台 (五档风机 + 远程重启)
             ControlSection({
               isMotorRunning: this.viewModel.telemetry.motor_on,
               isAlarmOn: this.viewModel.telemetry.alarm_on,
+              fanSpeed: this.viewModel.telemetry.fan_speed,
               onToggleMotor: (turnOn: boolean) => {
                 this.viewModel.sendMotorCommand(turnOn);
               },
+              onSetFanSpeed: (speed: number) => {
+                this.viewModel.sendFanSpeedCommand(speed);
+              },
               onMuteAlarm: () => {
                 this.viewModel.sendMuteCommand();
+              },
+              onRebootSystem: () => {
+                this.viewModel.sendRebootCommand();
               }
             })
 
-            // 4. 原生 Canvas 温湿度时序示波走势
+            // 6. 原生 Canvas 温湿度时序示波走势
             TrendChart({
               tempData: this.viewModel.tempHistory,
               humiData: this.viewModel.humiHistory
             })
 
-            // 5. 测控事件实时流水
+            // 7. 测控事件实时流水
             EventLogView({
               logs: this.viewModel.eventLogs
             })

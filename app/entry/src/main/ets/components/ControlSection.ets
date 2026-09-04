@@ -1,21 +1,42 @@
 import { Constants } from '../common/Constants';
 import { PinVerifyDialog } from './PinVerifyDialog';
 
+export class FanSpeedOption {
+  public id: number = 0;
+  public label: string = '';
+  constructor(id: number, label: string) {
+    this.id = id;
+    this.label = label;
+  }
+}
+
 /**
- * ⚡ 掌上极速双向控制台组件（纯矢量风扇 360° 高速旋转动效 + PIN 免密 + 消除所有 Emoji）
+ * 掌上极速双向控制台组件（五档风机调速旋钮 + 远程系统重启 + 纯矢量风扇 360° 高速旋转动效 + PIN 保护）
  */
 @Component
 export struct ControlSection {
   @Prop isMotorRunning: boolean;
   @Prop isAlarmOn: boolean;
+  @Prop fanSpeed: number = 4; // 0=关, 1=弱, 2=中, 3=强, 4=AUTO
   public onToggleMotor: (turnOn: boolean) => void = () => {};
+  public onSetFanSpeed: (speed: number) => void = () => {};
   public onMuteAlarm: () => void = () => {};
+  public onRebootSystem: () => void = () => {};
 
   @State isAuthorized: boolean = false;
   @State fanRotation: number = 0;
   @State pendingActionTitle: string = '执行控制指令';
   private pendingActionType: string = 'motor_on';
+  private targetSpeed: number = 4;
   private fanTimerId: number = -1;
+
+  private speedOptions: FanSpeedOption[] = [
+    new FanSpeedOption(0, '0:停机'),
+    new FanSpeedOption(1, '1:30%'),
+    new FanSpeedOption(2, '2:65%'),
+    new FanSpeedOption(3, '3:100%'),
+    new FanSpeedOption(4, 'AUTO')
+  ];
 
   private pinDialogController: CustomDialogController = new CustomDialogController({
     builder: PinVerifyDialog({
@@ -30,12 +51,17 @@ export struct ControlSection {
   });
 
   aboutToAppear() {
-    // 动态矢量风扇旋转定时器
+    // 动态矢量风扇根据档位改变旋转速度
     this.fanTimerId = setInterval(() => {
       if (this.isMotorRunning) {
-        this.fanRotation = (this.fanRotation + 40) % 360; // 飞速旋转
+        let step = 30;
+        if (this.fanSpeed === 1) step = 15;
+        else if (this.fanSpeed === 2) step = 28;
+        else if (this.fanSpeed === 3) step = 48;
+        else if (this.fanSpeed === 4) step = 32;
+        this.fanRotation = (this.fanRotation + step) % 360;
       } else {
-        this.fanRotation = (this.fanRotation + 2) % 360; // 待机微动
+        this.fanRotation = (this.fanRotation + 1) % 360;
       }
     }, 30);
   }
@@ -53,12 +79,17 @@ export struct ControlSection {
       this.onToggleMotor(false);
     } else if (this.pendingActionType === 'mute') {
       this.onMuteAlarm();
+    } else if (this.pendingActionType === 'set_speed') {
+      this.onSetFanSpeed(this.targetSpeed);
+    } else if (this.pendingActionType === 'reboot') {
+      this.onRebootSystem();
     }
   }
 
-  private requestAction(type: string, title: string): void {
+  private requestAction(type: string, title: string, speedVal: number = 4): void {
     this.pendingActionType = type;
     this.pendingActionTitle = title;
+    this.targetSpeed = speedVal;
     if (this.isAuthorized) {
       this.executePendingAction();
     } else {
@@ -68,14 +99,14 @@ export struct ControlSection {
 
   build() {
     Column({ space: 10 }) {
-      // 模块标题栏（自适应防溢出布局）
+      // 模块标题栏
       Row() {
         Row({ space: 6 }) {
           Image($r('app.media.ic_terminal'))
             .width(15)
             .height(15)
 
-          Text('执行机构控制台')
+          Text('执行机构与多档测控台')
             .fontSize(13)
             .fontWeight(FontWeight.Bold)
             .fontColor(Constants.COLOR_WHITE)
@@ -98,7 +129,7 @@ export struct ControlSection {
           }
         }
 
-        // 右侧紧凑时延角标与加锁
+        // 右侧状态与重置授权
         Row({ space: 6 }) {
           if (this.isAuthorized) {
             Text('[LOCK]')
@@ -123,96 +154,84 @@ export struct ControlSection {
       .width('100%')
       .justifyContent(FlexAlign.SpaceBetween)
 
-      // 控制卡片网格
-      Row({ space: 10 }) {
-        // 1. 排风电机控制卡片（纯矢量 360° 旋转风扇动画）
-        Column() {
-          Row() {
-            Row({ space: 6 }) {
-              Image($r('app.media.ic_fan'))
-                .width(16)
-                .height(16)
-                .rotate({ angle: this.fanRotation })
+      // 五档风机调速选择栏
+      Column({ space: 6 }) {
+        Row() {
+          Row({ space: 6 }) {
+            Image($r('app.media.ic_fan'))
+              .width(15)
+              .height(15)
+              .rotate({ angle: this.fanRotation })
 
-              Text('排风电机')
-                .fontSize(12)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(Constants.COLOR_WHITE)
-            }
-
-            Circle({ width: 6, height: 6 })
-              .fill(this.isMotorRunning ? Constants.COLOR_CYAN : Constants.COLOR_MUTED)
+            Text('风机转速档位 (PWM 硬件驱动)')
+              .fontSize(12)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(Constants.COLOR_WHITE)
           }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
 
-          Text(this.isMotorRunning ? 'ACTIVE (6000 RPM)' : 'STANDBY (0 RPM)')
-            .fontSize(9)
+          Text(this.fanSpeed === 4 ? 'AUTO 温控' : (this.fanSpeed === 0 ? '已停机' : `L${this.fanSpeed} 档`))
+            .fontSize(10)
+            .fontWeight(FontWeight.Bold)
             .fontColor(this.isMotorRunning ? Constants.COLOR_CYAN : Constants.COLOR_MUTED)
             .fontFamily('monospace')
-            .margin({ top: 4, bottom: 8 })
-
-          Button(this.isMotorRunning ? '停止电机' : '启动电机')
-            .backgroundColor(this.isMotorRunning ? '#DC2626' : '#0284C7')
-            .fontColor(Constants.COLOR_WHITE)
-            .fontSize(12)
-            .fontWeight(FontWeight.Bold)
-            .width('100%')
-            .height(32)
-            .borderRadius(4)
-            .onClick(() => {
-              this.requestAction(this.isMotorRunning ? 'motor_off' : 'motor_on', this.isMotorRunning ? '停止排风电机' : '启动排风电机');
-            })
         }
-        .layoutWeight(1)
-        .padding(10)
-        .backgroundColor('#0A1122')
-        .borderRadius(6)
-        .border({ width: 1, color: this.isMotorRunning ? Constants.COLOR_CYAN : '#1B2A4A' })
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
 
-        // 2. 应急消警静音卡片
-        Column() {
-          Row() {
-            Row({ space: 6 }) {
-              Image($r('app.media.ic_bell_mute'))
-                .width(16)
-                .height(16)
-
-              Text('应急消警')
-                .fontSize(12)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(Constants.COLOR_WHITE)
-            }
-
-            Circle({ width: 6, height: 6 })
-              .fill(this.isAlarmOn ? Constants.COLOR_RED : Constants.COLOR_GREEN)
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-
-          Text(this.isAlarmOn ? 'CAUTION ACTIVE' : 'NOMINAL SILENT')
-            .fontSize(9)
-            .fontColor(this.isAlarmOn ? Constants.COLOR_RED : Constants.COLOR_GREEN)
-            .fontFamily('monospace')
-            .margin({ top: 4, bottom: 8 })
-
-          Button('一键消警')
-            .backgroundColor('#1E293B')
-            .fontColor(Constants.COLOR_WHITE)
-            .fontSize(12)
-            .fontWeight(FontWeight.Bold)
-            .width('100%')
-            .height(32)
-            .borderRadius(4)
-            .onClick(() => {
-              this.requestAction('mute', '应急消警静音与复位');
-            })
+        // 5 档选择胶囊
+        Row({ space: 6 }) {
+          ForEach(this.speedOptions, (item: FanSpeedOption) => {
+            Button(item.label)
+              .layoutWeight(1)
+              .height(28)
+              .fontSize(10)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.fanSpeed === item.id ? '#000' : Constants.COLOR_WHITE)
+              .backgroundColor(this.fanSpeed === item.id ? Constants.COLOR_CYAN : '#1B2A4A')
+              .borderRadius(4)
+              .border({ width: 1, color: this.fanSpeed === item.id ? '#FFF' : '#2A3F6B' })
+              .onClick(() => {
+                this.requestAction('set_speed', `切换风机档位至 ${item.label}`, item.id);
+              })
+          })
         }
-        .layoutWeight(1)
-        .padding(10)
-        .backgroundColor('#0A1122')
-        .borderRadius(6)
-        .border({ width: 1, color: this.isAlarmOn ? Constants.COLOR_RED : '#1B2A4A' })
+        .width('100%')
+      }
+      .width('100%')
+      .padding(10)
+      .backgroundColor('#0A1122')
+      .borderRadius(6)
+      .border({ width: 1, color: '#1B2A4A' })
+
+      // 下排控制按钮组：消警与远程系统重启
+      Row({ space: 10 }) {
+        // 应急消警
+        Button('一键消警与复位')
+          .layoutWeight(1)
+          .height(34)
+          .fontSize(12)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Constants.COLOR_WHITE)
+          .backgroundColor('#1E293B')
+          .borderRadius(4)
+          .border({ width: 1, color: this.isAlarmOn ? Constants.COLOR_RED : '#334155' })
+          .onClick(() => {
+            this.requestAction('mute', '应急消警静音与复位');
+          })
+
+        // 远程软重启 (b13_reboot)
+        Button('远程系统安全重启')
+          .layoutWeight(1)
+          .height(34)
+          .fontSize(12)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Constants.COLOR_WHITE)
+          .backgroundColor('#450A0A')
+          .borderRadius(4)
+          .border({ width: 1, color: '#DC2626' })
+          .onClick(() => {
+            this.requestAction('reboot', '触发开发板远程系统软重启 (RebootDevice)');
+          })
       }
       .width('100%')
     }

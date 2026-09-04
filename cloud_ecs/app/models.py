@@ -17,6 +17,15 @@ class Telemetry(Base):
     gas_ppm: Mapped[float] = mapped_column(Float, nullable=True)
     motor_on: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
     alarm_on: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    accel_x: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
+    accel_y: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
+    accel_z: Mapped[float] = mapped_column(Float, nullable=True, default=1.0)
+    pitch: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
+    roll: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
+    fan_speed: Mapped[int] = mapped_column(Integer, default=0, nullable=True)
+    wdt_alive: Mapped[bool] = mapped_column(Boolean, default=True, nullable=True)
+    i2c_devices: Mapped[str] = mapped_column(String(128), default="SHT30,BH1750,MPU6050", nullable=True)
+    last_key: Mapped[str] = mapped_column(String(32), default="NONE", nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
 

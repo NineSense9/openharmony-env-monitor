@@ -93,7 +93,16 @@ export function useTelemetry() {
             lastSyncTime: syncTimeStr,
             totalPackets: data.id || prev.totalPackets,
             isAlarmActive: isOnline ? isAlarm : false,
-            isMotorRunning: isOnline ? realMotorRunning : false
+            isMotorRunning: isOnline ? realMotorRunning : false,
+            fanSpeed: data.fan_speed ?? prev.fanSpeed ?? 4,
+            pitch: data.pitch ?? prev.pitch ?? 0,
+            roll: data.roll ?? prev.roll ?? 0,
+            accelX: data.accel_x ?? prev.accelX ?? 0,
+            accelY: data.accel_y ?? prev.accelY ?? 0,
+            accelZ: data.accel_z ?? prev.accelZ ?? 1,
+            wdtAlive: data.wdt_alive ?? true,
+            i2cDevices: data.i2c_devices ?? prev.i2cDevices ?? 'SHT30,BH1750,MPU6050',
+            lastKey: data.last_key ?? prev.lastKey ?? 'NONE'
           };
         });
       } else {

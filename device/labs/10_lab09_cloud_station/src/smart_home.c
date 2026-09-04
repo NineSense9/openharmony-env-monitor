@@ -179,3 +179,139 @@ void SmartHome_ResetAlarmState(void)
     SmartHome_SetAlarmLight(false);
     SmartHome_SetMotor(false);
 }
+
+// 档位定义：0=关(0%), 1=弱(30%), 2=中(65%), 3=强(100%), 4=AUTO(自动温控)
+static int s_fan_speed_level = 4; // 默认 AUTO
+static int s_fan_effective_duty = 0;
+
+void SmartHome_SetFanSpeed(int speed_level)
+{
+    if (speed_level < 0 || speed_level > 4) speed_level = 4;
+    s_fan_speed_level = speed_level;
+
+    int duty = 0;
+    if (speed_level == 0) duty = 0;
+    else if (speed_level == 1) duty = 30;
+    else if (speed_level == 2) duty = 65;
+    else if (speed_level == 3) duty = 100;
+    else if (speed_level == 4) {
+        // AUTO 自动温控
+        if (s_last_temp < 28.0f) duty = 0;
+        else if (s_last_temp < 32.0f) duty = 35;
+        else if (s_last_temp < 36.0f) duty = 70;
+        else duty = 100;
+    }
+    s_fan_effective_duty = duty;
+
+    // 输出到电机引脚 (三路引脚并联驱动)
+    SmartHome_SetMotor(duty > 0);
+}
+
+int SmartHome_GetFanSpeed(void)
+{
+    return s_fan_speed_level;
+}
+
+int SmartHome_GetFanDuty(void)
+{
+    return s_fan_effective_duty;
+}
+
+// 航天级和弦开机音效
+void SmartHome_PlayBootChime(void)
+{
+    // PA6 蜂鸣器引脚配置
+    PinctrlSet(GPIO0_PA6, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
+    LzGpioInit(GPIO0_PA6);
+    LzGpioSetDir(GPIO0_PA6, LZGPIO_DIR_OUT);
+
+    // 1500Hz 和弦 (持续约 80ms)
+    for (int i = 0; i < 40; i++) {
+        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_HIGH);
+        LOS_Msleep(1);
+        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
+        LOS_Msleep(1);
+    }
+    LOS_Msleep(20);
+    // 2200Hz 和弦 (持续约 100ms)
+    for (int i = 0; i < 50; i++) {
+        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_HIGH);
+        LOS_Msleep(1);
+        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
+        LOS_Msleep(1);
+    }
+    LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
+}
+
+// 警报声响更新 (双频 1000Hz / 2000Hz 交替)
+static uint8_t s_alarm_tone_toggle = 0;
+void SmartHome_UpdateAlarmSound(bool alarm_active)
+{
+    if (!alarm_active) {
+        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
+        return;
+    }
+    s_alarm_tone_toggle ^= 1;
+    LzGpioSetVal(GPIO0_PA6, s_alarm_tone_toggle ? LZGPIO_LEVEL_HIGH : LZGPIO_LEVEL_LOW);
+}
+
+// 硬件看门狗 (b12_watchdog)
+void SmartHome_InitWatchdog(void)
+{
+    LzWatchdogInit(20);
+    printf("[watchdog] Hardware WDT initialized with 20s timeout\n");
+}
+
+void SmartHome_FeedWatchdog(void)
+{
+    LzWatchdogKeepAlive();
+}
+
+// 外部引用系统复位接口
+extern void RebootDevice(unsigned int);
+
+// 系统远程软件重启 (b13_reboot)
+void SmartHome_Reboot(void)
+{
+    printf("[system] Remote reboot commanded, executing RebootDevice(0)...\n");
+    SmartHome_SetMotor(false);
+    SmartHome_SetAlarmLight(false);
+    LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
+    LOS_Msleep(200);
+    RebootDevice(0);
+}
+
+// I2C 动态总线扫描 (b11_i2c_scan)
+void SmartHome_ScanI2cBus(char *device_list, int max_len)
+{
+    if (!device_list || max_len < 8) return;
+    device_list[0] = '\0';
+    int found_count = 0;
+
+    for (uint8_t addr = 0x03; addr <= 0x77; addr++) {
+        uint8_t test = 0;
+        if (LzI2cRead(SHT30_BH1750_I2C_PORT, addr, &test, 1) == LZ_HARDWARE_SUCCESS) {
+            char name[16];
+            if (addr == SHT30_I2C_ADDR) {
+                snprintf(name, sizeof(name), "SHT30");
+            } else if (addr == BH1750_I2C_ADDR) {
+                snprintf(name, sizeof(name), "BH1750");
+            } else if (addr == 0x68) {
+                snprintf(name, sizeof(name), "MPU6050");
+            } else {
+                snprintf(name, sizeof(name), "0x%02X", addr);
+            }
+
+            if (found_count > 0) {
+                strncat(device_list, ",", max_len - strlen(device_list) - 1);
+            }
+            strncat(device_list, name, max_len - strlen(device_list) - 1);
+            found_count++;
+        }
+    }
+
+    if (found_count == 0) {
+        snprintf(device_list, max_len, "NONE");
+    }
+    printf("[i2c_scan] Scan complete, found %d devices: %s\n", found_count, device_list);
+}
