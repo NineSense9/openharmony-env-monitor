@@ -84,7 +84,9 @@ AdcKeyType AdcKey_Scan(void)
         }
     }
 
-    // 消抖逻辑：连续 2 次周期 (10ms * 2 = 20ms) 保持同一按键，视为有效
+    // 消抖逻辑：
+    // 按下时连续 2 次采样 (20ms) 保持有效电平，视为真实按下，防电磁杂波
+    // 松开时只要引脚恢复高电平，立即判决释放，绝不拖泥带水！
     if (current_raw == s_last_detected_raw) {
         s_raw_stable_count++;
     } else {
@@ -93,30 +95,33 @@ AdcKeyType AdcKey_Scan(void)
     }
 
     AdcKeyType triggered = KEY_NONE;
-    if (s_raw_stable_count >= 2) {
+
+    // 当物理按键松开时 (从 KEY_K3 变为 KEY_NONE)，立即裁定手势，无需再等 20ms 消抖
+    if (s_confirmed_key == KEY_K3 && current_raw == KEY_NONE) {
+        uint32_t ticks = s_k3_press_ticks;
+        if (ticks >= 2 && ticks < 100) {
+            // 20ms ~ 1.0秒：短按单击 -> 切换风机档位 / 消除当前告警
+            triggered = KEY_K3;
+            printf("[adc_key] Released after %.2fs -> Trigger K3 (Fan/Mute)!\n", ticks * 0.01f);
+        } else if (ticks >= 100 && ticks < 250) {
+            // 1.0秒 ~ 2.5秒：长按自检 -> 启动/停止声光自检测试 (原K5功能)
+            triggered = KEY_K5;
+            printf("[adc_key] Released after %.2fs -> Trigger K5 (Alarm Test)!\n", ticks * 0.01f);
+        } else if (ticks >= 250 && ticks <= 500) {
+            // 2.5秒 ~ 5.0秒：超长按重扫 -> 启动 I2C 传感器拓扑重扫 (原K6功能)
+            triggered = KEY_K6;
+            printf("[adc_key] Released after %.2fs -> Trigger K6 (I2C Rescan)!\n", ticks * 0.01f);
+        } else if (ticks > 500) {
+            // > 5.0秒：超长按防误触取消操作
+            printf("[adc_key] Released after %.2fs -> Action Cancelled (>5s)!\n", ticks * 0.01f);
+        }
+        s_k3_press_ticks = 0;
+        s_confirmed_key = KEY_NONE;
+        s_raw_stable_count = 0;
+    } else if (s_raw_stable_count >= 2) {
         if (current_raw != s_confirmed_key) {
             if (current_raw == KEY_K3 && s_confirmed_key == KEY_NONE) {
                 // 物理按键按下瞬间：开启精准计时
-                s_k3_press_ticks = 0;
-            } else if (current_raw == KEY_NONE && s_confirmed_key == KEY_K3) {
-                // 物理按键松开（Release）瞬间：根据完整按压时长精准裁定触发手势
-                uint32_t ticks = s_k3_press_ticks;
-                if (ticks >= 4 && ticks < 100) {
-                    // 40ms ~ 1.0秒：短按单击 -> 切换风机档位 / 消除当前告警
-                    triggered = KEY_K3;
-                    printf("[adc_key] Released after %.2fs -> Trigger K3 (Fan/Mute)!\n", ticks * 0.01f);
-                } else if (ticks >= 100 && ticks < 250) {
-                    // 1.0秒 ~ 2.5秒：长按自检 -> 启动/停止声光自检测试 (原K5功能)
-                    triggered = KEY_K5;
-                    printf("[adc_key] Released after %.2fs -> Trigger K5 (Alarm Test)!\n", ticks * 0.01f);
-                } else if (ticks >= 250 && ticks <= 500) {
-                    // 2.5秒 ~ 5.0秒：超长按重扫 -> 启动 I2C 传感器拓扑重扫 (原K6功能)
-                    triggered = KEY_K6;
-                    printf("[adc_key] Released after %.2fs -> Trigger K6 (I2C Rescan)!\n", ticks * 0.01f);
-                } else if (ticks > 500) {
-                    // > 5.0秒：超长按防误触取消操作
-                    printf("[adc_key] Released after %.2fs -> Action Cancelled (>5s)!\n", ticks * 0.01f);
-                }
                 s_k3_press_ticks = 0;
             } else if (current_raw != KEY_NONE && current_raw != KEY_K3 && s_confirmed_key == KEY_NONE) {
                 // 外接分压按键直接边沿触发

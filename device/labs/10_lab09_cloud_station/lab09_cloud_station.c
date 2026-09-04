@@ -250,21 +250,40 @@ static void *UiTask(void *arg)
         int cur_speed = SmartHome_GetFanSpeed();
         int cur_duty = SmartHome_GetFanDuty();
 
-        if (cur_speed == 4) {
-            snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
-        } else {
-            snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
+        bool is_pressing = AdcKey_IsPhysicalPressed();
+        uint32_t hold_ms = AdcKey_GetHoldDurationMs();
+        int preview_target_speed = -1;
+        if (is_pressing && hold_ms < 1000) {
+            preview_target_speed = (cur_speed + 1) % 5;
         }
-        lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+
+        if (preview_target_speed >= 0) {
+            if (preview_target_speed == 4) {
+                snprintf(line_buf, sizeof(line_buf), "SET:->AUTO (TAP)");
+            } else {
+                snprintf(line_buf, sizeof(line_buf), "SET:->L%d   (TAP)", preview_target_speed);
+            }
+            lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_YELLOW, LCD_BLACK, 16, 0);
+        } else {
+            if (cur_speed == 4) {
+                snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
+            } else {
+                snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
+            }
+            lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+        }
 
         // 五档微型交互胶囊指示 [0][1][2][3][A]
         const char *caps[] = {"0", "1", "2", "3", "A"};
         for (int c = 0; c < 5; c++) {
             int cx = 10 + c * 29;
             bool active = (cur_speed == c);
-            lcd_fill(cx, 156, cx + 24, 168, active ? LCD_GREEN : LCD_DARKBLUE);
-            lcd_draw_rectangle(cx, 156, cx + 24, 168, active ? LCD_WHITE : LCD_GRAY);
-            lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], active ? LCD_BLACK : LCD_WHITE, active ? LCD_GREEN : LCD_DARKBLUE, 12, 0);
+            bool target = (preview_target_speed == c);
+            uint16_t bg = active ? LCD_GREEN : (target ? LCD_YELLOW : LCD_DARKBLUE);
+            uint16_t fg = active ? LCD_BLACK : (target ? LCD_BLACK : LCD_WHITE);
+            lcd_fill(cx, 156, cx + 24, 168, bg);
+            lcd_draw_rectangle(cx, 156, cx + 24, 168, (active || target) ? LCD_WHITE : LCD_GRAY);
+            lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], fg, bg, 12, 0);
         }
 
         // 状态文字 (局部整行黑色清屏，彻底消灭切换时的残影字符)
@@ -370,7 +389,7 @@ static void *UiTask(void *arg)
             }
         }
 
-        LOS_Msleep(50);
+        LOS_Msleep(25);
     }
     return NULL;
 }
@@ -619,12 +638,12 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 3;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 2. UiTask (优先级 7，负责 320x240 LCD 航天 HUD 实时渲染与自检开机动画)
+    // 2. UiTask (优先级 4，高优先级流畅渲染 320x240 LCD 航天 HUD，绝不被网络通信阻塞)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)UiTask;
     task_param.uwStackSize = 4096;
     task_param.pcName = "UiTask";
-    task_param.usTaskPrio = 7;
+    task_param.usTaskPrio = 4;
     LOS_TaskCreate(&task_id, &task_param);
 
     // 3. NetMonitorTask (优先级 9，后台网络监控)
@@ -643,20 +662,20 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 6;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 5. TelemetryTask (优先级 5，500ms 极速遥测上报)
+    // 5. TelemetryTask (优先级 7，后台极速遥测上报，网络 I/O 不干扰本地交互)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)TelemetryTask;
     task_param.uwStackSize = 6144;
     task_param.pcName = "TelemetryTask";
-    task_param.usTaskPrio = 5;
+    task_param.usTaskPrio = 7;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 6. CommandTask (优先级 5，200ms 极速下行指令响应与回执)
+    // 6. CommandTask (优先级 7，后台下行指令响应与回执)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)CommandTask;
     task_param.uwStackSize = 6144;
     task_param.pcName = "CommandTask";
-    task_param.usTaskPrio = 5;
+    task_param.usTaskPrio = 7;
     LOS_TaskCreate(&task_id, &task_param);
 
     return NULL;

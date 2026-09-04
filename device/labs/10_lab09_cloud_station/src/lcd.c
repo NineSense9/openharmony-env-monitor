@@ -654,10 +654,12 @@ void lcd_fill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend, uint16
         }
 #endif
 
-        if (((i - ysta) % LCD_FILL_YIELD_ROWS) == (LCD_FILL_YIELD_ROWS - 1))
+#if LCD_FILL_YIELD_ROWS
+        if ((yend - ysta > 100) && (((i - ysta) % LCD_FILL_YIELD_ROWS) == (LCD_FILL_YIELD_ROWS - 1)))
         {
             LOS_Msleep(1);
         }
+#endif
     }
 }
 
