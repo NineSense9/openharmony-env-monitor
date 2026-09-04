@@ -656,9 +656,6 @@ void lcd_fill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend, uint16
 
         if (((i - ysta) % LCD_FILL_YIELD_ROWS) == (LCD_FILL_YIELD_ROWS - 1))
         {
-            printf("lab01_lcd: LCD_FILL_PROGRESS row=%u/%u\r\n",
-                   (unsigned int)(i - ysta + 1),
-                   (unsigned int)(yend - ysta));
             LOS_Msleep(1);
         }
     }
