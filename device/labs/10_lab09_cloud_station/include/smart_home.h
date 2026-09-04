@@ -28,8 +28,7 @@ void SmartHome_SetFanSpeed(int speed_level);
 int SmartHome_GetFanSpeed(void);
 int SmartHome_GetFanDuty(void);
 
-// 航天级和弦与多频警报
-void SmartHome_PlayBootChime(void);
+// 警报声响与指示更新
 void SmartHome_UpdateAlarmSound(bool alarm_active);
 
 // 硬件看门狗 WDT (b12_watchdog)

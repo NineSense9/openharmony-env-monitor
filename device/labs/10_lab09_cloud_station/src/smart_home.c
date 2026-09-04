@@ -70,9 +70,9 @@ void SmartHome_Init(void)
     LzGpioSetDir(TX_GPIO_ALARM_LIGHT, LZGPIO_DIR_OUT);
     LzGpioSetVal(TX_GPIO_ALARM_LIGHT, LZGPIO_LEVEL_LOW);
 
-    // 4. 初始化 K3 按键
-    PinctrlSet(TX_GPIO_KEY_K3, MUX_FUNC0, PULL_UP, DRIVE_LEVEL3);
+    // 4. 初始化 K3 按键 (GPIO0_PC7, 输入, 硬件上拉)
     LzGpioInit(TX_GPIO_KEY_K3);
+    PinctrlSet(TX_GPIO_KEY_K3, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL0);
     LzGpioSetDir(TX_GPIO_KEY_K3, LZGPIO_DIR_IN);
 
     // 5. 初始化电机引脚 (三路引脚兼容)
@@ -217,42 +217,11 @@ int SmartHome_GetFanDuty(void)
     return s_fan_effective_duty;
 }
 
-// 航天级和弦开机音效
-void SmartHome_PlayBootChime(void)
-{
-    // PA6 蜂鸣器引脚配置
-    PinctrlSet(GPIO0_PA6, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL3);
-    LzGpioInit(GPIO0_PA6);
-    LzGpioSetDir(GPIO0_PA6, LZGPIO_DIR_OUT);
-
-    // 1500Hz 和弦 (持续约 80ms)
-    for (int i = 0; i < 40; i++) {
-        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_HIGH);
-        LOS_Msleep(1);
-        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
-        LOS_Msleep(1);
-    }
-    LOS_Msleep(20);
-    // 2200Hz 和弦 (持续约 100ms)
-    for (int i = 0; i < 50; i++) {
-        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_HIGH);
-        LOS_Msleep(1);
-        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
-        LOS_Msleep(1);
-    }
-    LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
-}
-
-// 警报声响更新 (双频 1000Hz / 2000Hz 交替)
-static uint8_t s_alarm_tone_toggle = 0;
+// 警报声响与声光状态更新 (静音/非阻塞)
 void SmartHome_UpdateAlarmSound(bool alarm_active)
 {
-    if (!alarm_active) {
-        LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
-        return;
-    }
-    s_alarm_tone_toggle ^= 1;
-    LzGpioSetVal(GPIO0_PA6, s_alarm_tone_toggle ? LZGPIO_LEVEL_HIGH : LZGPIO_LEVEL_LOW);
+    // 本地声光联动主要由 TX_GPIO_ALARM_LIGHT (GPIO0_PA5) 和 LCD HUD 实时呈现
+    (void)alarm_active;
 }
 
 // 硬件看门狗 (b12_watchdog)

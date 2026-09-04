@@ -48,13 +48,15 @@ float AdcKey_GetVoltage(void)
 
 static AdcKeyType adc_voltage_to_key(float v)
 {
-    if (v >= 0.0f && v < 0.30f) {
+    // 注意：未连接按键板时 ADC5 悬空读数为 0.0V 或 3.3V
+    // 只有在有效分压区间 (0.20V ~ 2.40V) 才识别为按键，防止 0.0V 导致 K3 持续锁死
+    if (v >= 0.20f && v < 0.50f) {
         return KEY_K3;
-    } else if (v >= 0.35f && v <= 0.75f) {
+    } else if (v >= 0.50f && v < 0.90f) {
         return KEY_K4;
-    } else if (v >= 0.80f && v <= 1.30f) {
+    } else if (v >= 0.90f && v < 1.45f) {
         return KEY_K5;
-    } else if (v >= 1.40f && v <= 2.00f) {
+    } else if (v >= 1.45f && v <= 2.20f) {
         return KEY_K6;
     }
     return KEY_NONE;
@@ -62,21 +64,22 @@ static AdcKeyType adc_voltage_to_key(float v)
 
 AdcKeyType AdcKey_Scan(void)
 {
-    unsigned int raw_data = 0;
     AdcKeyType current_raw = KEY_NONE;
 
-    if (LzSaradcReadValue(ADC_KEY_CHANNEL, &raw_data) == LZ_HARDWARE_SUCCESS) {
-        s_last_voltage = (float)(raw_data * 3.3f / 1024.0f);
-        current_raw = adc_voltage_to_key(s_last_voltage);
+    // 1. 优先检测底板真实物理按键 K3 (GPIO0_PC7 低电平有效)
+    LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
+    if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
+        if (pc7_val == LZGPIO_LEVEL_LOW) {
+            current_raw = KEY_K3;
+        }
     }
 
-    // 若 ADC 未检测到按键，检查 PC7 是否低电平 (兼容旧接线 K3)
+    // 2. 若物理 PC7 未按下，检查 SARADC5 梯形分压按键
     if (current_raw == KEY_NONE) {
-        LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
-        if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
-            if (pc7_val == LZGPIO_LEVEL_LOW) {
-                current_raw = KEY_K3;
-            }
+        unsigned int raw_data = 0;
+        if (LzSaradcReadValue(ADC_KEY_CHANNEL, &raw_data) == LZ_HARDWARE_SUCCESS) {
+            s_last_voltage = (float)(raw_data * 3.3f / 1024.0f);
+            current_raw = adc_voltage_to_key(s_last_voltage);
         }
     }
 
