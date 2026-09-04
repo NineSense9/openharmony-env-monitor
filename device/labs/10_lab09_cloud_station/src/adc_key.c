@@ -61,8 +61,6 @@ static AdcKeyType adc_voltage_to_key(float v)
 }
 
 static uint32_t s_k3_press_ticks = 0;
-static bool s_k3_long_1s_fired = false;
-static bool s_k3_long_3s_fired = false;
 
 AdcKeyType AdcKey_Scan(void)
 {
@@ -98,16 +96,28 @@ AdcKeyType AdcKey_Scan(void)
     if (s_raw_stable_count >= 2) {
         if (current_raw != s_confirmed_key) {
             if (current_raw == KEY_K3 && s_confirmed_key == KEY_NONE) {
-                // 物理按键刚按下 (K3/K4/K6 硬件并联于 PC7)
+                // 物理按键按下瞬间：开启精准计时
                 s_k3_press_ticks = 0;
-                s_k3_long_1s_fired = false;
-                s_k3_long_3s_fired = false;
             } else if (current_raw == KEY_NONE && s_confirmed_key == KEY_K3) {
-                // 按键释放！若未触发长按，则判定为短按有效触发 (调速/消警)
-                if (!s_k3_long_1s_fired && !s_k3_long_3s_fired && s_k3_press_ticks >= 2) {
+                // 物理按键松开（Release）瞬间：根据完整按压时长精准裁定触发手势
+                uint32_t ticks = s_k3_press_ticks;
+                if (ticks >= 4 && ticks < 100) {
+                    // 40ms ~ 1.0秒：短按单击 -> 切换风机档位 / 消除当前告警
                     triggered = KEY_K3;
-                    printf("[adc_key] Key Click Released -> Trigger K3 (Fan/Mute, ticks=%u)!\n", s_k3_press_ticks);
+                    printf("[adc_key] Released after %.2fs -> Trigger K3 (Fan/Mute)!\n", ticks * 0.01f);
+                } else if (ticks >= 100 && ticks < 250) {
+                    // 1.0秒 ~ 2.5秒：长按自检 -> 启动/停止声光自检测试 (原K5功能)
+                    triggered = KEY_K5;
+                    printf("[adc_key] Released after %.2fs -> Trigger K5 (Alarm Test)!\n", ticks * 0.01f);
+                } else if (ticks >= 250 && ticks <= 500) {
+                    // 2.5秒 ~ 5.0秒：超长按重扫 -> 启动 I2C 传感器拓扑重扫 (原K6功能)
+                    triggered = KEY_K6;
+                    printf("[adc_key] Released after %.2fs -> Trigger K6 (I2C Rescan)!\n", ticks * 0.01f);
+                } else if (ticks > 500) {
+                    // > 5.0秒：超长按防误触取消操作
+                    printf("[adc_key] Released after %.2fs -> Action Cancelled (>5s)!\n", ticks * 0.01f);
                 }
+                s_k3_press_ticks = 0;
             } else if (current_raw != KEY_NONE && current_raw != KEY_K3 && s_confirmed_key == KEY_NONE) {
                 // 外接分压按键直接边沿触发
                 triggered = current_raw;
@@ -117,25 +127,9 @@ AdcKeyType AdcKey_Scan(void)
         }
     }
 
-    // 板载按键长按检测逻辑 (按住期间连续计时)
+    // 按住期间连续累计计时 (仅用于 UI 实时显示进度条与倒计时，严禁在按住期间提前早触发)
     if (s_confirmed_key == KEY_K3) {
         s_k3_press_ticks++;
-        // 长按 > 1.2 秒：触发告警声光自检模式 (K5 功能)
-        if (s_k3_press_ticks >= 120 && !s_k3_long_1s_fired) {
-            s_k3_long_1s_fired = true;
-            triggered = KEY_K5;
-            printf("[adc_key] Key Hold > 1.2s -> Trigger K5 Alarm Test!\n");
-        }
-        // 长按 > 3.0 秒：触发 I2C 总线拓扑动态重扫 (K6 功能)
-        else if (s_k3_press_ticks >= 300 && !s_k3_long_3s_fired) {
-            s_k3_long_3s_fired = true;
-            triggered = KEY_K6;
-            printf("[adc_key] Key Hold > 3.0s -> Trigger K6 I2C Rescan!\n");
-        }
-    } else {
-        s_k3_press_ticks = 0;
-        s_k3_long_1s_fired = false;
-        s_k3_long_3s_fired = false;
     }
 
     return triggered;

@@ -267,40 +267,48 @@ static void *UiTask(void *arg)
             lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], active ? LCD_BLACK : LCD_WHITE, active ? LCD_GREEN : LCD_DARKBLUE, 12, 0);
         }
 
-        // 状态文字
+        // 状态文字 (局部整行黑色清屏，彻底消灭切换时的残影字符)
+        lcd_fill(8, 170, 156, 187, LCD_BLACK);
         if (g_remote_override) {
             lcd_show_chinese(8, 172, (uint8_t *)"远控", LCD_MAGENTA, LCD_BLACK, 16, 0);
             lcd_show_string(42, 172, (uint8_t *)"REMOTE OVERRIDE", LCD_MAGENTA, LCD_BLACK, 12, 0);
         } else if (g_k3_muted_latch) {
             lcd_show_chinese(8, 172, (uint8_t *)"静音", LCD_CYAN, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"MUTED LATCHED", LCD_CYAN, LCD_BLACK, 12, 0);
+            lcd_show_string(42, 172, (uint8_t *)"MUTED LATCHED  ", LCD_CYAN, LCD_BLACK, 12, 0);
         } else if (g_report.alarm_active || g_alarm_test_active) {
             lcd_show_chinese(8, 172, (uint8_t *)"警报", LCD_RED, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"ALARM CRITICAL", LCD_RED, LCD_BLACK, 12, 0);
+            lcd_show_string(42, 172, (uint8_t *)"ALARM CRITICAL ", LCD_RED, LCD_BLACK, 12, 0);
         } else {
             lcd_show_chinese(8, 172, (uint8_t *)"正常", LCD_GREEN, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"NORMAL MONITOR", LCD_GREEN, LCD_BLACK, 12, 0);
+            lcd_show_string(42, 172, (uint8_t *)"NORMAL MONITOR ", LCD_GREEN, LCD_BLACK, 12, 0);
         }
 
         // ==========================================
-        // 第四象限：SARADC5 按键矩阵与 I2C 总线卡片 (X: 162 ~ 316, Y: 120 ~ 188)
+        // 第四象限：K3 复合控制微动开关与 I2C 总线卡片 (X: 162 ~ 316, Y: 120 ~ 188)
         // ==========================================
         lcd_draw_rectangle(162, 120, 316, 188, LCD_GRAYBLUE);
         lcd_fill(163, 121, 315, 134, LCD_DARKBLUE);
-        lcd_show_string(166, 121, (uint8_t *)"[KEY MATRIX & BUS]", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        lcd_show_string(166, 121, (uint8_t *)"[KEY K3 & I2C BUS]", LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // K3 ~ K6 四键物理高亮状态
-        const char *k_labels[] = {"K3", "K4", "K5", "K6"};
-        for (int k = 0; k < 4; k++) {
-            int kx = 168 + k * 36;
-            bool k_act = (strcmp(g_last_key_name, k_labels[k]) == 0);
-            lcd_fill(kx, 138, kx + 32, 150, k_act ? LCD_YELLOW : LCD_DARKBLUE);
-            lcd_draw_rectangle(kx, 138, kx + 32, 150, k_act ? LCD_WHITE : LCD_GRAYBLUE);
-            lcd_show_string(kx + 8, 138, (uint8_t *)k_labels[k], k_act ? LCD_BLACK : LCD_CYAN, k_act ? LCD_YELLOW : LCD_DARKBLUE, 12, 0);
+        // K3 物理微动开关状态动态胶囊
+        bool is_k3_down = AdcKey_IsPhysicalPressed();
+        lcd_fill(166, 138, 312, 152, is_k3_down ? LCD_YELLOW : LCD_DARKBLUE);
+        lcd_draw_rectangle(166, 138, 312, 152, is_k3_down ? LCD_WHITE : LCD_GRAYBLUE);
+        if (is_k3_down) {
+            uint32_t hold_ms = AdcKey_GetHoldDurationMs();
+            if (hold_ms < 1000) {
+                lcd_show_string(170, 138, (uint8_t *)">> K3: FAN CYCLE <<", LCD_BLACK, LCD_YELLOW, 12, 0);
+            } else if (hold_ms < 2500) {
+                lcd_show_string(170, 138, (uint8_t *)">> K3: ALARM TEST <<", LCD_BLACK, LCD_YELLOW, 12, 0);
+            } else {
+                lcd_show_string(170, 138, (uint8_t *)">> K3: I2C RESCAN <<", LCD_BLACK, LCD_YELLOW, 12, 0);
+            }
+        } else {
+            lcd_show_string(172, 138, (uint8_t *)"K3 PIN: GPIO0_PC7", LCD_CYAN, LCD_DARKBLUE, 12, 0);
         }
 
-        snprintf(line_buf, sizeof(line_buf), "KEY: %-4s (PC7)", g_last_key_name);
-        lcd_show_string(166, 154, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+        // 手势导引
+        lcd_show_string(166, 156, (uint8_t *)"TAP:CYCLE | HOLD:TEST", LCD_WHITE, LCD_BLACK, 12, 0);
 
         snprintf(line_buf, sizeof(line_buf), "I2C: %-15s", g_i2c_device_str);
         lcd_show_string(166, 172, (uint8_t *)line_buf, LCD_LIGHTBLUE, LCD_BLACK, 12, 0);
@@ -313,24 +321,27 @@ static void *UiTask(void *arg)
         snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [FAST]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部功能与操作状态栏 (Y: 216 ~ 238，显式展示当前激活功能与按键感知)
+        // 底部功能与操作状态栏 (Y: 216 ~ 238，松手即触发模式，实时进度条直观感知)
         if (AdcKey_IsPhysicalPressed()) {
             uint32_t hold_ms = AdcKey_GetHoldDurationMs();
             lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
-            int p_w = (int)((hold_ms / 1200.0f) * 314);
+            int p_w = (int)((hold_ms / 2500.0f) * 314);
             if (p_w > 314) p_w = 314;
-            uint16_t bar_c = (hold_ms >= 1200) ? ((hold_ms >= 3000) ? LCD_GREEN : LCD_YELLOW) : LCD_CYAN;
+            uint16_t bar_c = (hold_ms >= 1000) ? ((hold_ms >= 2500) ? LCD_GREEN : LCD_YELLOW) : LCD_CYAN;
             lcd_fill(2, 217, 2 + p_w, 237, bar_c);
             lcd_draw_rectangle(2, 217, 317, 237, LCD_WHITE);
-            if (hold_ms < 1200) {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs [RELEASE: FAN L%d]", hold_ms / 1000.0f, (SmartHome_GetFanSpeed() + 1) % 5);
+            if (hold_ms < 1000) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:FAN L%d]", hold_ms * 0.001f, (SmartHome_GetFanSpeed() + 1) % 5);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
-            } else if (hold_ms < 3000) {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs >>> ALARM TEST! <<<", hold_ms / 1000.0f);
+            } else if (hold_ms < 2500) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:ALARM TEST]", hold_ms * 0.001f);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
+            } else if (hold_ms <= 5000) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:I2C RESCAN]", hold_ms * 0.001f);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
             } else {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs >>> I2C RESCAN! <<<", hold_ms / 1000.0f);
-                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:CANCEL]", hold_ms * 0.001f);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_WHITE, LCD_RED, 16, 0);
             }
         } else if (g_action_banner_ticks > 0) {
             g_action_banner_ticks--;
