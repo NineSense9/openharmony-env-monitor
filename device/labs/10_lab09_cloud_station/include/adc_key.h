@@ -21,6 +21,12 @@ AdcKeyType AdcKey_Scan(void);
 // 获取最新采集的 SARADC5 电压值 (V)
 float AdcKey_GetVoltage(void);
 
+// 获取物理按键是否正处于按下状态 (用于 UI 实时渲染按压感知)
+bool AdcKey_IsPhysicalPressed(void);
+
+// 获取物理按键当前已按住的毫秒数 (用于实时绘制长按进度条)
+uint32_t AdcKey_GetHoldDurationMs(void);
+
 // 获取按键名称字符串
 const char *AdcKey_GetName(AdcKeyType key);
 

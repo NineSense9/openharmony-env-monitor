@@ -5,6 +5,8 @@
 #include "smart_home.h"
 #include "lz_hardware.h"
 #include "los_task.h"
+#include "iot_pwm.h"
+#include "reset.h"
 
 #define SHT30_BH1750_I2C_PORT   0
 #define SHT30_I2C_ADDR          0x44
@@ -91,7 +93,11 @@ void SmartHome_Init(void)
     LzGpioSetDir(MOTOR_PIN_COMPAT_PA2, LZGPIO_DIR_OUT);
     LzGpioSetVal(MOTOR_PIN_COMPAT_PA2, LZGPIO_LEVEL_LOW);
 
-    // 6. 初始化 SARADC
+    // 6. 初始化硬件 PWM 通道 (PWM7_M1 / GPIO1_PD0, PWM6_M0 / GPIO0_PC6)
+    IoTPwmInit(EPWMDEV_PWM7_M1);
+    IoTPwmInit(EPWMDEV_PWM6_M0);
+
+    // 7. 初始化 SARADC
     LzSaradcInit();
 
     printf("[smart_home] hardware initialized successfully\n");
@@ -191,20 +197,28 @@ void SmartHome_SetFanSpeed(int speed_level)
 
     int duty = 0;
     if (speed_level == 0) duty = 0;
-    else if (speed_level == 1) duty = 30;
-    else if (speed_level == 2) duty = 65;
-    else if (speed_level == 3) duty = 100;
+    else if (speed_level == 1) duty = 30; // 30% 弱风 (低速静音，明显低速)
+    else if (speed_level == 2) duty = 60; // 60% 中风 (中速平稳，清晰适中)
+    else if (speed_level == 3) duty = 98; // 98% 强风 (高速全开，强劲风力)
     else if (speed_level == 4) {
-        // AUTO 自动温控
+        // AUTO 自动温控阶梯
         if (s_last_temp < 28.0f) duty = 0;
-        else if (s_last_temp < 32.0f) duty = 35;
-        else if (s_last_temp < 36.0f) duty = 70;
-        else duty = 100;
+        else if (s_last_temp < 31.0f) duty = 30;
+        else if (s_last_temp < 35.0f) duty = 60;
+        else duty = 98;
     }
     s_fan_effective_duty = duty;
 
-    // 输出到电机引脚 (三路引脚并联驱动)
-    SmartHome_SetMotor(duty > 0);
+    if (duty == 0) {
+        IoTPwmStop(EPWMDEV_PWM7_M1);
+        IoTPwmStop(EPWMDEV_PWM6_M0);
+        SmartHome_SetMotor(false);
+    } else {
+        // 硬件 PWM 精确调制，频率 1000Hz
+        IoTPwmStart(EPWMDEV_PWM7_M1, (unsigned short)duty, 1000);
+        IoTPwmStart(EPWMDEV_PWM6_M0, (unsigned short)duty, 1000);
+        SmartHome_SetMotor(true);
+    }
 }
 
 int SmartHome_GetFanSpeed(void)
@@ -220,7 +234,6 @@ int SmartHome_GetFanDuty(void)
 // 警报声响与声光状态更新 (静音/非阻塞)
 void SmartHome_UpdateAlarmSound(bool alarm_active)
 {
-    // 本地声光联动主要由 TX_GPIO_ALARM_LIGHT (GPIO0_PA5) 和 LCD HUD 实时呈现
     (void)alarm_active;
 }
 
@@ -242,30 +255,20 @@ void SmartHome_FeedWatchdog(void)
     LzWatchdogKeepAlive();
 }
 
-// 外部引用系统复位接口
-extern void RebootDevice(unsigned int);
-
-// 系统远程软件重启 (结合 Cortex-M4 内核寄存器与硬件看门狗)
+// 系统远程软件重启 (采用官方规范 Watchdog 1.0s 超时硬件复位)
 void SmartHome_Reboot(void)
 {
-    printf("[system] Remote reboot commanded, initiating hardware reset...\n");
+    printf("[system] Remote reboot commanded, initiating watchdog hardware reset...\n");
     s_is_rebooting = true;
     SmartHome_SetMotor(false);
     SmartHome_SetAlarmLight(false);
     LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
     LOS_Msleep(100);
 
-    // 1. 设置看门狗为最短 1 秒超时
-    LzWatchdogInit(1);
-
-    // 2. 直接触发 ARM Cortex-M4 内核级全局系统复位 (SCB->AIRCR: VECTKEY | SYSRESETREQ)
-    volatile uint32_t *aircr = (volatile uint32_t *)0xE000ED0CU;
-    *aircr = 0x05FA0004U;
-
-    // 3. 调用系统原生 RebootDevice 接口作为备用
+    // 调用官方原生 RebootDevice 接口 (启动看门狗1秒复位)
     RebootDevice(0);
 
-    // 4. 等待硬件复位生效
+    // 等待硬件复位生效
     while (1) {
         LOS_Msleep(50);
     }

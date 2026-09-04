@@ -25,6 +25,7 @@ static_library("lab09_cloud_station") {
         "//kernel/liteos_m/components/net/lwip-2.1/porting/include",
         "//third_party/lwip/src/include",
         "//third_party/lwip/src/include/lwip",
+        "//base/iot_hardware/peripheral/interfaces/kits",
     ]
 
     deps = [

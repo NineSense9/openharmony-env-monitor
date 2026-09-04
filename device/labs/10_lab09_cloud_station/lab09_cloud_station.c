@@ -41,6 +41,8 @@ static int g_manual_fan_speed = 4; // 默认 AUTO 智能温控
 static bool g_remote_override = false;
 static int g_remote_fan_speed = 4;
 static bool g_alarm_test_active = false;
+static char g_action_banner_text[48] = "";
+static int g_action_banner_ticks = 0;
 
 // 1. 航天级自检与雷达开机动画 (静音启动，边距自适应)
 static void Lcd_ShowBootAnimation(void)
@@ -311,13 +313,53 @@ static void *UiTask(void *arg)
         snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [FAST]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部按键提示胶囊 (K3/4/6短按单击调速消警 / 长按1.2秒自检 / 长按3秒重扫)
-        lcd_fill(0, 216, LCD_W, LCD_H, LCD_BLACK);
-        lcd_show_string(4, 220, (uint8_t *)"[FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
-        lcd_show_string(94, 220, (uint8_t *)"[HOLD 1s:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
-        lcd_show_string(214, 220, (uint8_t *)"[HOLD 3s:I2C]", LCD_GREEN, LCD_BLACK, 16, 0);
+        // 底部功能与操作状态栏 (Y: 216 ~ 238，显式展示当前激活功能与按键感知)
+        if (AdcKey_IsPhysicalPressed()) {
+            uint32_t hold_ms = AdcKey_GetHoldDurationMs();
+            lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
+            int p_w = (int)((hold_ms / 1200.0f) * 314);
+            if (p_w > 314) p_w = 314;
+            uint16_t bar_c = (hold_ms >= 1200) ? ((hold_ms >= 3000) ? LCD_GREEN : LCD_YELLOW) : LCD_CYAN;
+            lcd_fill(2, 217, 2 + p_w, 237, bar_c);
+            lcd_draw_rectangle(2, 217, 317, 237, LCD_WHITE);
+            if (hold_ms < 1200) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs [RELEASE: FAN L%d]", hold_ms / 1000.0f, (SmartHome_GetFanSpeed() + 1) % 5);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
+            } else if (hold_ms < 3000) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs >>> ALARM TEST! <<<", hold_ms / 1000.0f);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
+            } else {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs >>> I2C RESCAN! <<<", hold_ms / 1000.0f);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
+            }
+        } else if (g_action_banner_ticks > 0) {
+            g_action_banner_ticks--;
+            lcd_fill(0, 216, LCD_W, LCD_H, LCD_GREEN);
+            lcd_show_string(6, 220, (uint8_t *)g_action_banner_text, LCD_BLACK, LCD_GREEN, 16, 0);
+        } else {
+            // 常态下：底部全幅展示当前激活功能 (当前使用功能显式感知)
+            if (g_alarm_test_active) {
+                lcd_fill(0, 216, LCD_W, LCD_H, LCD_YELLOW);
+                lcd_show_string(6, 220, (uint8_t *)"[STATUS] ALARM TEST (CLICK:STOP)", LCD_BLACK, LCD_YELLOW, 16, 0);
+            } else if (g_report.alarm_active && !g_k3_muted_latch) {
+                lcd_fill(0, 216, LCD_W, LCD_H, LCD_RED);
+                lcd_show_string(6, 220, (uint8_t *)"[ALERT] CRITICAL! (CLICK:MUTE)", LCD_WHITE, LCD_RED, 16, 0);
+            } else if (g_k3_muted_latch) {
+                lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
+                lcd_show_string(6, 220, (uint8_t *)"[STATUS] MUTED LATCH (CLICK:FAN)", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+            } else if (g_remote_override) {
+                lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
+                snprintf(line_buf, sizeof(line_buf), "[CLOUD] REMOTE FAN: L%d (%d%%)", g_remote_fan_speed, cur_duty);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_MAGENTA, LCD_DARKBLUE, 16, 0);
+            } else {
+                lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
+                const char *spd_names[] = {"OFF", "LOW", "MED", "HIGH", "AUTO"};
+                snprintf(line_buf, sizeof(line_buf), "[RUN] FAN: L%d %-4s %2d%% [TAP:CYCLE]", cur_speed, spd_names[cur_speed], cur_duty);
+                lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_WHITE, LCD_DARKBLUE, 16, 0);
+            }
+        }
 
-        LOS_Msleep(100);
+        LOS_Msleep(50);
     }
     return NULL;
 }
@@ -415,13 +457,23 @@ static void *CommandTask(void *arg)
                     g_manual_fan_speed = 4;
                 }
                 SmartHome_SetFanSpeed(g_remote_override ? g_remote_fan_speed : g_manual_fan_speed);
+                snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] FAN -> %s", cmd.action);
+                g_action_banner_ticks = 30;
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
                 g_remote_override = false;
                 g_k3_muted_latch = true;
                 g_alarm_test_active = false;
                 SmartHome_ResetAlarmState();
+                snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] ALARM MUTED");
+                g_action_banner_ticks = 30;
             } else if (strcmp(cmd.target, "system") == 0 && strcmp(cmd.action, "reboot") == 0) {
                 HttpClient_AckCommand(cmd.command_id, "done", "system reboot acknowledged");
+                lcd_fill(30, 70, 290, 170, LCD_DARKBLUE);
+                lcd_draw_rectangle(30, 70, 290, 170, LCD_RED);
+                lcd_draw_rectangle(32, 72, 288, 168, LCD_YELLOW);
+                lcd_show_string(52, 90, (uint8_t *)"SYSTEM REBOOTING...", LCD_YELLOW, LCD_DARKBLUE, 16, 0);
+                lcd_show_string(52, 115, (uint8_t *)"WATCHDOG RESET (1.3s)", LCD_WHITE, LCD_DARKBLUE, 16, 0);
+                lcd_show_string(52, 140, (uint8_t *)"PLEASE WAIT RESTART...", LCD_CYAN, LCD_DARKBLUE, 16, 0);
                 SmartHome_Reboot();
             }
 
@@ -466,7 +518,8 @@ static void *KeyTask(void *arg)
 
             switch (k) {
                 case KEY_K3:
-                    // K3 (板载物理按键 PC7): 双重功能
+                case KEY_K4:
+                    // K3/K4: 短按单击 (板载 PC7):
                     // 若处于告警状态 -> 触发消警与安全复位 (MUTE & RESET)
                     // 若处于正常状态 -> 循环切换风机档位 (0 -> 1 -> 2 -> 3 -> AUTO)
                     if (g_report.alarm_active || g_alarm_test_active) {
@@ -474,41 +527,42 @@ static void *KeyTask(void *arg)
                         g_alarm_test_active = false;
                         g_remote_override = false;
                         SmartHome_ResetAlarmState();
-                        printf("[key] >>> K3 Pressed: Mute Alarm / Reset State <<<\n");
+                        snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] MUTE ALARM / RESET");
+                        g_action_banner_ticks = 30;
+                        printf("[key] >>> Key Click: Mute Alarm / Reset State <<<\n");
                     } else {
                         g_remote_override = false;
                         g_k3_muted_latch = false;
                         g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
                         SmartHome_SetFanSpeed(g_manual_fan_speed);
-                        printf("[key] >>> K3 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
+                        snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] FAN -> L%d (%d%%)",
+                                 g_manual_fan_speed, SmartHome_GetFanDuty());
+                        g_action_banner_ticks = 30;
+                        printf("[key] >>> Key Click: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
                                g_manual_fan_speed, SmartHome_GetFanDuty());
                     }
                     break;
 
-                case KEY_K4:
-                    // K4: 循环切换风扇档位 (0 -> 1 -> 2 -> 3 -> AUTO)
-                    g_remote_override = false;
-                    g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
-                    SmartHome_SetFanSpeed(g_manual_fan_speed);
-                    printf("[key] >>> K4 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
-                           g_manual_fan_speed, SmartHome_GetFanDuty());
-                    break;
-
                 case KEY_K5:
-                    // K5: 模拟舱内告警声光与应急排烟自检测试 (TEST TOGGLE)
+                    // K5: 长按 > 1.2s 模拟舱内告警声光与应急排烟自检测试 (TEST TOGGLE)
                     g_alarm_test_active = !g_alarm_test_active;
                     if (!g_alarm_test_active) {
                         g_k3_muted_latch = false;
                         SmartHome_ResetAlarmState();
+                        snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] ALARM TEST STOPPED");
                     } else {
                         g_k3_muted_latch = false;
+                        snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] ALARM TEST STARTED!");
                     }
-                    printf("[key] >>> K5 Pressed: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
+                    g_action_banner_ticks = 30;
+                    printf("[key] >>> Key Hold 1.2s: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
                     break;
 
                 case KEY_K6:
-                    // K6: I2C 总线拓扑动态重扫 (SCAN BUS)
-                    printf("[key] >>> K6 Pressed: Rescan I2C Bus... <<<\n");
+                    // K6: 长按 > 3.0s I2C 总线拓扑动态重扫 (SCAN BUS)
+                    snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] I2C RESCANNED");
+                    g_action_banner_ticks = 30;
+                    printf("[key] >>> Key Hold 3.0s: Rescan I2C Bus... <<<\n");
                     SmartHome_ScanI2cBus(g_i2c_device_str, sizeof(g_i2c_device_str));
                     break;
 

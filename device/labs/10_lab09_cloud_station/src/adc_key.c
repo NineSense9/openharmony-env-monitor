@@ -141,6 +141,17 @@ AdcKeyType AdcKey_Scan(void)
     return triggered;
 }
 
+bool AdcKey_IsPhysicalPressed(void)
+{
+    return (s_confirmed_key == KEY_K3);
+}
+
+uint32_t AdcKey_GetHoldDurationMs(void)
+{
+    if (s_confirmed_key != KEY_K3) return 0;
+    return s_k3_press_ticks * 10;
+}
+
 const char *AdcKey_GetName(AdcKeyType key)
 {
     switch (key) {
