@@ -33,6 +33,21 @@ export function useTelemetry() {
 
   const { playAlarm } = useAudioFeedback();
 
+  // 乐观锁：用户点击风机档位后，在4秒内或设备遥测确认前保持用户所选档位，防止300ms轮询冲掉UI
+  const optimisticFanSpeedRef = useRef<{ speed: number; expiresAt: number } | null>(null);
+
+  const setOptimisticFanSpeed = (speed: number) => {
+    optimisticFanSpeedRef.current = {
+      speed,
+      expiresAt: Date.now() + 4000 // 最长锁定 4 秒
+    };
+    setSystemState(prev => ({
+      ...prev,
+      fanSpeed: speed,
+      isMotorRunning: speed > 0
+    }));
+  };
+
   const addLog = (msg: string, type: 'info' | 'alarm' | 'cmd' = 'info') => {
     setLogs(prev => [
       {
@@ -81,10 +96,26 @@ export function useTelemetry() {
             addLog(`[RECOVERY] 舱内环境恢复正常安全阈值`, 'info');
           }
 
-          // 物理硬件真实电机状态直接驱动大屏动画
-          const realMotorRunning = (isOnline && data.motor_on !== undefined) 
-            ? Boolean(data.motor_on) 
-            : prev.isMotorRunning;
+          // 乐观锁判断：如果有未过期的用户手动设定，优先展示用户选中的档位，避免跳变
+          let resolvedFanSpeed = data.fan_speed ?? prev.fanSpeed ?? 4;
+          if (optimisticFanSpeedRef.current) {
+            if (Date.now() < optimisticFanSpeedRef.current.expiresAt) {
+              if (data.fan_speed !== undefined && data.fan_speed === optimisticFanSpeedRef.current.speed) {
+                // 硬件已上报匹配的档位，乐观锁提前释放
+                optimisticFanSpeedRef.current = null;
+              } else {
+                // 硬件尚未同步完成，维持前端乐观档位
+                resolvedFanSpeed = optimisticFanSpeedRef.current.speed;
+              }
+            } else {
+              optimisticFanSpeedRef.current = null;
+            }
+          }
+
+          // 物理硬件真实电机状态直接驱动大屏动画 (有乐观锁时优先按选定档位判断)
+          const realMotorRunning = optimisticFanSpeedRef.current
+            ? (resolvedFanSpeed > 0)
+            : ((isOnline && data.motor_on !== undefined) ? Boolean(data.motor_on) : prev.isMotorRunning);
 
           return {
             ...prev,
@@ -94,7 +125,7 @@ export function useTelemetry() {
             totalPackets: data.id || prev.totalPackets,
             isAlarmActive: isOnline ? isAlarm : false,
             isMotorRunning: isOnline ? realMotorRunning : false,
-            fanSpeed: data.fan_speed ?? prev.fanSpeed ?? 4,
+            fanSpeed: resolvedFanSpeed,
             pitch: data.pitch ?? prev.pitch ?? 0,
             roll: data.roll ?? prev.roll ?? 0,
             accelX: data.accel_x ?? prev.accelX ?? 0,
@@ -156,6 +187,7 @@ export function useTelemetry() {
     history,
     systemState,
     setSystemState,
+    setOptimisticFanSpeed,
     logs,
     addLog
   };

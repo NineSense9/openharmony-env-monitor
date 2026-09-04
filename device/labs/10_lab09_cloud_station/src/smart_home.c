@@ -224,6 +224,8 @@ void SmartHome_UpdateAlarmSound(bool alarm_active)
     (void)alarm_active;
 }
 
+static volatile bool s_is_rebooting = false;
+
 // 硬件看门狗 (b12_watchdog)
 void SmartHome_InitWatchdog(void)
 {
@@ -233,21 +235,40 @@ void SmartHome_InitWatchdog(void)
 
 void SmartHome_FeedWatchdog(void)
 {
+    if (s_is_rebooting) {
+        // 正在执行重启，严禁喂狗，让硬件看门狗彻底复位
+        return;
+    }
     LzWatchdogKeepAlive();
 }
 
 // 外部引用系统复位接口
 extern void RebootDevice(unsigned int);
 
-// 系统远程软件重启 (b13_reboot)
+// 系统远程软件重启 (结合 Cortex-M4 内核寄存器与硬件看门狗)
 void SmartHome_Reboot(void)
 {
-    printf("[system] Remote reboot commanded, executing RebootDevice(0)...\n");
+    printf("[system] Remote reboot commanded, initiating hardware reset...\n");
+    s_is_rebooting = true;
     SmartHome_SetMotor(false);
     SmartHome_SetAlarmLight(false);
     LzGpioSetVal(GPIO0_PA6, LZGPIO_LEVEL_LOW);
-    LOS_Msleep(200);
+    LOS_Msleep(100);
+
+    // 1. 设置看门狗为最短 1 秒超时
+    LzWatchdogInit(1);
+
+    // 2. 直接触发 ARM Cortex-M4 内核级全局系统复位 (SCB->AIRCR: VECTKEY | SYSRESETREQ)
+    volatile uint32_t *aircr = (volatile uint32_t *)0xE000ED0CU;
+    *aircr = 0x05FA0004U;
+
+    // 3. 调用系统原生 RebootDevice 接口作为备用
     RebootDevice(0);
+
+    // 4. 等待硬件复位生效
+    while (1) {
+        LOS_Msleep(50);
+    }
 }
 
 // I2C 动态总线扫描 (b11_i2c_scan)

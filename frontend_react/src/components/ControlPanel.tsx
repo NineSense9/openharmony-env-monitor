@@ -8,9 +8,10 @@ interface ControlPanelProps {
   systemState: SystemState;
   setSystemState: React.Dispatch<React.SetStateAction<SystemState>>;
   addLog: (msg: string, type?: 'info' | 'alarm' | 'cmd') => void;
+  setOptimisticFanSpeed?: (speed: number) => void;
 }
 
-export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSystemState, addLog }) => {
+export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSystemState, addLog, setOptimisticFanSpeed }) => {
   const [loadingMotor, setLoadingMotor] = useState(false);
   const [loadingMute, setLoadingMute] = useState(false);
   const [loadingReboot, setLoadingReboot] = useState(false);
@@ -56,6 +57,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
     setLoadingMotor(true);
     addLog(`[COMMAND] 发送风机档位调节指令 -> ${actionName}`, 'cmd');
 
+    // 立即乐观锁定UI状态，避免300ms轮询拿到旧数据产生“先跳回再跳过去”的视觉抖动
+    if (setOptimisticFanSpeed) {
+      setOptimisticFanSpeed(speedLevel);
+    } else {
+      setSystemState(prev => ({
+        ...prev,
+        fanSpeed: speedLevel,
+        isMotorRunning: speedLevel > 0
+      }));
+    }
+
     const res = await sendRemoteCommand({
       device_id: 'rk2206-station-01',
       target: 'fan',
@@ -64,11 +76,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
 
     setLoadingMotor(false);
     if (res.ok) {
-      setSystemState(prev => ({
-        ...prev,
-        fanSpeed: speedLevel,
-        isMotorRunning: speedLevel > 0
-      }));
       addLog(`[COMMAND ACK] 风机档位指令已生效 (ID: ${res.id})`, 'cmd');
     } else {
       addLog(`[COMMAND FAIL] 指令发送失败: ${res.msg}`, 'alarm');

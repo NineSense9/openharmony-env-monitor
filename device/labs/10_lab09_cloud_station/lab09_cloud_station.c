@@ -307,22 +307,21 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_fill(0, 192, LCD_W, 214, LCD_DARKBLUE);
         lcd_draw_line(0, 192, 319, 192, LCD_CYAN);
-        snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [1.2s]", g_cloud_upload_count, g_cloud_fail_count);
+        snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [FAST]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部按键提示胶囊 (K3调速/消警 / K4极速调速 / K5告警自检 / K6拓扑重扫)
+        // 底部按键提示胶囊 (K3单击调速/消警 / 长按1秒自检 / 长按3秒重扫)
         lcd_fill(0, 216, LCD_W, LCD_H, LCD_BLACK);
         lcd_show_string(4, 220, (uint8_t *)"[K3:FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
-        lcd_show_string(114, 220, (uint8_t *)"[K4:FAN]", LCD_GREEN, LCD_BLACK, 16, 0);
-        lcd_show_string(184, 220, (uint8_t *)"[K5:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
-        lcd_show_string(254, 220, (uint8_t *)"[K6:SCAN]", LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
+        lcd_show_string(116, 220, (uint8_t *)"[HOLD 1s:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
+        lcd_show_string(232, 220, (uint8_t *)"[HOLD 3s:I2C]", LCD_GREEN, LCD_BLACK, 16, 0);
 
         LOS_Msleep(200);
     }
     return NULL;
 }
 
-// 4. 极速遥测上报任务 (1200ms 周期，上报完整全量状态)
+// 4. 极速遥测上报任务 (800ms 周期，上报完整全量状态)
 static void *TelemetryTask(void *arg)
 {
     (void)arg;
@@ -365,12 +364,12 @@ static void *TelemetryTask(void *arg)
             g_cloud_fail_count++;
         }
 
-        LOS_Msleep(1200);
+        LOS_Msleep(800);
     }
     return NULL;
 }
 
-// 5. 极速指令拉取与多外设控制响应任务 (1200ms 错峰轮询)
+// 5. 极速指令拉取与多外设控制响应任务 (250ms 极速响应 + 立即回传闭环)
 static void *CommandTask(void *arg)
 {
     (void)arg;
@@ -379,8 +378,7 @@ static void *CommandTask(void *arg)
         LOS_Msleep(200);
     }
 
-    // 初始等待 1800ms，与 TelemetryTask 错峰执行，避免套接字争抢
-    LOS_Msleep(1800);
+    LOS_Msleep(1000);
 
     while (1) {
         RemoteCommand cmd;
@@ -407,20 +405,44 @@ static void *CommandTask(void *arg)
                     g_remote_override = false;
                     g_manual_fan_speed = 4;
                 }
+                SmartHome_SetFanSpeed(g_remote_override ? g_remote_fan_speed : g_manual_fan_speed);
+                Ui_RefreshFanCardImmediate();
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
                 g_remote_override = false;
                 g_k3_muted_latch = true;
                 g_alarm_test_active = false;
                 SmartHome_ResetAlarmState();
+                Ui_RefreshFanCardImmediate();
             } else if (strcmp(cmd.target, "system") == 0 && strcmp(cmd.action, "reboot") == 0) {
                 HttpClient_AckCommand(cmd.command_id, "done", "system reboot acknowledged");
                 SmartHome_Reboot();
             }
 
             HttpClient_AckCommand(cmd.command_id, "done", "executed on rk2206");
+
+            // 关键优化：指令执行完毕后立即上报一次全量最新遥测，实现毫秒级双向闭环同步！
+            TelemetryData fast_telem;
+            memset(&fast_telem, 0, sizeof(fast_telem));
+            strncpy(fast_telem.device_id, CLOUD_DEVICE_ID, sizeof(fast_telem.device_id) - 1);
+            fast_telem.temperature = g_report.temperature;
+            fast_telem.humidity = g_report.humidity;
+            fast_telem.lux = g_report.lux;
+            fast_telem.gas_ppm = g_report.gas_ppm;
+            fast_telem.motor_on = (SmartHome_GetFanDuty() > 0) ? 1 : 0;
+            fast_telem.alarm_on = ((g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch) ? 1 : 0;
+            fast_telem.accel_x = g_mpu_data.accel_x;
+            fast_telem.accel_y = g_mpu_data.accel_y;
+            fast_telem.accel_z = g_mpu_data.accel_z;
+            fast_telem.pitch = g_mpu_data.pitch;
+            fast_telem.roll = g_mpu_data.roll;
+            fast_telem.fan_speed = SmartHome_GetFanSpeed();
+            fast_telem.wdt_alive = 1;
+            strncpy(fast_telem.i2c_devices, g_i2c_device_str, sizeof(fast_telem.i2c_devices) - 1);
+            strncpy(fast_telem.last_key, g_last_key_name, sizeof(fast_telem.last_key) - 1);
+            HttpClient_PostTelemetry(&fast_telem);
         }
 
-        LOS_Msleep(1200);
+        LOS_Msleep(250);
     }
     return NULL;
 }
@@ -556,6 +578,27 @@ static void *KeyTask(void *arg)
                 default:
                     break;
             }
+
+            // 按键动作后立即上报一次遥测，让 Web 端大屏瞬间感知按键交互
+            TelemetryData key_telem;
+            memset(&key_telem, 0, sizeof(key_telem));
+            strncpy(key_telem.device_id, CLOUD_DEVICE_ID, sizeof(key_telem.device_id) - 1);
+            key_telem.temperature = g_report.temperature;
+            key_telem.humidity = g_report.humidity;
+            key_telem.lux = g_report.lux;
+            key_telem.gas_ppm = g_report.gas_ppm;
+            key_telem.motor_on = (SmartHome_GetFanDuty() > 0) ? 1 : 0;
+            key_telem.alarm_on = ((g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch) ? 1 : 0;
+            key_telem.accel_x = g_mpu_data.accel_x;
+            key_telem.accel_y = g_mpu_data.accel_y;
+            key_telem.accel_z = g_mpu_data.accel_z;
+            key_telem.pitch = g_mpu_data.pitch;
+            key_telem.roll = g_mpu_data.roll;
+            key_telem.fan_speed = SmartHome_GetFanSpeed();
+            key_telem.wdt_alive = 1;
+            strncpy(key_telem.i2c_devices, g_i2c_device_str, sizeof(key_telem.i2c_devices) - 1);
+            strncpy(key_telem.last_key, g_last_key_name, sizeof(key_telem.last_key) - 1);
+            HttpClient_PostTelemetry(&key_telem);
         }
 
         LOS_Msleep(10);

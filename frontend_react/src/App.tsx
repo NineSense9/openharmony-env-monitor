@@ -11,7 +11,7 @@ import { sendRemoteCommand } from './services/api';
 import { Cpu, Box } from 'lucide-react';
 
 export function App() {
-  const { telemetry, history, systemState, setSystemState, logs, addLog } = useTelemetry();
+  const { telemetry, history, systemState, setSystemState, setOptimisticFanSpeed, logs, addLog } = useTelemetry();
   const [activeCenterTab, setActiveCenterTab] = useState<'board' | 'cabin'>('board');
 
   const handleBoardKeyTrigger = async (key: 'K3' | 'K4' | 'K5' | 'K6') => {
@@ -37,12 +37,13 @@ export function App() {
         3: 'speed_3',
         4: 'auto'
       };
+      setOptimisticFanSpeed(nextSpeed);
+      setSystemState(prev => ({ ...prev, lastKey: 'K4' }));
       await sendRemoteCommand({
         device_id: 'rk2206-station-01',
         target: 'fan',
         action: actionMap[nextSpeed] as any
       });
-      setSystemState(prev => ({ ...prev, fanSpeed: nextSpeed, isMotorRunning: nextSpeed > 0, lastKey: 'K4' }));
       addLog(`[COMMAND ACK] K4 档位已循环切换至 L${nextSpeed}`, 'cmd');
     } else if (key === 'K5') {
       setSystemState(prev => ({ ...prev, lastKey: 'K5' }));
@@ -123,6 +124,7 @@ export function App() {
           <ControlPanel 
             systemState={systemState} 
             setSystemState={setSystemState} 
+            setOptimisticFanSpeed={setOptimisticFanSpeed}
             addLog={addLog} 
           />
           <EventFeed logs={logs} />

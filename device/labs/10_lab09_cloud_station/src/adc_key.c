@@ -60,6 +60,10 @@ static AdcKeyType adc_voltage_to_key(float v)
     return KEY_NONE;
 }
 
+static uint32_t s_k3_press_ticks = 0;
+static bool s_k3_long_1s_fired = false;
+static bool s_k3_long_3s_fired = false;
+
 AdcKeyType AdcKey_Scan(void)
 {
     AdcKeyType current_raw = KEY_NONE;
@@ -96,10 +100,34 @@ AdcKeyType AdcKey_Scan(void)
             // 按键初次按下边沿触发 (Leading Edge Trigger) - 零延迟响应！
             if (current_raw != KEY_NONE && s_confirmed_key == KEY_NONE) {
                 triggered = current_raw;
+                s_k3_press_ticks = 0;
+                s_k3_long_1s_fired = false;
+                s_k3_long_3s_fired = false;
                 printf("[adc_key] Press Triggered %s (voltage: %.2fV)\n", AdcKey_GetName(triggered), s_last_voltage);
             }
             s_confirmed_key = current_raw;
         }
+    }
+
+    // 板载按键长按检测逻辑 (针对单物理键实现多功能复用)
+    if (s_confirmed_key == KEY_K3) {
+        s_k3_press_ticks++;
+        // 长按 > 1.2 秒：触发告警声光自检模式 (K5 功能)
+        if (s_k3_press_ticks >= 120 && !s_k3_long_1s_fired) {
+            s_k3_long_1s_fired = true;
+            triggered = KEY_K5;
+            printf("[adc_key] K3 Hold > 1.2s -> Trigger K5 Alarm Test!\n");
+        }
+        // 长按 > 3.0 秒：触发 I2C 总线拓扑动态重扫 (K6 功能)
+        else if (s_k3_press_ticks >= 300 && !s_k3_long_3s_fired) {
+            s_k3_long_3s_fired = true;
+            triggered = KEY_K6;
+            printf("[adc_key] K3 Hold > 3.0s -> Trigger K6 I2C Rescan!\n");
+        }
+    } else {
+        s_k3_press_ticks = 0;
+        s_k3_long_1s_fired = false;
+        s_k3_long_3s_fired = false;
     }
 
     return triggered;
