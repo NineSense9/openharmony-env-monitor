@@ -4,6 +4,7 @@
 
 #include "ohos_init.h"
 #include "los_task.h"
+#include "los_mux.h"
 #include "wifi_device.h"
 #include "config_network.h"
 
@@ -13,6 +14,11 @@
 #include "mpu6050.h"
 #include "http_client.h"
 #include "lcd.h"
+
+// LCD 硬件总线互斥锁与风机 UI 极速刷新标记
+static UINT32 g_lcd_mutex = 0;
+static bool g_lcd_mutex_created = false;
+static volatile bool g_fan_ui_dirty = true;
 
 // 全局传感器与状态结构体
 static SensorReport g_report = {
@@ -143,7 +149,128 @@ static void *SensorTask(void *arg)
     return NULL;
 }
 
-// 3. UI 极致航天 HUD 刷新任务 (200ms)
+// 局部快速渲染第三象限：多档位风扇控制卡片 (X: 4 ~ 158, Y: 120 ~ 188)
+static void Ui_RenderFanActuatorCard(int cur_speed, int cur_duty, int preview_target_speed)
+{
+    char line_buf[64];
+
+    lcd_draw_rectangle(4, 120, 158, 188, LCD_GRAYBLUE);
+    lcd_fill(5, 121, 157, 134, LCD_DARKBLUE);
+    lcd_show_string(8, 121, (uint8_t *)"[FAN ACTUATOR]", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+
+    if (preview_target_speed >= 0) {
+        if (preview_target_speed == 4) {
+            snprintf(line_buf, sizeof(line_buf), "SET:->AUTO (TAP)");
+        } else {
+            snprintf(line_buf, sizeof(line_buf), "SET:->L%d   (TAP)", preview_target_speed);
+        }
+        lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_YELLOW, LCD_BLACK, 16, 0);
+    } else {
+        if (cur_speed == 4) {
+            snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
+        } else {
+            snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
+        }
+        lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+    }
+
+    // 五档微型交互胶囊指示 [0][1][2][3][A]
+    const char *caps[] = {"0", "1", "2", "3", "A"};
+    for (int c = 0; c < 5; c++) {
+        int cx = 10 + c * 29;
+        bool active = (cur_speed == c);
+        bool target = (preview_target_speed == c);
+        uint16_t bg = active ? LCD_GREEN : (target ? LCD_YELLOW : LCD_DARKBLUE);
+        uint16_t fg = active ? LCD_BLACK : (target ? LCD_BLACK : LCD_WHITE);
+        lcd_fill(cx, 156, cx + 24, 168, bg);
+        lcd_draw_rectangle(cx, 156, cx + 24, 168, (active || target) ? LCD_WHITE : LCD_GRAY);
+        lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], fg, bg, 12, 0);
+    }
+
+    // 状态文字 (局部整行黑色清屏，彻底消灭切换时的残影字符)
+    lcd_fill(8, 170, 156, 187, LCD_BLACK);
+    if (g_remote_override) {
+        lcd_show_chinese(8, 172, (uint8_t *)"远控", LCD_MAGENTA, LCD_BLACK, 16, 0);
+        lcd_show_string(42, 172, (uint8_t *)"REMOTE OVERRIDE", LCD_MAGENTA, LCD_BLACK, 12, 0);
+    } else if (g_k3_muted_latch) {
+        lcd_show_chinese(8, 172, (uint8_t *)"静音", LCD_CYAN, LCD_BLACK, 16, 0);
+        lcd_show_string(42, 172, (uint8_t *)"MUTED LATCHED  ", LCD_CYAN, LCD_BLACK, 12, 0);
+    } else if (g_report.alarm_active || g_alarm_test_active) {
+        lcd_show_chinese(8, 172, (uint8_t *)"警报", LCD_RED, LCD_BLACK, 16, 0);
+        lcd_show_string(42, 172, (uint8_t *)"ALARM CRITICAL ", LCD_RED, LCD_BLACK, 12, 0);
+    } else {
+        lcd_show_chinese(8, 172, (uint8_t *)"正常", LCD_GREEN, LCD_BLACK, 16, 0);
+        lcd_show_string(42, 172, (uint8_t *)"NORMAL MONITOR ", LCD_GREEN, LCD_BLACK, 12, 0);
+    }
+}
+
+// 快速更新底部风机运行状态
+static void Ui_UpdateFanBottomHud(int cur_speed, int cur_duty)
+{
+    if (!AdcKey_IsPhysicalPressed() && g_action_banner_ticks == 0 &&
+        !g_alarm_test_active && !g_report.alarm_active && !g_k3_muted_latch && !g_remote_override) {
+        char line_buf[64];
+        lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
+        const char *spd_names[] = {"OFF", "LOW", "MED", "HIGH", "AUTO"};
+        snprintf(line_buf, sizeof(line_buf), "[RUN] FAN: L%d %-4s %2d%% [TAP:CYCLE]", cur_speed, spd_names[cur_speed], cur_duty);
+        lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_WHITE, LCD_DARKBLUE, 16, 0);
+    }
+}
+
+// 专用高频风机模式与档位极速刷新任务 (10ms 循环，按键切换瞬间零延迟直出)
+static void *FanModeUiTask(void *arg)
+{
+    (void)arg;
+    static int last_speed = -1;
+    static int last_duty = -1;
+    static int last_preview = -2;
+    static int last_state = -1;
+
+    // 等待开机引导动画完成
+    LOS_Msleep(1200);
+
+    while (1) {
+        int cur_speed = SmartHome_GetFanSpeed();
+        int cur_duty = SmartHome_GetFanDuty();
+
+        bool is_pressing = AdcKey_IsPhysicalPressed();
+        uint32_t hold_ms = AdcKey_GetHoldDurationMs();
+        int preview_target_speed = -1;
+        if (is_pressing && hold_ms < 1000) {
+            preview_target_speed = (cur_speed + 1) % 5;
+        }
+
+        int cur_state = 0;
+        if (g_remote_override) cur_state = 1;
+        else if (g_k3_muted_latch) cur_state = 2;
+        else if (g_report.alarm_active || g_alarm_test_active) cur_state = 3;
+
+        if (g_fan_ui_dirty ||
+            cur_speed != last_speed ||
+            cur_duty != last_duty ||
+            preview_target_speed != last_preview ||
+            cur_state != last_state) {
+
+            last_speed = cur_speed;
+            last_duty = cur_duty;
+            last_preview = preview_target_speed;
+            last_state = cur_state;
+            g_fan_ui_dirty = false;
+
+            if (g_lcd_mutex_created) {
+                LOS_MuxPend(g_lcd_mutex, LOS_WAIT_FOREVER);
+                Ui_RenderFanActuatorCard(cur_speed, cur_duty, preview_target_speed);
+                Ui_UpdateFanBottomHud(cur_speed, cur_duty);
+                LOS_MuxPost(g_lcd_mutex);
+            }
+        }
+
+        LOS_Msleep(10);
+    }
+    return NULL;
+}
+
+// 3. UI 极致航天 HUD 刷新任务 (80ms)
 static void *UiTask(void *arg)
 {
     (void)arg;
@@ -155,6 +282,10 @@ static void *UiTask(void *arg)
 
     while (1) {
         tick_toggle ^= 1;
+
+        if (g_lcd_mutex_created) {
+            LOS_MuxPend(g_lcd_mutex, LOS_WAIT_FOREVER);
+        }
 
         // ==========================================
         // 顶部 HUD 科技顶栏 (Y: 0 ~ 22)
@@ -243,64 +374,15 @@ static void *UiTask(void *arg)
         // ==========================================
         // 第三象限：多档位风扇控制卡片 (X: 4 ~ 158, Y: 120 ~ 188)
         // ==========================================
-        lcd_draw_rectangle(4, 120, 158, 188, LCD_GRAYBLUE);
-        lcd_fill(5, 121, 157, 134, LCD_DARKBLUE);
-        lcd_show_string(8, 121, (uint8_t *)"[FAN ACTUATOR]", LCD_CYAN, LCD_DARKBLUE, 16, 0);
-
         int cur_speed = SmartHome_GetFanSpeed();
         int cur_duty = SmartHome_GetFanDuty();
-
         bool is_pressing = AdcKey_IsPhysicalPressed();
         uint32_t hold_ms = AdcKey_GetHoldDurationMs();
         int preview_target_speed = -1;
         if (is_pressing && hold_ms < 1000) {
             preview_target_speed = (cur_speed + 1) % 5;
         }
-
-        if (preview_target_speed >= 0) {
-            if (preview_target_speed == 4) {
-                snprintf(line_buf, sizeof(line_buf), "SET:->AUTO (TAP)");
-            } else {
-                snprintf(line_buf, sizeof(line_buf), "SET:->L%d   (TAP)", preview_target_speed);
-            }
-            lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_YELLOW, LCD_BLACK, 16, 0);
-        } else {
-            if (cur_speed == 4) {
-                snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
-            } else {
-                snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
-            }
-            lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
-        }
-
-        // 五档微型交互胶囊指示 [0][1][2][3][A]
-        const char *caps[] = {"0", "1", "2", "3", "A"};
-        for (int c = 0; c < 5; c++) {
-            int cx = 10 + c * 29;
-            bool active = (cur_speed == c);
-            bool target = (preview_target_speed == c);
-            uint16_t bg = active ? LCD_GREEN : (target ? LCD_YELLOW : LCD_DARKBLUE);
-            uint16_t fg = active ? LCD_BLACK : (target ? LCD_BLACK : LCD_WHITE);
-            lcd_fill(cx, 156, cx + 24, 168, bg);
-            lcd_draw_rectangle(cx, 156, cx + 24, 168, (active || target) ? LCD_WHITE : LCD_GRAY);
-            lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], fg, bg, 12, 0);
-        }
-
-        // 状态文字 (局部整行黑色清屏，彻底消灭切换时的残影字符)
-        lcd_fill(8, 170, 156, 187, LCD_BLACK);
-        if (g_remote_override) {
-            lcd_show_chinese(8, 172, (uint8_t *)"远控", LCD_MAGENTA, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"REMOTE OVERRIDE", LCD_MAGENTA, LCD_BLACK, 12, 0);
-        } else if (g_k3_muted_latch) {
-            lcd_show_chinese(8, 172, (uint8_t *)"静音", LCD_CYAN, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"MUTED LATCHED  ", LCD_CYAN, LCD_BLACK, 12, 0);
-        } else if (g_report.alarm_active || g_alarm_test_active) {
-            lcd_show_chinese(8, 172, (uint8_t *)"警报", LCD_RED, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"ALARM CRITICAL ", LCD_RED, LCD_BLACK, 12, 0);
-        } else {
-            lcd_show_chinese(8, 172, (uint8_t *)"正常", LCD_GREEN, LCD_BLACK, 16, 0);
-            lcd_show_string(42, 172, (uint8_t *)"NORMAL MONITOR ", LCD_GREEN, LCD_BLACK, 12, 0);
-        }
+        Ui_RenderFanActuatorCard(cur_speed, cur_duty, preview_target_speed);
 
         // ==========================================
         // 第四象限：K3 复合控制微动开关与 I2C 总线卡片 (X: 162 ~ 316, Y: 120 ~ 188)
@@ -314,10 +396,10 @@ static void *UiTask(void *arg)
         lcd_fill(166, 138, 312, 152, is_k3_down ? LCD_YELLOW : LCD_DARKBLUE);
         lcd_draw_rectangle(166, 138, 312, 152, is_k3_down ? LCD_WHITE : LCD_GRAYBLUE);
         if (is_k3_down) {
-            uint32_t hold_ms = AdcKey_GetHoldDurationMs();
-            if (hold_ms < 1000) {
+            uint32_t hold_ms_k3 = AdcKey_GetHoldDurationMs();
+            if (hold_ms_k3 < 1000) {
                 lcd_show_string(170, 138, (uint8_t *)">> K3: FAN CYCLE <<", LCD_BLACK, LCD_YELLOW, 12, 0);
-            } else if (hold_ms < 2500) {
+            } else if (hold_ms_k3 < 2500) {
                 lcd_show_string(170, 138, (uint8_t *)">> K3: ALARM TEST <<", LCD_BLACK, LCD_YELLOW, 12, 0);
             } else {
                 lcd_show_string(170, 138, (uint8_t *)">> K3: I2C RESCAN <<", LCD_BLACK, LCD_YELLOW, 12, 0);
@@ -342,24 +424,24 @@ static void *UiTask(void *arg)
 
         // 底部功能与操作状态栏 (Y: 216 ~ 238，松手即触发模式，实时进度条直观感知)
         if (AdcKey_IsPhysicalPressed()) {
-            uint32_t hold_ms = AdcKey_GetHoldDurationMs();
+            uint32_t hold_ms_bar = AdcKey_GetHoldDurationMs();
             lcd_fill(0, 216, LCD_W, LCD_H, LCD_DARKBLUE);
-            int p_w = (int)((hold_ms / 2500.0f) * 314);
+            int p_w = (int)((hold_ms_bar / 2500.0f) * 314);
             if (p_w > 314) p_w = 314;
-            uint16_t bar_c = (hold_ms >= 1000) ? ((hold_ms >= 2500) ? LCD_GREEN : LCD_YELLOW) : LCD_CYAN;
+            uint16_t bar_c = (hold_ms_bar >= 1000) ? ((hold_ms_bar >= 2500) ? LCD_GREEN : LCD_YELLOW) : LCD_CYAN;
             lcd_fill(2, 217, 2 + p_w, 237, bar_c);
             lcd_draw_rectangle(2, 217, 317, 237, LCD_WHITE);
-            if (hold_ms < 1000) {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:FAN L%d]", hold_ms * 0.001f, (SmartHome_GetFanSpeed() + 1) % 5);
+            if (hold_ms_bar < 1000) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:FAN L%d]", hold_ms_bar * 0.001f, (SmartHome_GetFanSpeed() + 1) % 5);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
-            } else if (hold_ms < 2500) {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:ALARM TEST]", hold_ms * 0.001f);
+            } else if (hold_ms_bar < 2500) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:ALARM TEST]", hold_ms_bar * 0.001f);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
-            } else if (hold_ms <= 5000) {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:I2C RESCAN]", hold_ms * 0.001f);
+            } else if (hold_ms_bar <= 5000) {
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:I2C RESCAN]", hold_ms_bar * 0.001f);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_BLACK, bar_c, 16, 0);
             } else {
-                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:CANCEL]", hold_ms * 0.001f);
+                snprintf(line_buf, sizeof(line_buf), "HOLD %.1fs -> [RELEASE:CANCEL]", hold_ms_bar * 0.001f);
                 lcd_show_string(6, 220, (uint8_t *)line_buf, LCD_WHITE, LCD_RED, 16, 0);
             }
         } else if (g_action_banner_ticks > 0) {
@@ -389,7 +471,11 @@ static void *UiTask(void *arg)
             }
         }
 
-        LOS_Msleep(25);
+        if (g_lcd_mutex_created) {
+            LOS_MuxPost(g_lcd_mutex);
+        }
+
+        LOS_Msleep(80);
     }
     return NULL;
 }
@@ -489,6 +575,7 @@ static void *CommandTask(void *arg)
                 SmartHome_SetFanSpeed(g_remote_override ? g_remote_fan_speed : g_manual_fan_speed);
                 snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] FAN -> %s", cmd.action);
                 g_action_banner_ticks = 30;
+                g_fan_ui_dirty = true;
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
                 g_remote_override = false;
                 g_k3_muted_latch = true;
@@ -496,8 +583,12 @@ static void *CommandTask(void *arg)
                 SmartHome_ResetAlarmState();
                 snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] ALARM MUTED");
                 g_action_banner_ticks = 30;
+                g_fan_ui_dirty = true;
             } else if (strcmp(cmd.target, "system") == 0 && strcmp(cmd.action, "reboot") == 0) {
                 HttpClient_AckCommand(cmd.command_id, "done", "system reboot acknowledged");
+                if (g_lcd_mutex_created) {
+                    LOS_MuxPend(g_lcd_mutex, LOS_WAIT_FOREVER);
+                }
                 lcd_fill(30, 70, 290, 170, LCD_DARKBLUE);
                 lcd_draw_rectangle(30, 70, 290, 170, LCD_RED);
                 lcd_draw_rectangle(32, 72, 288, 168, LCD_YELLOW);
@@ -559,6 +650,7 @@ static void *KeyTask(void *arg)
                         SmartHome_ResetAlarmState();
                         snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] MUTE ALARM / RESET");
                         g_action_banner_ticks = 30;
+                        g_fan_ui_dirty = true;
                         printf("[key] >>> Key Click: Mute Alarm / Reset State <<<\n");
                     } else {
                         g_remote_override = false;
@@ -568,6 +660,7 @@ static void *KeyTask(void *arg)
                         snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] FAN -> L%d (%d%%)",
                                  g_manual_fan_speed, SmartHome_GetFanDuty());
                         g_action_banner_ticks = 30;
+                        g_fan_ui_dirty = true;
                         printf("[key] >>> Key Click: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
                                g_manual_fan_speed, SmartHome_GetFanDuty());
                     }
@@ -585,6 +678,7 @@ static void *KeyTask(void *arg)
                         snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[ACTION] ALARM TEST STARTED!");
                     }
                     g_action_banner_ticks = 30;
+                    g_fan_ui_dirty = true;
                     printf("[key] >>> Key Hold 1.2s: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
                     break;
 
@@ -617,6 +711,12 @@ static void *MainStationTask(void *arg)
     printf("===== Lockzhiner RK2206 Space Station Advanced =====\n");
     printf("====================================================\n");
 
+    // 初始化全局 LCD 硬件互斥锁
+    if (!g_lcd_mutex_created) {
+        LOS_MuxCreate(&g_lcd_mutex);
+        g_lcd_mutex_created = true;
+    }
+
     // 初始化各硬件驱动与传感器
     SmartHome_Init();
     AdcKey_Init();
@@ -638,12 +738,20 @@ static void *MainStationTask(void *arg)
     task_param.usTaskPrio = 3;
     LOS_TaskCreate(&task_id, &task_param);
 
-    // 2. UiTask (优先级 4，高优先级流畅渲染 320x240 LCD 航天 HUD，绝不被网络通信阻塞)
+    // 2. FanModeUiTask (优先级 3，极速专用模式刷新任务，10ms 循环，毫秒级即时响应)
+    memset(&task_param, 0, sizeof(task_param));
+    task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)FanModeUiTask;
+    task_param.uwStackSize = 4096;
+    task_param.pcName = "FanModeUiTask";
+    task_param.usTaskPrio = 3;
+    LOS_TaskCreate(&task_id, &task_param);
+
+    // 3. UiTask (优先级 5，高精航天全屏 HUD 刷新任务)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)UiTask;
     task_param.uwStackSize = 4096;
     task_param.pcName = "UiTask";
-    task_param.usTaskPrio = 4;
+    task_param.usTaskPrio = 5;
     LOS_TaskCreate(&task_id, &task_param);
 
     // 3. NetMonitorTask (优先级 9，后台网络监控)
