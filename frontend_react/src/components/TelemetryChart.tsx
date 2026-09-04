@@ -133,10 +133,10 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({ history }) => {
         top: 0
       },
       grid: {
-        top: 36,
-        left: 50,
-        right: 50,
-        bottom: 24
+        top: 28,
+        left: 45,
+        right: 45,
+        bottom: 20
       },
       xAxis: {
         type: 'category',
@@ -150,8 +150,8 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({ history }) => {
   };
 
   return (
-    <div className="glass-panel rounded-xl p-4 flex flex-col h-[300px]">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+    <div className="glass-panel rounded-xl p-3 flex flex-col h-[220px]">
+      <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-[#00F0FF]" />
           <span className="font-hud text-sm font-bold text-slate-200 tracking-wider">
@@ -161,7 +161,7 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({ history }) => {
         <div className="flex items-center gap-1.5 bg-slate-900/80 p-0.5 rounded-lg border border-slate-800">
           <button
             onClick={() => setMode('temp_humi')}
-            className={`px-3 py-1 rounded text-xs font-hud transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-hud transition-all ${
               mode === 'temp_humi'
                 ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40 shadow-[0_0_8px_rgba(0,240,255,0.2)]'
                 : 'text-slate-400 hover:text-slate-200'
@@ -171,7 +171,7 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({ history }) => {
           </button>
           <button
             onClick={() => setMode('gas_lux')}
-            className={`px-3 py-1 rounded text-xs font-hud transition-all ${
+            className={`px-2.5 py-0.5 rounded text-xs font-hud transition-all ${
               mode === 'gas_lux'
                 ? 'bg-[#00F0FF]/20 text-[#00F0FF] border border-[#00F0FF]/40 shadow-[0_0_8px_rgba(0,240,255,0.2)]'
                 : 'text-slate-400 hover:text-slate-200'
@@ -182,7 +182,7 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({ history }) => {
         </div>
       </div>
 
-      <div className="flex-1 w-full pt-2">
+      <div className="flex-1 w-full pt-1">
         <ReactECharts option={getOption()} style={{ height: '100%', width: '100%' }} notMerge={true} />
       </div>
     </div>
