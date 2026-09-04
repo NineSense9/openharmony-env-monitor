@@ -307,22 +307,22 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_fill(0, 192, LCD_W, 214, LCD_DARKBLUE);
         lcd_draw_line(0, 192, 319, 192, LCD_CYAN);
-        snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [500ms]", g_cloud_upload_count, g_cloud_fail_count);
+        snprintf(line_buf, sizeof(line_buf), "UPLINK: OK=%-4d ERR=%-2d  [1.2s]", g_cloud_upload_count, g_cloud_fail_count);
         lcd_show_string(8, 196, (uint8_t *)line_buf, (g_cloud_upload_count > 0) ? LCD_GREEN : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 底部按键提示胶囊 (K3消警复位 / K4极速调速 / K5告警自检 / K6拓扑重扫)
+        // 底部按键提示胶囊 (K3调速/消警 / K4极速调速 / K5告警自检 / K6拓扑重扫)
         lcd_fill(0, 216, LCD_W, LCD_H, LCD_BLACK);
-        lcd_show_string(4, 220, (uint8_t *)"[K3:MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
-        lcd_show_string(84, 220, (uint8_t *)"[K4:FAN]", LCD_GREEN, LCD_BLACK, 16, 0);
-        lcd_show_string(160, 220, (uint8_t *)"[K5:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
-        lcd_show_string(240, 220, (uint8_t *)"[K6:SCAN]", LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
+        lcd_show_string(4, 220, (uint8_t *)"[K3:FAN/MUTE]", LCD_CYAN, LCD_BLACK, 16, 0);
+        lcd_show_string(114, 220, (uint8_t *)"[K4:FAN]", LCD_GREEN, LCD_BLACK, 16, 0);
+        lcd_show_string(184, 220, (uint8_t *)"[K5:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
+        lcd_show_string(254, 220, (uint8_t *)"[K6:SCAN]", LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
 
         LOS_Msleep(200);
     }
     return NULL;
 }
 
-// 4. 极速遥测上报任务 (500ms 周期，上报完整全量状态)
+// 4. 极速遥测上报任务 (1200ms 周期，上报完整全量状态)
 static void *TelemetryTask(void *arg)
 {
     (void)arg;
@@ -365,12 +365,12 @@ static void *TelemetryTask(void *arg)
             g_cloud_fail_count++;
         }
 
-        LOS_Msleep(500);
+        LOS_Msleep(1200);
     }
     return NULL;
 }
 
-// 5. 极速指令拉取与多外设控制响应任务 (200ms)
+// 5. 极速指令拉取与多外设控制响应任务 (1200ms 错峰轮询)
 static void *CommandTask(void *arg)
 {
     (void)arg;
@@ -379,7 +379,8 @@ static void *CommandTask(void *arg)
         LOS_Msleep(200);
     }
 
-    LOS_Msleep(1200);
+    // 初始等待 1800ms，与 TelemetryTask 错峰执行，避免套接字争抢
+    LOS_Msleep(1800);
 
     while (1) {
         RemoteCommand cmd;
@@ -419,7 +420,7 @@ static void *CommandTask(void *arg)
             HttpClient_AckCommand(cmd.command_id, "done", "executed on rk2206");
         }
 
-        LOS_Msleep(200);
+        LOS_Msleep(1200);
     }
     return NULL;
 }
@@ -471,7 +472,24 @@ void Ui_RefreshFanCardImmediate(void)
     }
 }
 
-// 7. 按键检测与物理交互任务 (极速按键检测与分工明确：K3消警复位 / K4风扇调速 / K5告警自检 / K6拓扑重扫)
+// 极速刷新按键卡片与矩阵高亮 (< 20ms 交互响应)
+void Ui_RefreshKeyCardImmediate(void)
+{
+    const char *k_labels[] = {"K3", "K4", "K5", "K6"};
+    for (int k = 0; k < 4; k++) {
+        int kx = 168 + k * 36;
+        bool k_act = (strcmp(g_last_key_name, k_labels[k]) == 0);
+        lcd_fill(kx, 138, kx + 32, 150, k_act ? LCD_YELLOW : LCD_DARKBLUE);
+        lcd_draw_rectangle(kx, 138, kx + 32, 150, k_act ? LCD_WHITE : LCD_GRAYBLUE);
+        lcd_show_string(kx + 8, 138, (uint8_t *)k_labels[k], k_act ? LCD_BLACK : LCD_CYAN, k_act ? LCD_YELLOW : LCD_DARKBLUE, 12, 0);
+    }
+
+    char line_buf[32];
+    snprintf(line_buf, sizeof(line_buf), "ADC5:%.2fV  KEY:%-4s", AdcKey_GetVoltage(), g_last_key_name);
+    lcd_show_string(166, 154, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+}
+
+// 7. 按键检测与物理交互任务 (极速按键检测与分工明确：K3调速/消警 / K4调速 / K5自检 / K6重扫)
 static void *KeyTask(void *arg)
 {
     (void)arg;
@@ -483,12 +501,25 @@ static void *KeyTask(void *arg)
 
             switch (k) {
                 case KEY_K3:
-                    // K3: 本地消警与安全复位 (MUTE & RESET)
-                    g_k3_muted_latch = true;
-                    g_alarm_test_active = false;
-                    g_remote_override = false;
-                    SmartHome_ResetAlarmState();
-                    printf("[key] >>> K3 Pressed: Mute Alarm / Reset State <<<\n");
+                    // K3 (板载物理按键 PC7): 双重功能
+                    // 若处于告警状态 -> 触发消警与安全复位 (MUTE & RESET)
+                    // 若处于正常状态 -> 循环切换风机档位 (0 -> 1 -> 2 -> 3 -> AUTO)
+                    if (g_report.alarm_active || g_alarm_test_active) {
+                        g_k3_muted_latch = true;
+                        g_alarm_test_active = false;
+                        g_remote_override = false;
+                        SmartHome_ResetAlarmState();
+                        printf("[key] >>> K3 Pressed: Mute Alarm / Reset State <<<\n");
+                    } else {
+                        g_remote_override = false;
+                        g_k3_muted_latch = false;
+                        g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
+                        SmartHome_SetFanSpeed(g_manual_fan_speed);
+                        Ui_RefreshFanCardImmediate(); // < 20ms 极速刷新 LCD 档位与胶囊！
+                        printf("[key] >>> K3 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
+                               g_manual_fan_speed, SmartHome_GetFanDuty());
+                    }
+                    Ui_RefreshKeyCardImmediate();
                     break;
 
                 case KEY_K4:
@@ -497,6 +528,7 @@ static void *KeyTask(void *arg)
                     g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
                     SmartHome_SetFanSpeed(g_manual_fan_speed);
                     Ui_RefreshFanCardImmediate(); // < 20ms 极速刷新 LCD 档位与胶囊！
+                    Ui_RefreshKeyCardImmediate();
                     printf("[key] >>> K4 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
                            g_manual_fan_speed, SmartHome_GetFanDuty());
                     break;
@@ -510,12 +542,14 @@ static void *KeyTask(void *arg)
                     } else {
                         g_k3_muted_latch = false;
                     }
+                    Ui_RefreshKeyCardImmediate();
                     printf("[key] >>> K5 Pressed: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
                     break;
 
                 case KEY_K6:
                     // K6: I2C 总线拓扑动态重扫 (SCAN BUS)
                     printf("[key] >>> K6 Pressed: Rescan I2C Bus... <<<\n");
+                    Ui_RefreshKeyCardImmediate();
                     SmartHome_ScanI2cBus(g_i2c_device_str, sizeof(g_i2c_device_str));
                     break;
 

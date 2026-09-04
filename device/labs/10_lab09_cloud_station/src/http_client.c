@@ -6,6 +6,7 @@
 
 #include "los_task.h"
 #include "los_tick.h"
+#include "los_mux.h"
 #include "lz_hardware.h"
 
 #include "lwip/opt.h"
@@ -16,8 +17,15 @@
 #include "http_client.h"
 #include "board_pins.h"
 
+static UINT32 g_http_mux = 0;
+static bool g_http_mux_created = false;
+
 void HttpClient_Init(void)
 {
+    if (!g_http_mux_created) {
+        LOS_MuxCreate(&g_http_mux);
+        g_http_mux_created = true;
+    }
 }
 
 static int create_connected_socket(void)
@@ -28,9 +36,12 @@ static int create_connected_socket(void)
         return -1;
     }
 
+    int opt = 1;
+    lwip_setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
     struct timeval tv;
     tv.tv_sec = 1;
-    tv.tv_usec = 200000;
+    tv.tv_usec = 0;
     lwip_setsockopt(sfd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(tv));
     lwip_setsockopt(sfd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof(tv));
 
@@ -59,9 +70,13 @@ static int recv_full_http_response(int sfd, char *buf, int max_len)
             break;
         }
         total += n;
-        // 如果已经读取到了完整 JSON 正文的结束符 '}'，可提前退出
-        if (strstr(buf, "\r\n\r\n") != NULL && strchr(buf, '}') != NULL) {
-            break;
+        buf[total] = '\0';
+        // 如果已经读取到了完整 JSON 正文的结束符 '}' 或空对象 "null"，可立即提前退出
+        char *body_start = strstr(buf, "\r\n\r\n");
+        if (body_start != NULL) {
+            if (strchr(body_start, '}') != NULL || strstr(body_start, "null") != NULL) {
+                break;
+            }
         }
     }
     buf[total] = '\0';
@@ -72,8 +87,17 @@ int HttpClient_PostTelemetry(const TelemetryData *data)
 {
     if (!data) return -1;
 
+    if (g_http_mux_created) {
+        LOS_MuxPend(g_http_mux, LOS_WAIT_FOREVER);
+    }
+
     int sfd = create_connected_socket();
-    if (sfd < 0) return -1;
+    if (sfd < 0) {
+        if (g_http_mux_created) {
+            LOS_MuxPost(g_http_mux);
+        }
+        return -1;
+    }
 
     char body[512];
     snprintf(body, sizeof(body),
@@ -102,12 +126,19 @@ int HttpClient_PostTelemetry(const TelemetryData *data)
     if (sent <= 0) {
         printf("[http] send telemetry failed\n");
         lwip_close(sfd);
+        if (g_http_mux_created) {
+            LOS_MuxPost(g_http_mux);
+        }
         return -1;
     }
 
     char resp[256];
     int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
+
+    if (g_http_mux_created) {
+        LOS_MuxPost(g_http_mux);
+    }
 
     if (recvd > 0 && (strstr(resp, "200 OK") != NULL || strstr(resp, "HTTP/1.1 200") != NULL)) {
         return 0; // Success
@@ -120,8 +151,17 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
 {
     if (!cmd) return -1;
 
+    if (g_http_mux_created) {
+        LOS_MuxPend(g_http_mux, LOS_WAIT_FOREVER);
+    }
+
     int sfd = create_connected_socket();
-    if (sfd < 0) return -1;
+    if (sfd < 0) {
+        if (g_http_mux_created) {
+            LOS_MuxPost(g_http_mux);
+        }
+        return -1;
+    }
 
     char req[256];
     snprintf(req, sizeof(req),
@@ -130,11 +170,22 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
              "Connection: close\r\n\r\n",
              CLOUD_DEVICE_ID, CLOUD_SERVER_IP, CLOUD_SERVER_PORT);
 
-    lwip_send(sfd, req, strlen(req), 0);
+    int sent = lwip_send(sfd, req, strlen(req), 0);
+    if (sent <= 0) {
+        lwip_close(sfd);
+        if (g_http_mux_created) {
+            LOS_MuxPost(g_http_mux);
+        }
+        return -1;
+    }
 
     char resp[1024];
     int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
+
+    if (g_http_mux_created) {
+        LOS_MuxPost(g_http_mux);
+    }
 
     if (recvd <= 0) return -1;
 
@@ -182,8 +233,17 @@ int HttpClient_GetPendingCommand(RemoteCommand *cmd)
 
 int HttpClient_AckCommand(int command_id, const char *status, const char *note)
 {
+    if (g_http_mux_created) {
+        LOS_MuxPend(g_http_mux, LOS_WAIT_FOREVER);
+    }
+
     int sfd = create_connected_socket();
-    if (sfd < 0) return -1;
+    if (sfd < 0) {
+        if (g_http_mux_created) {
+            LOS_MuxPost(g_http_mux);
+        }
+        return -1;
+    }
 
     char body[128];
     snprintf(body, sizeof(body),
@@ -205,6 +265,10 @@ int HttpClient_AckCommand(int command_id, const char *status, const char *note)
     char resp[256];
     int recvd = recv_full_http_response(sfd, resp, sizeof(resp));
     lwip_close(sfd);
+
+    if (g_http_mux_created) {
+        LOS_MuxPost(g_http_mux);
+    }
 
     printf("[http] ack command id=%d response len=%d\n", command_id, recvd);
     return (recvd > 0) ? 0 : -1;

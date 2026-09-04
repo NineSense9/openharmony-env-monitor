@@ -33,12 +33,12 @@ void AdcKey_Init(void)
     ulValue |= ((0x1 << 4) << 16);
     *pGrfSocCon29 = ulValue;
 
-    // 兼容初始化 PC7 数字引脚
-    PinctrlSet(TX_GPIO_KEY_K3, MUX_FUNC0, PULL_UP, DRIVE_LEVEL3);
+    // 严谨按照 Lab02 可行基线初始化 PC7 板载物理按键
     LzGpioInit(TX_GPIO_KEY_K3);
+    PinctrlSet(TX_GPIO_KEY_K3, MUX_FUNC0, PULL_KEEP, DRIVE_LEVEL0);
     LzGpioSetDir(TX_GPIO_KEY_K3, LZGPIO_DIR_IN);
 
-    printf("[adc_key] SARADC5 Key Matrix & PC7 Compatibility initialized\n");
+    printf("[adc_key] SARADC5 & GPIO0_PC7 Key subsystem initialized\n");
 }
 
 float AdcKey_GetVoltage(void)
@@ -48,15 +48,9 @@ float AdcKey_GetVoltage(void)
 
 static AdcKeyType adc_voltage_to_key(float v)
 {
-    // 底板原理图梯形电阻分压基准 (R17=10K 上拉至 3.3V)：
-    // K3 (R18 22R):  理论 ~0.01V  -> 判定范围 [0.00V, 0.25V)
-    // K4 (R21 2K):   理论 ~0.55V  -> 判定范围 [0.35V, 0.80V)
-    // K5 (R19 4.7K): 理论 ~1.05V  -> 判定范围 [0.85V, 1.35V)
-    // K6 (R20 10K):  理论 ~1.65V  -> 判定范围 [1.45V, 2.20V)
-    // 未按下: 上拉 3.3V (>= 2.60V) -> KEY_NONE
-    if (v >= 0.00f && v < 0.25f) {
-        return KEY_K3;
-    } else if (v >= 0.35f && v < 0.80f) {
+    // 重要：ADC5 悬空/未接梯形分压板时读数为 0.00V 或 3.3V
+    // 0.00V ~ 0.30V 必须返回 KEY_NONE，绝不能判定为有效按键，否则会导致 K3 永久锁死！
+    if (v >= 0.35f && v < 0.80f) {
         return KEY_K4;
     } else if (v >= 0.85f && v < 1.35f) {
         return KEY_K5;
@@ -70,21 +64,21 @@ AdcKeyType AdcKey_Scan(void)
 {
     AdcKeyType current_raw = KEY_NONE;
 
-    // 1. 优先读取 SARADC5 梯形分压电压 (可明确区分 K3/K4/K5/K6 四个物理键)
+    // 1. 优先读取底板真实物理按键 (GPIO0_PC7 低电平有效)
+    LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
+    if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
+        if (pc7_val == LZGPIO_LEVEL_LOW) {
+            current_raw = KEY_K3;
+        }
+    }
+
+    // 2. 同时采集 SARADC5 分压电压；若检测到有效外接梯形分压按键，则细化具体键位
     unsigned int raw_data = 0;
     if (LzSaradcReadValue(ADC_KEY_CHANNEL, &raw_data) == LZ_HARDWARE_SUCCESS) {
         s_last_voltage = (float)(raw_data * 3.3f / 1024.0f);
-        current_raw = adc_voltage_to_key(s_last_voltage);
-    }
-
-    // 2. 只有在 ADC5 未检测到按键 (电压 > 2.6V 处于释放态) 时，才检测独立数字引脚 PC7
-    // 这样可彻底杜绝 PC7 共享中断线路造成 K4/K5/K6 被误当成 K3 抢占的问题
-    if (current_raw == KEY_NONE) {
-        LzGpioValue pc7_val = LZGPIO_LEVEL_HIGH;
-        if (LzGpioGetVal(TX_GPIO_KEY_K3, &pc7_val) == LZ_HARDWARE_SUCCESS) {
-            if (pc7_val == LZGPIO_LEVEL_LOW) {
-                current_raw = KEY_K3;
-            }
+        AdcKeyType k_adc = adc_voltage_to_key(s_last_voltage);
+        if (k_adc != KEY_NONE) {
+            current_raw = k_adc;
         }
     }
 
