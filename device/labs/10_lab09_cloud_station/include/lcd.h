@@ -17,8 +17,8 @@
 
 #include <stdint.h>
 
-/* SMART-R LCD 旋转 180 度横屏，与主板丝印方向对齐 (0xA0) */
-#define USE_HORIZONTAL      3
+/* 正常横屏扫描 (0x60 = MX|MV)，基线与 lab01~lab08 保持一致，无 RAM 行偏移 */
+#define USE_HORIZONTAL      2
 
 /* 根据LCD是横屏或者竖屏，设置LCD的宽度和高度 */
 #if ((USE_HORIZONTAL==0) || (USE_HORIZONTAL==1))

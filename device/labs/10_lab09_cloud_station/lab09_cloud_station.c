@@ -31,6 +31,7 @@ static char g_last_key_name[16] = "NONE";
 static int g_cloud_upload_count = 0;
 static int g_cloud_fail_count = 0;
 static bool g_wifi_ready = false;
+static volatile bool g_fast_telemetry_needed = false;
 
 // K3 本地消警锁存：一旦按下 K3，保持静音，直到环境完全恢复正常后才自动解除静音
 static bool g_k3_muted_latch = false;
@@ -316,12 +317,12 @@ static void *UiTask(void *arg)
         lcd_show_string(116, 220, (uint8_t *)"[HOLD 1s:TEST]", LCD_YELLOW, LCD_BLACK, 16, 0);
         lcd_show_string(232, 220, (uint8_t *)"[HOLD 3s:I2C]", LCD_GREEN, LCD_BLACK, 16, 0);
 
-        LOS_Msleep(200);
+        LOS_Msleep(100);
     }
     return NULL;
 }
 
-// 4. 极速遥测上报任务 (800ms 周期，上报完整全量状态)
+// 4. 极速遥测上报任务 (基础 1000ms 周期，事件触发即刻快发)
 static void *TelemetryTask(void *arg)
 {
     (void)arg;
@@ -331,7 +332,7 @@ static void *TelemetryTask(void *arg)
         LOS_Msleep(200);
     }
 
-    LOS_Msleep(800);
+    LOS_Msleep(500);
 
     while (1) {
         bool real_motor_on = (SmartHome_GetFanDuty() > 0);
@@ -364,12 +365,20 @@ static void *TelemetryTask(void *arg)
             g_cloud_fail_count++;
         }
 
-        LOS_Msleep(800);
+        g_fast_telemetry_needed = false;
+
+        // 睡眠最多 1000ms，如遇按键/指令快发事件则在 100ms 内提前唤醒
+        for (int i = 0; i < 10; i++) {
+            LOS_Msleep(100);
+            if (g_fast_telemetry_needed) {
+                break;
+            }
+        }
     }
     return NULL;
 }
 
-// 5. 极速指令拉取与多外设控制响应任务 (250ms 极速响应 + 立即回传闭环)
+// 5. 极速指令拉取与多外设控制响应任务 (500ms 错峰轮询 + 事件快发标记)
 static void *CommandTask(void *arg)
 {
     (void)arg;
@@ -406,43 +415,21 @@ static void *CommandTask(void *arg)
                     g_manual_fan_speed = 4;
                 }
                 SmartHome_SetFanSpeed(g_remote_override ? g_remote_fan_speed : g_manual_fan_speed);
-                Ui_RefreshFanCardImmediate();
             } else if (strcmp(cmd.target, "alarm") == 0 && strcmp(cmd.action, "ack") == 0) {
                 g_remote_override = false;
                 g_k3_muted_latch = true;
                 g_alarm_test_active = false;
                 SmartHome_ResetAlarmState();
-                Ui_RefreshFanCardImmediate();
             } else if (strcmp(cmd.target, "system") == 0 && strcmp(cmd.action, "reboot") == 0) {
                 HttpClient_AckCommand(cmd.command_id, "done", "system reboot acknowledged");
                 SmartHome_Reboot();
             }
 
             HttpClient_AckCommand(cmd.command_id, "done", "executed on rk2206");
-
-            // 关键优化：指令执行完毕后立即上报一次全量最新遥测，实现毫秒级双向闭环同步！
-            TelemetryData fast_telem;
-            memset(&fast_telem, 0, sizeof(fast_telem));
-            strncpy(fast_telem.device_id, CLOUD_DEVICE_ID, sizeof(fast_telem.device_id) - 1);
-            fast_telem.temperature = g_report.temperature;
-            fast_telem.humidity = g_report.humidity;
-            fast_telem.lux = g_report.lux;
-            fast_telem.gas_ppm = g_report.gas_ppm;
-            fast_telem.motor_on = (SmartHome_GetFanDuty() > 0) ? 1 : 0;
-            fast_telem.alarm_on = ((g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch) ? 1 : 0;
-            fast_telem.accel_x = g_mpu_data.accel_x;
-            fast_telem.accel_y = g_mpu_data.accel_y;
-            fast_telem.accel_z = g_mpu_data.accel_z;
-            fast_telem.pitch = g_mpu_data.pitch;
-            fast_telem.roll = g_mpu_data.roll;
-            fast_telem.fan_speed = SmartHome_GetFanSpeed();
-            fast_telem.wdt_alive = 1;
-            strncpy(fast_telem.i2c_devices, g_i2c_device_str, sizeof(fast_telem.i2c_devices) - 1);
-            strncpy(fast_telem.last_key, g_last_key_name, sizeof(fast_telem.last_key) - 1);
-            HttpClient_PostTelemetry(&fast_telem);
+            g_fast_telemetry_needed = true;
         }
 
-        LOS_Msleep(250);
+        LOS_Msleep(500);
     }
     return NULL;
 }
@@ -467,51 +454,7 @@ static void *NetMonitorTask(void *arg)
     return NULL;
 }
 
-// 极速刷新风扇档位卡片与指示胶囊 (< 20ms 交互响应)
-void Ui_RefreshFanCardImmediate(void)
-{
-    int cur_speed = SmartHome_GetFanSpeed();
-    int cur_duty = SmartHome_GetFanDuty();
-    char line_buf[32];
-
-    // 1. 局部擦除并重绘档位与占空比行 (X: 8~155, Y: 138~154)
-    lcd_fill(8, 138, 155, 154, LCD_BLACK);
-    if (cur_speed == 4) {
-        snprintf(line_buf, sizeof(line_buf), "MODE:AUTO (%d%%)", cur_duty);
-    } else {
-        snprintf(line_buf, sizeof(line_buf), "MODE:L%d   (%d%%)", cur_speed, cur_duty);
-    }
-    lcd_show_string(8, 138, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
-
-    // 2. 局部刷新五档微型交互胶囊指示 [0][1][2][3][A] (X: 10~155, Y: 156~168)
-    const char *caps[] = {"0", "1", "2", "3", "A"};
-    for (int c = 0; c < 5; c++) {
-        int cx = 10 + c * 29;
-        bool active = (cur_speed == c);
-        lcd_fill(cx, 156, cx + 24, 168, active ? LCD_GREEN : LCD_DARKBLUE);
-        lcd_draw_rectangle(cx, 156, cx + 24, 168, active ? LCD_WHITE : LCD_GRAY);
-        lcd_show_string(cx + 8, 156, (uint8_t *)caps[c], active ? LCD_BLACK : LCD_WHITE, active ? LCD_GREEN : LCD_DARKBLUE, 12, 0);
-    }
-}
-
-// 极速刷新按键卡片与矩阵高亮 (< 20ms 交互响应)
-void Ui_RefreshKeyCardImmediate(void)
-{
-    const char *k_labels[] = {"K3", "K4", "K5", "K6"};
-    for (int k = 0; k < 4; k++) {
-        int kx = 168 + k * 36;
-        bool k_act = (strcmp(g_last_key_name, k_labels[k]) == 0);
-        lcd_fill(kx, 138, kx + 32, 150, k_act ? LCD_YELLOW : LCD_DARKBLUE);
-        lcd_draw_rectangle(kx, 138, kx + 32, 150, k_act ? LCD_WHITE : LCD_GRAYBLUE);
-        lcd_show_string(kx + 8, 138, (uint8_t *)k_labels[k], k_act ? LCD_BLACK : LCD_CYAN, k_act ? LCD_YELLOW : LCD_DARKBLUE, 12, 0);
-    }
-
-    char line_buf[32];
-    snprintf(line_buf, sizeof(line_buf), "ADC5:%.2fV  KEY:%-4s", AdcKey_GetVoltage(), g_last_key_name);
-    lcd_show_string(166, 154, (uint8_t *)line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
-}
-
-// 7. 按键检测与物理交互任务 (极速按键检测与分工明确：K3调速/消警 / K4调速 / K5自检 / K6重扫)
+// 7. 按键检测与物理交互任务 (纯状态管理，零阻塞，完全交由 UiTask 绘制与 TelemetryTask 快发)
 static void *KeyTask(void *arg)
 {
     (void)arg;
@@ -537,20 +480,16 @@ static void *KeyTask(void *arg)
                         g_k3_muted_latch = false;
                         g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
                         SmartHome_SetFanSpeed(g_manual_fan_speed);
-                        Ui_RefreshFanCardImmediate(); // < 20ms 极速刷新 LCD 档位与胶囊！
                         printf("[key] >>> K3 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
                                g_manual_fan_speed, SmartHome_GetFanDuty());
                     }
-                    Ui_RefreshKeyCardImmediate();
                     break;
 
                 case KEY_K4:
-                    // K4: 循环切换风扇档位 (0 -> 1 -> 2 -> 3 -> AUTO) - 零延迟即时响应！
+                    // K4: 循环切换风扇档位 (0 -> 1 -> 2 -> 3 -> AUTO)
                     g_remote_override = false;
                     g_manual_fan_speed = (g_manual_fan_speed + 1) % 5;
                     SmartHome_SetFanSpeed(g_manual_fan_speed);
-                    Ui_RefreshFanCardImmediate(); // < 20ms 极速刷新 LCD 档位与胶囊！
-                    Ui_RefreshKeyCardImmediate();
                     printf("[key] >>> K4 Pressed: Switch Fan Speed -> %d (duty: %d%%) <<<\n",
                            g_manual_fan_speed, SmartHome_GetFanDuty());
                     break;
@@ -564,14 +503,12 @@ static void *KeyTask(void *arg)
                     } else {
                         g_k3_muted_latch = false;
                     }
-                    Ui_RefreshKeyCardImmediate();
                     printf("[key] >>> K5 Pressed: Toggle Alarm Test -> %d <<<\n", g_alarm_test_active);
                     break;
 
                 case KEY_K6:
                     // K6: I2C 总线拓扑动态重扫 (SCAN BUS)
                     printf("[key] >>> K6 Pressed: Rescan I2C Bus... <<<\n");
-                    Ui_RefreshKeyCardImmediate();
                     SmartHome_ScanI2cBus(g_i2c_device_str, sizeof(g_i2c_device_str));
                     break;
 
@@ -579,26 +516,8 @@ static void *KeyTask(void *arg)
                     break;
             }
 
-            // 按键动作后立即上报一次遥测，让 Web 端大屏瞬间感知按键交互
-            TelemetryData key_telem;
-            memset(&key_telem, 0, sizeof(key_telem));
-            strncpy(key_telem.device_id, CLOUD_DEVICE_ID, sizeof(key_telem.device_id) - 1);
-            key_telem.temperature = g_report.temperature;
-            key_telem.humidity = g_report.humidity;
-            key_telem.lux = g_report.lux;
-            key_telem.gas_ppm = g_report.gas_ppm;
-            key_telem.motor_on = (SmartHome_GetFanDuty() > 0) ? 1 : 0;
-            key_telem.alarm_on = ((g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch) ? 1 : 0;
-            key_telem.accel_x = g_mpu_data.accel_x;
-            key_telem.accel_y = g_mpu_data.accel_y;
-            key_telem.accel_z = g_mpu_data.accel_z;
-            key_telem.pitch = g_mpu_data.pitch;
-            key_telem.roll = g_mpu_data.roll;
-            key_telem.fan_speed = SmartHome_GetFanSpeed();
-            key_telem.wdt_alive = 1;
-            strncpy(key_telem.i2c_devices, g_i2c_device_str, sizeof(key_telem.i2c_devices) - 1);
-            strncpy(key_telem.last_key, g_last_key_name, sizeof(key_telem.last_key) - 1);
-            HttpClient_PostTelemetry(&key_telem);
+            // 触发遥测任务即刻快发，向云端同步按键交互状态
+            g_fast_telemetry_needed = true;
         }
 
         LOS_Msleep(10);
@@ -630,7 +549,7 @@ static void *MainStationTask(void *arg)
     // 1. KeyTask (优先级 3，极速按键检测，不丢失输入)
     memset(&task_param, 0, sizeof(task_param));
     task_param.pfnTaskEntry = (TSK_ENTRY_FUNC)KeyTask;
-    task_param.uwStackSize = 2048;
+    task_param.uwStackSize = 4096;
     task_param.pcName = "KeyTask";
     task_param.usTaskPrio = 3;
     LOS_TaskCreate(&task_id, &task_param);
