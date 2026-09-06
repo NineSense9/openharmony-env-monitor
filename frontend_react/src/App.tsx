@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTelemetry } from './hooks/useTelemetry';
 import { HudHeader } from './components/HudHeader';
 import { SensorGrid } from './components/SensorGrid';
+import { SpatialAttitudeCard } from './components/SpatialAttitudeCard';
 import { CabinTwin } from './components/CabinTwin';
 import { BoardDigitalTwin } from './components/BoardDigitalTwin';
 import { TelemetryChart } from './components/TelemetryChart';
@@ -64,9 +65,10 @@ export function App() {
       {/* 2. Main 3-Column Dashboard Grid */}
       <main className="grid grid-cols-1 lg:grid-cols-[360px_1fr_380px] gap-4 flex-1">
         
-        {/* Left Column: 4 Metric Cards */}
+        {/* Left Column: 4 Metric Cards + Spatial Attitude HUD (Filled bottom-left gap) */}
         <div className="flex flex-col gap-4">
           <SensorGrid telemetry={telemetry} systemState={systemState} />
+          <SpatialAttitudeCard telemetry={telemetry} systemState={systemState} />
         </div>
 
         {/* Center Column: Digital Twin Switcher & ECharts History */}
@@ -104,7 +106,7 @@ export function App() {
             </span>
           </div>
 
-          {/* 渲染所选视图 */}
+          {/* 渲染所选视图 (板卡孪生与舱段模型高度均为 520px 无缝切换) */}
           {activeCenterTab === 'board' ? (
             <BoardDigitalTwin
               telemetry={telemetry}
@@ -112,10 +114,13 @@ export function App() {
               onTriggerKey={handleBoardKeyTrigger}
             />
           ) : (
-            <CabinTwin systemState={systemState} />
+            <CabinTwin 
+              systemState={systemState} 
+              telemetry={telemetry}
+            />
           )}
 
-          {/* ECharts 温湿度时序示波曲线 */}
+          {/* ECharts 温湿度时序示波曲线 (高精动态标尺) */}
           <TelemetryChart history={history} />
         </div>
 

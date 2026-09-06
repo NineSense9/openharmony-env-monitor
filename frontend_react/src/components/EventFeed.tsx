@@ -7,7 +7,7 @@ interface EventFeedProps {
 
 export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
   return (
-    <div className="glass-panel rounded-xl p-4 flex flex-col flex-1 min-h-[220px]">
+    <div className="glass-panel rounded-xl p-4 flex flex-col flex-1 min-h-[300px] bg-[#060D1A]/90 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,240,255,0.06)]">
       <div className="flex items-center justify-between pb-2 border-b border-slate-800">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-[#00F0FF]" />
@@ -20,7 +20,7 @@ export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto mt-2 space-y-1.5 pr-1 max-h-[240px]">
+      <div className="flex-1 overflow-y-auto mt-2 space-y-1.5 pr-1 max-h-[460px]">
         {logs.map(log => {
           let borderCol = 'border-l-[#00F0FF] bg-slate-900/30';
           if (log.type === 'alarm') borderCol = 'border-l-rose-500 bg-rose-950/20 text-rose-300';
