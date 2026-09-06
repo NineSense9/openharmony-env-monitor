@@ -210,6 +210,9 @@ static void *UiTask(void *arg)
         lcd_fill(5, 27, 157, 40, LCD_DARKBLUE);
         Lcd_ShowMixedText(8, 27, "环境感知", LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
+        // 清空文本列，防止数值变短时的数字残影
+        lcd_fill(6, 42, 104, 114, LCD_BLACK);
+
         // 温度 (带原生 ℃ 符号)
         snprintf(line_buf, sizeof(line_buf), "温度:%-4.1f℃", g_report.temperature);
         uint16_t tc = (g_report.temperature > ALARM_TEMP_THRESHOLD) ? LCD_RED : LCD_WHITE;
@@ -287,13 +290,11 @@ static void *UiTask(void *arg)
         int cur_speed = SmartHome_GetFanSpeed();
         int cur_duty = SmartHome_GetFanDuty();
 
-        if (cur_speed == 4) {
-            snprintf(line_buf, sizeof(line_buf), "模式: 自动 (%d%%)", cur_duty);
-        } else if (cur_speed == 0) {
-            snprintf(line_buf, sizeof(line_buf), "模式: 关机 ( 0%%)");
-        } else {
-            snprintf(line_buf, sizeof(line_buf), "模式: %d档 (%2d%%)", cur_speed, cur_duty);
-        }
+        // 局部清空模式文字所在行，彻底消灭切换档位时的末尾残余字符（彻底根除多括号残影）
+        lcd_fill(6, 136, 156, 152, LCD_BLACK);
+
+        const char *spd_labels[] = {"关机", "1档", "2档", "3档", "自动"};
+        snprintf(line_buf, sizeof(line_buf), "模式: %s (%2d%%)", spd_labels[cur_speed], cur_duty);
         Lcd_ShowMixedText(8, 136, line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
 
         // 五档微型交互胶囊指示 [关][弱][中][强][自] (16x16 高对比度实体中文字符)
@@ -329,6 +330,9 @@ static void *UiTask(void *arg)
         lcd_draw_rectangle(162, 120, 316, 188, LCD_GRAYBLUE);
         lcd_fill(163, 121, 315, 134, LCD_DARKBLUE);
         Lcd_ShowMixedText(168, 121, "K3控制与总线", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+
+        // 清理 Card 4 顶部 K3 按键行，彻底消灭外侧残留像素与边框杂点
+        lcd_fill(163, 135, 315, 152, LCD_BLACK);
 
         // K3 物理微动开关状态动态胶囊
         bool is_k3_down = AdcKey_IsPhysicalPressed();
