@@ -286,13 +286,15 @@ void SmartHome_ScanI2cBus(char *device_list, int max_len)
         if (LzI2cRead(SHT30_BH1750_I2C_PORT, addr, &test, 1) == LZ_HARDWARE_SUCCESS) {
             char name[16];
             if (addr == SHT30_I2C_ADDR) {
-                snprintf(name, sizeof(name), "SHT30");
+                snprintf(name, sizeof(name), "SHT");
             } else if (addr == BH1750_I2C_ADDR) {
-                snprintf(name, sizeof(name), "BH1750");
+                snprintf(name, sizeof(name), "BH");
             } else if (addr == 0x68) {
-                snprintf(name, sizeof(name), "MPU6050");
+                snprintf(name, sizeof(name), "MPU");
+            } else if (addr == 0x51) {
+                snprintf(name, sizeof(name), "RTC");
             } else {
-                snprintf(name, sizeof(name), "0x%02X", addr);
+                snprintf(name, sizeof(name), "%02X", addr);
             }
 
             if (found_count > 0) {

@@ -178,6 +178,10 @@ static void *UiTask(void *arg)
     // 运行精致自检开机动画
     Lcd_ShowBootAnimation();
 
+    // 动画结束，全屏黑色清屏，彻底杜绝自检文字、雷达圆圈残留像素
+    lcd_fill(0, 0, LCD_W, LCD_H, LCD_BLACK);
+    LOS_Msleep(50);
+
     while (1) {
         tick_toggle ^= 1;
 
@@ -186,29 +190,28 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_fill(0, 0, LCD_W, 22, LCD_DARKBLUE);
         lcd_draw_line(0, 22, 319, 22, LCD_CYAN);
-        Lcd_ShowMixedText(4, 3, "鸿蒙空间站", LCD_YELLOW, LCD_DARKBLUE, 16, 0);
-        Lcd_ShowMixedText(86, 3, "CSS-01", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        Lcd_ShowMixedText(6, 3, "鸿蒙空间站", LCD_YELLOW, LCD_DARKBLUE, 16, 0);
 
         if (g_wifi_ready) {
-            snprintf(line_buf, sizeof(line_buf), "IP:%-12s", g_ip_str);
-            Lcd_ShowMixedText(138, 3, line_buf, LCD_GREEN, LCD_DARKBLUE, 16, 0);
+            snprintf(line_buf, sizeof(line_buf), "IP:%-13s", g_ip_str);
+            Lcd_ShowMixedText(106, 3, line_buf, LCD_GREEN, LCD_DARKBLUE, 16, 0);
         } else {
-            Lcd_ShowMixedText(138, 3, "网络: 离线模式", LCD_RED, LCD_DARKBLUE, 16, 0);
+            Lcd_ShowMixedText(106, 3, "网络: 离线模式", LCD_RED, LCD_DARKBLUE, 16, 0);
         }
 
-        // 看门狗状态与闪烁心跳 (X=270，留出足够空间杜绝与 IP 重合)
-        Lcd_ShowMixedText(270, 3, "心跳", LCD_LIGHTBLUE, LCD_DARKBLUE, 16, 0);
-        lcd_show_char(304, 3, tick_toggle ? '*' : 'o', tick_toggle ? LCD_YELLOW : LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        // 看门狗状态与闪烁心跳
+        Lcd_ShowMixedText(266, 3, "心跳", LCD_LIGHTBLUE, LCD_DARKBLUE, 16, 0);
+        lcd_show_char(302, 3, tick_toggle ? '*' : 'o', tick_toggle ? LCD_YELLOW : LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
         // ==========================================
         // 第一象限：环境感知卡片 (X: 4 ~ 158, Y: 26 ~ 116)
         // ==========================================
         lcd_draw_rectangle(4, 26, 158, 116, LCD_GRAYBLUE);
         lcd_fill(5, 27, 157, 40, LCD_DARKBLUE);
-        Lcd_ShowMixedText(8, 27, "【环境感知】", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        Lcd_ShowMixedText(8, 27, "环境感知", LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
-        // 温度
-        snprintf(line_buf, sizeof(line_buf), "温度:%-4.1fC", g_report.temperature);
+        // 温度 (带原生 ℃ 符号)
+        snprintf(line_buf, sizeof(line_buf), "温度:%-4.1f℃", g_report.temperature);
         uint16_t tc = (g_report.temperature > ALARM_TEMP_THRESHOLD) ? LCD_RED : LCD_WHITE;
         Lcd_ShowMixedText(8, 44, line_buf, tc, LCD_BLACK, 16, 0);
         int t_bar = (int)((g_report.temperature / 50.0f) * 44);
@@ -252,16 +255,19 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_draw_rectangle(162, 26, 316, 116, LCD_GRAYBLUE);
         lcd_fill(163, 27, 315, 40, LCD_DARKBLUE);
-        Lcd_ShowMixedText(166, 27, "【空间姿态】MPU6050", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        Lcd_ShowMixedText(168, 27, "空间姿态 MPU6050", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+
+        // 刷新姿态数据前，局部整区黑色清屏，彻底消灭开机自检残留与数字残影
+        lcd_fill(163, 42, 315, 96, LCD_BLACK);
 
         snprintf(line_buf, sizeof(line_buf), "俯仰角度: %+05.1f度", g_mpu_data.pitch);
-        Lcd_ShowMixedText(166, 44, line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+        Lcd_ShowMixedText(168, 44, line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
 
         snprintf(line_buf, sizeof(line_buf), "横滚角度: %+05.1f度", g_mpu_data.roll);
-        Lcd_ShowMixedText(166, 62, line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
+        Lcd_ShowMixedText(168, 62, line_buf, LCD_WHITE, LCD_BLACK, 16, 0);
 
         snprintf(line_buf, sizeof(line_buf), "Z轴重力 : %+04.2fG", g_mpu_data.accel_z);
-        Lcd_ShowMixedText(166, 80, line_buf, LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
+        Lcd_ShowMixedText(168, 80, line_buf, LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
 
         // 微型人工地平仪视窗 (166 ~ 312, Y: 98 ~ 112)
         lcd_fill(166, 98, 312, 112, LCD_BLACK);
@@ -276,7 +282,7 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_draw_rectangle(4, 120, 158, 188, LCD_GRAYBLUE);
         lcd_fill(5, 121, 157, 134, LCD_DARKBLUE);
-        Lcd_ShowMixedText(8, 121, "【风机动力】", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        Lcd_ShowMixedText(8, 121, "风机动力", LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
         int cur_speed = SmartHome_GetFanSpeed();
         int cur_duty = SmartHome_GetFanDuty();
@@ -300,20 +306,20 @@ static void *UiTask(void *arg)
             Lcd_ShowMixedText(cx + 5, 154, caps[c], active ? LCD_BLACK : LCD_CYAN, active ? LCD_GREEN : LCD_DARKBLUE, 16, 0);
         }
 
-        // 状态文字 (局部整行黑色清屏，彻底消灭切换时的残影字符)
+        // 状态文字 (局部整行黑色清屏，规整高对比度徽章)
         lcd_fill(6, 172, 156, 187, LCD_BLACK);
         if (g_remote_override) {
-            Lcd_ShowMixedText(8, 172, "【远控】云端接管中", LCD_MAGENTA, LCD_BLACK, 16, 0);
+            Lcd_ShowMixedText(8, 172, "[远控] 云端接管中", LCD_MAGENTA, LCD_BLACK, 16, 0);
         } else if (g_k3_muted_latch) {
-            Lcd_ShowMixedText(8, 172, "【静音】按键已消警", LCD_CYAN, LCD_BLACK, 16, 0);
+            Lcd_ShowMixedText(8, 172, "[静音] 按键已消警", LCD_CYAN, LCD_BLACK, 16, 0);
         } else if (g_report.alarm_active || g_alarm_test_active) {
-            Lcd_ShowMixedText(8, 172, "【告警】环境指标超标", LCD_RED, LCD_BLACK, 16, 0);
+            Lcd_ShowMixedText(8, 172, "[告警] 环境指标超标", LCD_RED, LCD_BLACK, 16, 0);
         } else if (cur_speed == 4) {
-            Lcd_ShowMixedText(8, 172, "【就绪】自动温控调速", LCD_GREEN, LCD_BLACK, 16, 0);
+            Lcd_ShowMixedText(8, 172, "[就绪] 自动温控调速", LCD_GREEN, LCD_BLACK, 16, 0);
         } else if (cur_speed == 0) {
-            Lcd_ShowMixedText(8, 172, "【待机】风机静止关机", LCD_GRAYBLUE, LCD_BLACK, 16, 0);
+            Lcd_ShowMixedText(8, 172, "[待机] 风机静止关机", LCD_GRAYBLUE, LCD_BLACK, 16, 0);
         } else {
-            snprintf(line_buf, sizeof(line_buf), "【运行】风机运行%d档", cur_speed);
+            snprintf(line_buf, sizeof(line_buf), "[运行] 风机运行%d档", cur_speed);
             Lcd_ShowMixedText(8, 172, line_buf, LCD_GREEN, LCD_BLACK, 16, 0);
         }
 
@@ -322,31 +328,34 @@ static void *UiTask(void *arg)
         // ==========================================
         lcd_draw_rectangle(162, 120, 316, 188, LCD_GRAYBLUE);
         lcd_fill(163, 121, 315, 134, LCD_DARKBLUE);
-        Lcd_ShowMixedText(166, 121, "【K3控制与总线】", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+        Lcd_ShowMixedText(168, 121, "K3控制与总线", LCD_CYAN, LCD_DARKBLUE, 16, 0);
 
         // K3 物理微动开关状态动态胶囊
         bool is_k3_down = AdcKey_IsPhysicalPressed();
-        lcd_fill(166, 136, 312, 151, is_k3_down ? LCD_YELLOW : LCD_DARKBLUE);
-        lcd_draw_rectangle(166, 136, 312, 151, is_k3_down ? LCD_WHITE : LCD_GRAYBLUE);
+        lcd_fill(166, 136, 310, 151, is_k3_down ? LCD_YELLOW : LCD_DARKBLUE);
+        lcd_draw_rectangle(166, 136, 310, 151, is_k3_down ? LCD_WHITE : LCD_GRAYBLUE);
         if (is_k3_down) {
             uint32_t hold_ms = AdcKey_GetHoldDurationMs();
             if (hold_ms < 1000) {
-                Lcd_ShowMixedText(172, 136, ">> 松开: 切换风速 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
+                Lcd_ShowMixedText(170, 136, ">> 松开: 切换风速 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
             } else if (hold_ms < 2500) {
-                Lcd_ShowMixedText(172, 136, ">> 松开: 声光自检 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
+                Lcd_ShowMixedText(170, 136, ">> 松开: 声光自检 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
             } else {
-                Lcd_ShowMixedText(172, 136, ">> 松开: 重扫总线 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
+                Lcd_ShowMixedText(170, 136, ">> 松开: 重扫总线 <<", LCD_BLACK, LCD_YELLOW, 16, 0);
             }
         } else {
-            Lcd_ShowMixedText(172, 136, "K3按键: GPIO0_PC7", LCD_CYAN, LCD_DARKBLUE, 16, 0);
+            Lcd_ShowMixedText(170, 136, "K3按键: GPIO0_PC7", LCD_CYAN, LCD_DARKBLUE, 16, 0);
         }
 
-        // 手势导引 (16x16 清晰中文字库)
-        Lcd_ShowMixedText(166, 153, "短按调速  长按测试", LCD_WHITE, LCD_BLACK, 16, 0);
+        // 清理 Card 4 文本区域
+        lcd_fill(163, 152, 315, 187, LCD_BLACK);
 
-        // I2C 总线拓扑
+        // 手势导引 (16x16 清晰中文字库)
+        Lcd_ShowMixedText(168, 153, "短按调速  长按测试", LCD_WHITE, LCD_BLACK, 16, 0);
+
+        // I2C 总线拓扑 (短小精炼，完全在卡片内)
         snprintf(line_buf, sizeof(line_buf), "I2C: %-14s", g_i2c_device_str);
-        Lcd_ShowMixedText(166, 171, line_buf, LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
+        Lcd_ShowMixedText(168, 171, line_buf, LCD_LIGHTBLUE, LCD_BLACK, 16, 0);
 
         // ==========================================
         // 底部遥测通信与按键引导栏 (Y: 192 ~ 238)
