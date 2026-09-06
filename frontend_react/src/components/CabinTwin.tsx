@@ -61,15 +61,25 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
           fill="none"
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* 左侧节点对接口 (DOCK-01) */}
-          <rect x="22" y="102" width="20" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
-          <line x1="32" y1="112" x2="32" y2="158" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
-          <text x="26" y="180" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono" transform="rotate(-90 26 180)">DOCK-01</text>
+          {/* 左侧节点对接口 (机械对接环结构，无旋转文字溢出) */}
+          <g>
+            <rect x="20" y="96" width="22" height="78" rx="4" fill="rgba(0, 240, 255, 0.12)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
+            <rect x="25" y="104" width="12" height="62" rx="2" fill="rgba(0, 240, 255, 0.2)" stroke="rgba(0, 240, 255, 0.35)" strokeWidth="1" />
+            <line x1="31" y1="100" x2="31" y2="170" stroke="rgba(0, 240, 255, 0.5)" strokeWidth="1" strokeDasharray="3 3" />
+            <circle cx="31" cy="114" r="2" fill="#00F0FF" />
+            <circle cx="31" cy="135" r="2.5" fill="#00F0FF" />
+            <circle cx="31" cy="156" r="2" fill="#00F0FF" />
+          </g>
 
-          {/* 右侧动力排气口 (VENT-OUT) */}
-          <rect x="878" y="102" width="20" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
-          <line x1="888" y1="112" x2="888" y2="158" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
-          <text x="898" y="125" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono" transform="rotate(90 898 125)">VENT-OUT</text>
+          {/* 右侧动力排气口 (多孔排气环结构，无旋转文字溢出) */}
+          <g>
+            <rect x="878" y="96" width="22" height="78" rx="4" fill="rgba(0, 240, 255, 0.12)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
+            <rect x="883" y="104" width="12" height="62" rx="2" fill="rgba(0, 240, 255, 0.2)" stroke="rgba(0, 240, 255, 0.35)" strokeWidth="1" />
+            <line x1="889" y1="100" x2="889" y2="170" stroke="rgba(0, 240, 255, 0.5)" strokeWidth="1" strokeDasharray="3 3" />
+            <circle cx="889" cy="114" r="2" fill="#00F0FF" />
+            <circle cx="889" cy="135" r="2.5" fill="#00F0FF" />
+            <circle cx="889" cy="156" r="2" fill="#00F0FF" />
+          </g>
 
           {/* 核心耐压外舱壁 (宽屏完整舒展铺满) */}
           <rect
@@ -93,18 +103,6 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
             strokeDasharray="6 4"
             fill="none"
           />
-
-          {/* 顶部主供风风道 (带流向箭头) */}
-          <path d="M 60 64 L 860 64" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
-          <text x="850" y="59" textAnchor="end" fill="#00F0FF" fontSize="8" fontFamily="JetBrains Mono" opacity="0.7">
-            ▲ 供风主风道 [AIR SUPPLY &lt;&lt;&lt;]
-          </text>
-
-          {/* 底部主回风管路 */}
-          <path d="M 60 216 L 860 216" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
-          <text x="70" y="226" fill="#3A86FF" fontSize="8" fontFamily="JetBrains Mono" opacity="0.7">
-            ▼ 回风循环管 [AIR RETURN &gt;&gt;&gt;]
-          </text>
 
           {/* 隔舱肋骨与隔离气密门 (Hatch A-B) - x: 320 */}
           <g>
