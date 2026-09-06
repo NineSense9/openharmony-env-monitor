@@ -32,39 +32,39 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
 
   return (
     <div className="glass-panel rounded-xl p-3 flex flex-col justify-between bg-[#060D1A]/90 border border-cyan-500/30 flex-1 min-h-0 overflow-hidden shadow-[0_0_20px_rgba(0,240,255,0.06)]">
-      {/* 1. Header */}
+      {/* 1. Header (简洁规整，彻底杜绝换行挤压) */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
-        <div className="flex items-center gap-2">
-          <Compass className="w-4 h-4 text-[#00F0FF] animate-spin" style={{ animationDuration: '12s' }} />
-          <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
-            空间姿态与重力矢量 HUD
+        <div className="flex items-center gap-1.5 min-w-0">
+          <Compass className="w-4 h-4 text-[#00F0FF] shrink-0 animate-spin" style={{ animationDuration: '12s' }} />
+          <span className="font-hud text-sm font-bold text-slate-100 tracking-wider whitespace-nowrap">
+            空间姿态与重力 HUD
           </span>
-          <span className="text-xs font-mono px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded">
+          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded whitespace-nowrap">
             MPU6050
           </span>
         </div>
         
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-mono text-slate-300 font-medium">ECLSS适居:</span>
-          <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded border ${
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[11px] font-mono text-slate-400 whitespace-nowrap">适居:</span>
+          <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded border whitespace-nowrap ${
             habitabilityIndex >= 85
               ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
               : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
           }`}>
-            {habitabilityIndex}分 · {habitabilityIndex >= 85 ? '适居优' : '良'}
+            {habitabilityIndex}分 · {habitabilityIndex >= 85 ? '优' : '良'}
           </span>
         </div>
       </div>
 
-      {/* 2. Middle Row: Horizon + Bubble Level (大尺寸仪表盘，填满卡片内部) */}
+      {/* 2. Middle Row: Horizon + Bubble Level (大尺寸仪表盘) */}
       <div className="grid grid-cols-2 gap-2 my-1 flex-1 min-h-0 items-stretch">
         {/* 2.1 航空姿态地平仪 */}
-        <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 flex flex-col items-center justify-between relative overflow-hidden">
+        <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between relative overflow-hidden">
           <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 font-medium">
-            <span className="flex items-center gap-1 text-cyan-300 font-bold">
-              <Crosshair className="w-3.5 h-3.5" /> 姿态地平仪
+            <span className="flex items-center gap-1 text-cyan-300 font-bold whitespace-nowrap">
+              <Crosshair className="w-3.5 h-3.5" /> 姿态地平
             </span>
-            <span className="text-slate-500">PITCH/ROLL</span>
+            <span className="text-[10px] text-slate-400 font-mono whitespace-nowrap">P / R</span>
           </div>
 
           <div className="w-[104px] h-[104px] rounded-full border-2 border-cyan-500/40 relative overflow-hidden bg-slate-900 shadow-[inset_0_0_12px_rgba(0,0,0,0.8)] my-auto">
@@ -90,19 +90,19 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
             </div>
           </div>
 
-          <div className="w-full flex items-center justify-between text-xs font-mono px-1 font-bold">
-            <span className="text-cyan-300">仰角: {pitch >= 0 ? `+${pitch.toFixed(1)}` : pitch.toFixed(1)}°</span>
-            <span className="text-amber-300">滚转: {roll >= 0 ? `+${roll.toFixed(1)}` : roll.toFixed(1)}°</span>
+          <div className="w-full flex items-center justify-between text-xs font-mono px-0.5 font-bold whitespace-nowrap">
+            <span className="text-cyan-300">P:{pitch >= 0 ? `+${pitch.toFixed(1)}` : pitch.toFixed(1)}°</span>
+            <span className="text-amber-300">R:{roll >= 0 ? `+${roll.toFixed(1)}` : roll.toFixed(1)}°</span>
           </div>
         </div>
 
         {/* 2.2 重力水准仪 */}
-        <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 flex flex-col items-center justify-between">
+        <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between">
           <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 font-medium">
-            <span className="flex items-center gap-1 text-emerald-400 font-bold">
-              <Activity className="w-3.5 h-3.5" /> 重力水准仪
+            <span className="flex items-center gap-1 text-emerald-400 font-bold whitespace-nowrap">
+              <Activity className="w-3.5 h-3.5" /> 重力水准
             </span>
-            <span className="text-slate-500">|G|={totalG.toFixed(2)}g</span>
+            <span className="text-[10px] text-slate-400 font-mono whitespace-nowrap">{totalG.toFixed(2)}g</span>
           </div>
 
           <div className="w-[94px] h-[94px] rounded-full border border-slate-700 bg-slate-900/90 relative flex items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.6)] my-auto">
@@ -117,47 +117,47 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
             />
           </div>
 
-          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 px-1 font-bold">
-            <span className="text-cyan-400">X:{ax.toFixed(2)}</span>
-            <span className="text-blue-400">Y:{ay.toFixed(2)}</span>
-            <span className="text-purple-400">Z:{az.toFixed(2)}</span>
+          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 px-0.5 font-bold whitespace-nowrap">
+            <span className="text-cyan-400">X:{ax.toFixed(1)}</span>
+            <span className="text-blue-400">Y:{ay.toFixed(1)}</span>
+            <span className="text-purple-400">Z:{az.toFixed(1)}</span>
           </div>
         </div>
       </div>
 
-      {/* 3. Bottom Row: I2C0 Bus Matrix */}
+      {/* 3. Bottom Row: I2C0 Bus Matrix (单行不换行，宽敞舒展) */}
       <div className="bg-slate-950/50 border border-slate-800/80 rounded-lg p-2 flex flex-col gap-1 shrink-0">
         <div className="flex items-center justify-between text-xs font-mono font-bold">
-          <span className="flex items-center gap-1.5 text-slate-200">
+          <span className="flex items-center gap-1.5 text-slate-200 whitespace-nowrap">
             <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            I2C0 物理总线外设矩阵
+            I2C0 总线外设矩阵
           </span>
-          <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+          <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1 whitespace-nowrap">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            20s WDT: ACTIVE
+            WDT: ACTIVE
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-1 text-[9px] font-mono text-center">
+        <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
           <div className={`border rounded py-1 px-0.5 transition-all ${isScanning ? 'bg-cyan-500/20 border-cyan-400 animate-pulse' : 'bg-cyan-950/40 border-cyan-500/30'}`}>
-            <div className="text-cyan-300 font-bold">SHT30</div>
-            <div className="text-[8px] text-slate-400">0x44</div>
-            <div className="text-[8px] text-emerald-400 font-bold">ONLINE</div>
+            <div className="text-cyan-300 font-bold text-xs">SHT30</div>
+            <div className="text-[9px] text-slate-400">0x44</div>
+            <div className="text-[9px] text-emerald-400 font-bold">在线</div>
           </div>
           <div className={`border rounded py-1 px-0.5 transition-all ${isScanning ? 'bg-amber-500/20 border-amber-400 animate-pulse' : 'bg-amber-950/40 border-amber-500/30'}`}>
-            <div className="text-amber-300 font-bold">BH1750</div>
-            <div className="text-[8px] text-slate-400">0x23</div>
-            <div className="text-[8px] text-emerald-400 font-bold">ONLINE</div>
+            <div className="text-amber-300 font-bold text-xs">BH1750</div>
+            <div className="text-[9px] text-slate-400">0x23</div>
+            <div className="text-[9px] text-emerald-400 font-bold">在线</div>
           </div>
           <div className={`border rounded py-1 px-0.5 transition-all ${isScanning ? 'bg-purple-500/20 border-purple-400 animate-pulse' : 'bg-purple-950/40 border-purple-500/30'}`}>
-            <div className="text-purple-300 font-bold">MPU6050</div>
-            <div className="text-[8px] text-slate-400">0x68</div>
-            <div className="text-[8px] text-emerald-400 font-bold">ONLINE</div>
+            <div className="text-purple-300 font-bold text-xs">MPU6050</div>
+            <div className="text-[9px] text-slate-400">0x68</div>
+            <div className="text-[9px] text-emerald-400 font-bold">在线</div>
           </div>
           <div className={`border rounded py-1 px-0.5 transition-all ${isScanning ? 'bg-emerald-500/20 border-emerald-400 animate-pulse' : 'bg-slate-900/60 border-slate-700/50'}`}>
-            <div className="text-slate-300 font-bold">PCF8563</div>
-            <div className="text-[8px] text-slate-400">0x51</div>
-            <div className="text-[8px] text-emerald-400 font-bold">RTC-OK</div>
+            <div className="text-slate-300 font-bold text-xs">PCF8563</div>
+            <div className="text-[9px] text-slate-400">0x51</div>
+            <div className="text-[9px] text-emerald-400 font-bold">RTC</div>
           </div>
         </div>
       </div>

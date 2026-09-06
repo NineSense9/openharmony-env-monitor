@@ -95,7 +95,7 @@ export function App() {
       <HudHeader systemState={systemState} />
 
       {/* 2. Main 3-Column Dashboard Grid (完美铺满整个屏幕，三列底线完全对齐) */}
-      <main className="grid grid-cols-1 lg:grid-cols-[340px_1fr_360px] gap-3 flex-1 min-h-0">
+      <main className="grid grid-cols-1 lg:grid-cols-[360px_1fr_360px] gap-3 flex-1 min-h-0">
         
         {/* Left Column: 4 Metric Cards + Spatial Attitude HUD (自然拉伸填满左侧) */}
         <div className="flex flex-col gap-3 h-full min-h-0">
