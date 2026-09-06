@@ -50,107 +50,43 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
         </div>
       </div>
 
-      {/* 空间站核心舱全景透视剖面图 (填充左右黑边，充实动力舱空白) */}
+      {/* 空间站核心舱宽屏全景透视模型 (移除外侧杂框，舱体整体铺满，彻底消除文字溢出) */}
       <div className="flex-1 relative flex items-center justify-center bg-radial-gradient py-1 overflow-hidden min-h-0 w-full">
-        {/* 背景微粒通风流线 */}
+        {/* 背景气流微粒 */}
         <AirflowCanvas isRunning={isMotor} isAlarm={isAlarm} />
 
         <svg
           className="w-full h-full max-h-[300px] z-10 filter drop-shadow-[0_0_15px_rgba(0,240,255,0.2)] select-none"
-          viewBox="0 0 960 280"
+          viewBox="0 0 920 270"
           fill="none"
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* ============================================================== */}
-          {/* 1. 左翼：太阳能柔性光伏翼帆 A (填补左侧黑边空白) */}
-          {/* ============================================================== */}
-          <g className="filter drop-shadow-[0_0_8px_rgba(0,240,255,0.25)]">
-            <line x1="20" y1="138" x2="135" y2="138" stroke="rgba(0, 240, 255, 0.7)" strokeWidth="2" />
-            
-            {/* 上光伏板 */}
-            <rect x="25" y="42" width="85" height="82" rx="5" fill="rgba(8, 25, 52, 0.85)" stroke="#00F0FF" strokeWidth="1.2" />
-            <line x1="25" y1="69" x2="110" y2="69" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="25" y1="96" x2="110" y2="96" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="67" y1="42" x2="67" y2="124" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
-            
-            {/* 下光伏板 */}
-            <rect x="25" y="152" width="85" height="82" rx="5" fill="rgba(8, 25, 52, 0.85)" stroke="#00F0FF" strokeWidth="1.2" />
-            <line x1="25" y1="179" x2="110" y2="179" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="25" y1="206" x2="110" y2="206" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="67" y1="152" x2="67" y2="234" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
+          {/* 左侧节点对接口 (DOCK-01) */}
+          <rect x="22" y="102" width="20" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
+          <line x1="32" y1="112" x2="32" y2="158" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
+          <text x="26" y="180" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono" transform="rotate(-90 26 180)">DOCK-01</text>
 
-            {/* 光伏翼说明标签 */}
-            <text x="67" y="32" fill="#00F0FF" fontSize="9" fontFamily="Orbitron" fontWeight="bold" textAnchor="middle">
-              SOLAR WING-A
-            </text>
-            <text x="67" y="248" fill="#38BDF8" fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">
-              48V / 14.2kW
-            </text>
+          {/* 右侧动力排气口 (VENT-OUT) */}
+          <rect x="878" y="102" width="20" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
+          <line x1="888" y1="112" x2="888" y2="158" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
+          <text x="898" y="125" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono" transform="rotate(90 898 125)">VENT-OUT</text>
 
-            {/* 关节万向节 */}
-            <circle cx="125" cy="138" r="5" fill="#00F0FF" />
-            <circle cx="125" cy="138" r="8" stroke="#00F0FF" strokeWidth="1" fill="none" opacity="0.5" />
-          </g>
-
-          {/* ============================================================== */}
-          {/* 2. 右翼：太阳能柔性光伏翼帆 B (填补右侧黑边空白) */}
-          {/* ============================================================== */}
-          <g className="filter drop-shadow-[0_0_8px_rgba(0,240,255,0.25)]">
-            <line x1="825" y1="138" x2="940" y2="138" stroke="rgba(0, 240, 255, 0.7)" strokeWidth="2" />
-            
-            {/* 上光伏板 */}
-            <rect x="850" y="42" width="85" height="82" rx="5" fill="rgba(8, 25, 52, 0.85)" stroke="#00F0FF" strokeWidth="1.2" />
-            <line x1="850" y1="69" x2="935" y2="69" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="850" y1="96" x2="935" y2="96" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="892" y1="42" x2="892" y2="124" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
-            
-            {/* 下光伏板 */}
-            <rect x="850" y="152" width="85" height="82" rx="5" fill="rgba(8, 25, 52, 0.85)" stroke="#00F0FF" strokeWidth="1.2" />
-            <line x1="850" y1="179" x2="935" y2="179" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="850" y1="206" x2="935" y2="206" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" strokeDasharray="3 2" />
-            <line x1="892" y1="152" x2="892" y2="234" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
-
-            {/* 光伏翼说明标签 */}
-            <text x="892" y="32" fill="#00F0FF" fontSize="9" fontFamily="Orbitron" fontWeight="bold" textAnchor="middle">
-              SOLAR WING-B
-            </text>
-            <text x="892" y="248" fill="#38BDF8" fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">
-              48V / 14.2kW
-            </text>
-
-            {/* 关节万向节 */}
-            <circle cx="835" cy="138" r="5" fill="#00F0FF" />
-            <circle cx="835" cy="138" r="8" stroke="#00F0FF" strokeWidth="1" fill="none" opacity="0.5" />
-          </g>
-
-          {/* ============================================================== */}
-          {/* 3. 核心舱主耐压壳体与三舱段 (居中黄金比例) */}
-          {/* ============================================================== */}
-
-          {/* 左侧对接口 DOCK-01 */}
-          <rect x="124" y="105" width="16" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
-          <line x1="132" y1="115" x2="132" y2="161" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
-
-          {/* 右侧排气口 VENT-OUT */}
-          <rect x="818" y="105" width="16" height="66" rx="4" fill="rgba(0, 240, 255, 0.15)" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.5" />
-          <line x1="826" y1="115" x2="826" y2="161" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1.5" strokeDasharray="3 3" />
-
-          {/* 外舱壁 */}
+          {/* 核心耐压外舱壁 (宽屏完整舒展铺满) */}
           <rect
-            x="138"
-            y="20"
-            width="682"
-            height="236"
+            x="42"
+            y="18"
+            width="836"
+            height="234"
             rx="36"
             stroke="rgba(0, 240, 255, 0.55)"
             strokeWidth="2"
-            fill="rgba(5, 12, 24, 0.75)"
+            fill="rgba(5, 12, 24, 0.78)"
           />
           <rect
-            x="144"
-            y="26"
-            width="670"
-            height="224"
+            x="48"
+            y="24"
+            width="824"
+            height="222"
             rx="30"
             stroke="rgba(0, 240, 255, 0.18)"
             strokeWidth="1"
@@ -158,138 +94,143 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
             fill="none"
           />
 
-          {/* 顶部主供风管道 */}
-          <path d="M 160 66 L 795 66" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
-          
-          {/* 底部主回风管道 */}
-          <path d="M 160 214 L 795 214" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
-          <text x="165" y="224" fill="#3A86FF" fontSize="7.5" fontFamily="JetBrains Mono" opacity="0.7">
+          {/* 顶部主供风风道 (带流向箭头) */}
+          <path d="M 60 64 L 860 64" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
+          <text x="850" y="59" textAnchor="end" fill="#00F0FF" fontSize="8" fontFamily="JetBrains Mono" opacity="0.7">
+            ▲ 供风主风道 [AIR SUPPLY &lt;&lt;&lt;]
+          </text>
+
+          {/* 底部主回风管路 */}
+          <path d="M 60 216 L 860 216" stroke="rgba(0, 240, 255, 0.22)" strokeWidth="1.2" strokeDasharray="5 3" />
+          <text x="70" y="226" fill="#3A86FF" fontSize="8" fontFamily="JetBrains Mono" opacity="0.7">
             ▼ 回风循环管 [AIR RETURN &gt;&gt;&gt;]
           </text>
 
-          {/* 隔舱肋骨与隔离气密门 (Hatch A-B) */}
+          {/* 隔舱肋骨与隔离气密门 (Hatch A-B) - x: 320 */}
           <g>
-            <line x1="365" y1="20" x2="365" y2="256" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1.5" strokeDasharray="6 3" />
-            <rect x="357" y="110" width="16" height="56" rx="8" fill="#0B1C33" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.2" />
-            <circle cx="365" cy="138" r="3.5" fill="#10B981" />
-            <text x="365" y="178" textAnchor="middle" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono">HATCH A-B</text>
+            <line x1="320" y1="18" x2="320" y2="252" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1.5" strokeDasharray="6 3" />
+            <rect x="312" y="108" width="16" height="54" rx="8" fill="#0B1C33" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.2" />
+            <circle cx="320" cy="135" r="3.5" fill="#10B981" />
+            <text x="320" y="174" textAnchor="middle" fill="#64748B" fontSize="8" fontFamily="JetBrains Mono">HATCH A-B</text>
           </g>
 
-          {/* 隔舱肋骨与隔离气密门 (Hatch B-C) */}
+          {/* 隔舱肋骨与隔离气密门 (Hatch B-C) - x: 600 */}
           <g>
-            <line x1="592" y1="20" x2="592" y2="256" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1.5" strokeDasharray="6 3" />
-            <rect x="584" y="110" width="16" height="56" rx="8" fill="#0B1C33" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.2" />
-            <circle cx="592" cy="138" r="3.5" fill="#10B981" />
-            <text x="592" y="178" textAnchor="middle" fill="#64748B" fontSize="7.5" fontFamily="JetBrains Mono">HATCH B-C</text>
+            <line x1="600" y1="18" x2="600" y2="252" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1.5" strokeDasharray="6 3" />
+            <rect x="592" y="108" width="16" height="54" rx="8" fill="#0B1C33" stroke="rgba(0, 240, 255, 0.6)" strokeWidth="1.2" />
+            <circle cx="600" cy="135" r="3.5" fill="#10B981" />
+            <text x="600" y="174" textAnchor="middle" fill="#64748B" fontSize="8" fontFamily="JetBrains Mono">HATCH B-C</text>
           </g>
 
           {/* ============================================================== */}
-          {/* SEC-A: 生保居住舱 (x: 140 ~ 365) */}
+          {/* SEC-A: 生保居住舱 (x: 42 ~ 320, 宽敞无挤压) */}
           {/* ============================================================== */}
           <g>
-            <text x="160" y="46" fill="#00F0FF" fontSize="11" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
+            <text x="65" y="46" fill="#00F0FF" fontSize="12" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
               SEC-A 生保居住舱
             </text>
-            <text x="160" y="58" fill="#64748B" fontSize="8" fontFamily="JetBrains Mono">
+            <text x="65" y="59" fill="#64748B" fontSize="8.5" fontFamily="JetBrains Mono">
               HABITAT &amp; LIFE-SUPPORT
             </text>
 
             {/* SHT30 主测点 */}
-            <circle cx="250" cy="108" r="10" fill={isAlarm ? '#F43F5E' : '#00F0FF'} className="animate-pulse" />
-            <circle cx="250" cy="108" r="20" stroke={isAlarm ? '#F43F5E' : '#00F0FF'} strokeWidth="1.2" opacity="0.35" />
-            <text x="250" y="132" textAnchor="middle" fill="#00F0FF" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold">
-              SHT30 环控微气候
+            <circle cx="180" cy="106" r="10" fill={isAlarm ? '#F43F5E' : '#00F0FF'} className="animate-pulse" />
+            <circle cx="180" cy="106" r="20" stroke={isAlarm ? '#F43F5E' : '#00F0FF'} strokeWidth="1.2" opacity="0.35" />
+            <text x="180" y="128" textAnchor="middle" fill="#00F0FF" fontSize="10.5" fontFamily="JetBrains Mono" fontWeight="bold">
+              SHT30 环控微气候主测点
             </text>
 
-            <rect x="180" y="138" width="140" height="52" rx="7" fill="rgba(6, 18, 38, 0.9)" stroke="rgba(0, 240, 255, 0.45)" strokeWidth="1" />
-            <text x="191" y="157" fill="#E2E8F0" fontSize="10" fontFamily="JetBrains Mono">
+            {/* 遥测数据卡片 */}
+            <rect x="85" y="136" width="190" height="56" rx="7" fill="rgba(6, 18, 38, 0.9)" stroke="rgba(0, 240, 255, 0.45)" strokeWidth="1" />
+            <text x="100" y="156" fill="#E2E8F0" fontSize="11" fontFamily="JetBrains Mono">
               温度: <tspan fill="#00F0FF" fontWeight="bold">{temp}°C</tspan>
             </text>
-            <text x="191" y="173" fill="#E2E8F0" fontSize="10" fontFamily="JetBrains Mono">
+            <text x="100" y="173" fill="#E2E8F0" fontSize="11" fontFamily="JetBrains Mono">
               湿度: <tspan fill="#60A5FA" fontWeight="bold">{humi}% RH</tspan>
             </text>
-            <text x="191" y="185" fill="#10B981" fontSize="8" fontFamily="JetBrains Mono">
-              ● 舱内微气候: 适居优
+            <text x="100" y="186" fill="#10B981" fontSize="8.5" fontFamily="JetBrains Mono">
+              ● 舱内生态: 适居优 (ECLSS标称)
             </text>
           </g>
 
           {/* ============================================================== */}
-          {/* SEC-B: 实验载荷舱 (x: 365 ~ 592) */}
+          {/* SEC-B: 实验载荷舱 (x: 320 ~ 600, 宽屏舒展，卡片加宽彻底消除溢出) */}
           {/* ============================================================== */}
           <g>
-            <text x="388" y="46" fill="#00F0FF" fontSize="11" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
+            <text x="340" y="46" fill="#00F0FF" fontSize="12" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
               SEC-B 实验载荷舱
             </text>
-            <text x="388" y="58" fill="#64748B" fontSize="8" fontFamily="JetBrains Mono">
+            <text x="340" y="59" fill="#64748B" fontSize="8.5" fontFamily="JetBrains Mono">
               SCIENCE PAYLOAD RACKS
             </text>
 
             {/* BH1750 照度传感器 */}
             <g>
-              <circle cx="436" cy="98" r="9" fill="#FF9900" />
-              <circle cx="436" cy="98" r="16" stroke="#FF9900" strokeWidth="1" opacity="0.3" />
-              <text x="454" y="102" fill="#FFB74D" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold">
-                BH1750: {lux} Lux
+              <circle cx="410" cy="95" r="9" fill="#FF9900" />
+              <circle cx="410" cy="95" r="16" stroke="#FF9900" strokeWidth="1" opacity="0.3" />
+              <text x="430" y="99" fill="#FFB74D" fontSize="11" fontFamily="JetBrains Mono" fontWeight="bold">
+                BH1750 光照: {lux} Lux
               </text>
             </g>
 
             {/* MQ-2 气体传感器 */}
             <g>
-              <circle cx="436" cy="136" r="9" fill={isAlarm ? '#F43F5E' : '#10B981'} className={isAlarm ? 'animate-ping' : ''} />
-              <circle cx="436" cy="136" r="16" stroke={isAlarm ? '#F43F5E' : '#10B981'} strokeWidth="1" opacity="0.3" />
-              <text x="454" y="140" fill={isAlarm ? '#F43F5E' : '#34D399'} fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold">
-                MQ-2: {gas} PPM
+              <circle cx="410" cy="128" r="9" fill={isAlarm ? '#F43F5E' : '#10B981'} className={isAlarm ? 'animate-ping' : ''} />
+              <circle cx="410" cy="128" r="16" stroke={isAlarm ? '#F43F5E' : '#10B981'} strokeWidth="1" opacity="0.3" />
+              <text x="430" y="132" fill={isAlarm ? '#F43F5E' : '#34D399'} fontSize="11" fontFamily="JetBrains Mono" fontWeight="bold">
+                MQ-2 毒气烟雾: {gas} PPM
               </text>
             </g>
 
-            <rect x="396" y="156" width="162" height="34" rx="6" fill="rgba(6, 18, 38, 0.9)" stroke={isAlarm ? 'rgba(244, 63, 94, 0.6)' : 'rgba(16, 185, 129, 0.45)'} strokeWidth="1" />
-            <text x="406" y="172" fill={isAlarm ? '#F43F5E' : '#34D399'} fontSize="9.5" fontFamily="JetBrains Mono" fontWeight="bold">
+            {/* 解决红框溢出：卡片宽度增至 230px，文字精炼，留白宽裕 */}
+            <rect x="345" y="148" width="230" height="42" rx="7" fill="rgba(6, 18, 38, 0.9)" stroke={isAlarm ? 'rgba(244, 63, 94, 0.6)' : 'rgba(16, 185, 129, 0.45)'} strokeWidth="1" />
+            <text x="358" y="167" fill={isAlarm ? '#F43F5E' : '#34D399'} fontSize="10.5" fontFamily="JetBrains Mono" fontWeight="bold">
               {isAlarm ? '⚠️ 舱内气体异常超标告警' : '● 空气洁净度: 极佳 (ISO 14644)'}
             </text>
-            <text x="406" y="184" fill="#94A3B8" fontSize="8" fontFamily="JetBrains Mono">
-              实验机柜 RACK #01/#02: 正常
+            <text x="358" y="182" fill="#94A3B8" fontSize="8.5" fontFamily="JetBrains Mono">
+              实验机柜 RACK #01/#02: 正常供电
             </text>
           </g>
 
           {/* ============================================================== */}
-          {/* SEC-C: 环控动力舱 (x: 592 ~ 820) - 彻底充实红框 2 的上部空白 */}
+          {/* SEC-C: 环控动力舱 (x: 600 ~ 880, 宽屏舒展，卡片加宽彻底消除溢出) */}
           {/* ============================================================== */}
           <g>
-            <text x="615" y="46" fill="#00F0FF" fontSize="11" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
+            <text x="620" y="46" fill="#00F0FF" fontSize="12" fontFamily="Orbitron" fontWeight="bold" letterSpacing="0.5">
               SEC-C 环控动力舱
             </text>
-            <text x="615" y="58" fill="#64748B" fontSize="8" fontFamily="JetBrains Mono">
+            <text x="620" y="59" fill="#64748B" fontSize="8.5" fontFamily="JetBrains Mono">
               ECLSS VENTILATION &amp; POWER
             </text>
 
-            {/* 解决红框 2 空白：新增 ECLSS 热控催化净化与吸附单元卡片 */}
-            <rect x="615" y="68" width="186" height="36" rx="6" fill="rgba(6, 22, 48, 0.92)" stroke="rgba(0, 240, 255, 0.45)" strokeWidth="1" />
-            <circle cx="628" cy="86" r="4" fill="#10B981" className="animate-pulse" />
-            <text x="638" y="81" fill="#00F0FF" fontSize="9.5" fontFamily="JetBrains Mono" fontWeight="bold">
+            {/* 解决红框溢出：卡片宽度增至 230px，文案精炼对齐，绝不溢出 */}
+            <rect x="620" y="68" width="230" height="38" rx="6" fill="rgba(6, 22, 48, 0.92)" stroke="rgba(0, 240, 255, 0.45)" strokeWidth="1" />
+            <circle cx="634" cy="87" r="4" fill="#10B981" className="animate-pulse" />
+            <text x="646" y="82" fill="#00F0FF" fontSize="10.5" fontFamily="JetBrains Mono" fontWeight="bold">
               ECLSS 催化净化与热控换热
             </text>
-            <text x="638" y="95" fill="#94A3B8" fontSize="8" fontFamily="JetBrains Mono">
-              ▲ 供风主风道 [AIR SUPPLY &lt;&lt;&lt;] · 99.9% 洁净
+            <text x="646" y="97" fill="#94A3B8" fontSize="8.5" fontFamily="JetBrains Mono">
+              供风净化率: 99.9% · 循环压差正常
             </text>
 
             {/* PWM 涡轮风机外圈与动叶轮 */}
-            <circle cx="708" cy="144" r="32" stroke="#00F0FF" strokeWidth="2" fill="rgba(0, 240, 255, 0.07)" />
-            <circle cx="708" cy="144" r="40" stroke="rgba(0, 240, 255, 0.25)" strokeWidth="1" strokeDasharray="4 4" />
+            <circle cx="735" cy="146" r="32" stroke="#00F0FF" strokeWidth="2" fill="rgba(0, 240, 255, 0.07)" />
+            <circle cx="735" cy="146" r="40" stroke="rgba(0, 240, 255, 0.25)" strokeWidth="1" strokeDasharray="4 4" />
             
-            <g className={isMotor ? 'animate-spin origin-[708px_144px]' : ''} style={{ animationDuration: fanSpeed === 1 ? '1.5s' : fanSpeed === 2 ? '0.8s' : '0.35s' }}>
-              <path d="M 708 144 L 708 118 A 6 6 0 0 1 716 125 Z" fill="#00F0FF" />
-              <path d="M 708 144 L 734 144 A 6 6 0 0 1 727 154 Z" fill="#00F0FF" />
-              <path d="M 708 144 L 708 170 A 6 6 0 0 1 700 163 Z" fill="#00F0FF" />
-              <path d="M 708 144 L 682 144 A 6 6 0 0 1 689 134 Z" fill="#00F0FF" />
-              <circle cx="708" cy="144" r="5" fill="#FFF" />
+            <g className={isMotor ? 'animate-spin origin-[735px_146px]' : ''} style={{ animationDuration: fanSpeed === 1 ? '1.5s' : fanSpeed === 2 ? '0.8s' : '0.35s' }}>
+              <path d="M 735 146 L 735 120 A 6 6 0 0 1 743 127 Z" fill="#00F0FF" />
+              <path d="M 735 146 L 761 146 A 6 6 0 0 1 754 156 Z" fill="#00F0FF" />
+              <path d="M 735 146 L 735 172 A 6 6 0 0 1 727 165 Z" fill="#00F0FF" />
+              <path d="M 735 146 L 709 146 A 6 6 0 0 1 716 136 Z" fill="#00F0FF" />
+              <circle cx="735" cy="146" r="5" fill="#FFF" />
             </g>
 
             {/* 风机状态信息 */}
-            <text x="708" y="192" textAnchor="middle" fill="#38BDF8" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold">
+            <text x="735" y="195" textAnchor="middle" fill="#38BDF8" fontSize="10.5" fontFamily="JetBrains Mono" fontWeight="bold">
               PWM 涡轮主循环风机
             </text>
-            <rect x="638" y="198" width="140" height="22" rx="5" fill="rgba(6, 18, 38, 0.85)" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
-            <text x="708" y="213" textAnchor="middle" fill="#E2E8F0" fontSize="9" fontFamily="JetBrains Mono">
+            <rect x="655" y="201" width="160" height="24" rx="5" fill="rgba(6, 18, 38, 0.85)" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="1" />
+            <text x="735" y="217" textAnchor="middle" fill="#E2E8F0" fontSize="9.5" fontFamily="JetBrains Mono">
               {isMotor ? `排风: ${windVelocity} m/s | ${fanRpm} RPM` : '风机待命: 0.0 m/s (待机)'}
             </text>
           </g>
