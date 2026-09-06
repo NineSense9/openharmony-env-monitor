@@ -32,20 +32,19 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
 
   return (
     <div className="glass-panel rounded-xl p-3 flex flex-col justify-between bg-[#060D1A]/90 border border-cyan-500/30 flex-1 min-h-0 overflow-hidden shadow-[0_0_20px_rgba(0,240,255,0.06)]">
-      {/* 1. Header (简洁规整，彻底杜绝换行挤压) */}
+      {/* 1. Header (左侧标题与右侧标签两端对齐，完全移除“适居：”，空间宽敞) */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-2">
           <Compass className="w-4 h-4 text-[#00F0FF] shrink-0 animate-spin" style={{ animationDuration: '12s' }} />
           <span className="font-hud text-sm font-bold text-slate-100 tracking-wider whitespace-nowrap">
             空间姿态与重力 HUD
           </span>
-          <span className="text-[10px] font-mono px-1.5 py-0.2 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded whitespace-nowrap">
-            MPU6050
-          </span>
         </div>
         
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="text-[11px] font-mono text-slate-400 whitespace-nowrap">适居:</span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded whitespace-nowrap">
+            MPU6050
+          </span>
           <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded border whitespace-nowrap ${
             habitabilityIndex >= 85
               ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
