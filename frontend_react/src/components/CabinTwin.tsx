@@ -22,40 +22,40 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
   const flowRate = isMotor ? ((fanSpeed === 4 ? 3 : fanSpeed) * 120 + 180) : 0;
 
   return (
-    <div className="glass-panel rounded-lg p-2 flex flex-col h-[370px] relative overflow-hidden bg-[#060D1A]/90 border border-cyan-500/30 shrink-0">
-      {/* 1. 顶部标题栏 */}
-      <div className="flex items-center justify-between pb-1 border-b border-slate-800 z-10 shrink-0">
-        <div className="flex items-center gap-1.5">
-          <Box className="w-3.5 h-3.5 text-[#00F0FF] animate-pulse" />
-          <span className="font-hud text-xs font-bold text-slate-100 tracking-wider">
+    <div className="glass-panel rounded-xl p-3 flex flex-col justify-between h-full w-full relative overflow-hidden bg-[#060D1A]/90 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,240,255,0.06)]">
+      {/* 顶部标题栏 */}
+      <div className="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0 z-10">
+        <div className="flex items-center gap-2">
+          <Box className="w-4 h-4 text-[#00F0FF] animate-pulse" />
+          <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
             空间站核心舱透视模型 (CSS-CABIN-TWIN)
           </span>
-          <span className="text-[9px] font-mono px-1 py-0.2 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded">
-            ECLSS 生保舱
+          <span className="text-[10px] font-mono px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded">
+            微重力 ECLSS 生保舱
           </span>
         </div>
-        <div className="flex items-center gap-2 font-mono text-[9px]">
-          <span className={`px-1.5 py-0.2 rounded border flex items-center gap-1 ${
+        <div className="flex items-center gap-2 font-mono text-[10px]">
+          <span className={`px-2 py-0.5 rounded border flex items-center gap-1.5 ${
             isMotor 
               ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' 
               : 'bg-slate-800 text-slate-400 border-slate-700'
           }`}>
-            <Wind className={`w-2.5 h-2.5 ${isMotor ? 'animate-spin' : ''}`} />
+            <Wind className={`w-3 h-3 ${isMotor ? 'animate-spin' : ''}`} />
             风机: {isMotor ? `${fanRpm} RPM (L${fanSpeed})` : '待机节能'}
           </span>
-          <span className="flex items-center gap-1 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.2 rounded bg-cyan-950/40">
-            <ShieldCheck className="w-2.5 h-2.5 text-cyan-300" />
-            环控自检: 正常
+          <span className="flex items-center gap-1 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded bg-cyan-950/40">
+            <ShieldCheck className="w-3 h-3 text-cyan-300" />
+            环控自巡检: 正常
           </span>
         </div>
       </div>
 
-      {/* 2. 空间站核心舱剖面图 */}
-      <div className="flex-1 relative flex items-center justify-center bg-radial-gradient py-0.5 overflow-hidden min-h-0">
+      {/* 空间站核心舱剖面图 */}
+      <div className="flex-1 relative flex items-center justify-center bg-radial-gradient py-1 overflow-hidden min-h-0">
         <AirflowCanvas isRunning={isMotor} isAlarm={isAlarm} />
 
         <svg
-          className="w-full h-full max-h-[240px] z-10 filter drop-shadow-[0_0_10px_rgba(0,240,255,0.18)]"
+          className="w-full h-full max-h-[300px] z-10 filter drop-shadow-[0_0_12px_rgba(0,240,255,0.18)]"
           viewBox="0 0 700 280"
           fill="none"
           preserveAspectRatio="xMidYMid meet"
@@ -103,7 +103,7 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
             <circle cx="140" cy="115" r="9" fill={isAlarm ? '#F43F5E' : '#00F0FF'} className="animate-pulse" />
             <circle cx="140" cy="115" r="18" stroke={isAlarm ? '#F43F5E' : '#00F0FF'} strokeWidth="1.2" opacity="0.4" />
             <text x="85" y="145" fill="#00F0FF" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold">
-              SHT30 环控测点
+              SHT30 环控主测点
             </text>
             <rect x="75" y="155" width="130" height="42" rx="6" fill="rgba(8, 20, 42, 0.85)" stroke="rgba(0, 240, 255, 0.4)" strokeWidth="1" />
             <text x="85" y="172" fill="#E2E8F0" fontSize="9" fontFamily="JetBrains Mono">
@@ -129,7 +129,7 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
           </g>
           <rect x="280" y="180" width="140" height="30" rx="5" fill="rgba(8, 20, 42, 0.85)" stroke={isAlarm ? 'rgba(244, 63, 94, 0.5)' : 'rgba(16, 185, 129, 0.4)'} strokeWidth="1" />
           <text x="290" y="199" fill={isAlarm ? '#F43F5E' : '#34D399'} fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold">
-            {isAlarm ? '⚠️ 舱内气体超标' : '● 空气洁净度: 优'}
+            {isAlarm ? '⚠️ 舱内气体异常超标' : '● 空气洁净度: 极佳'}
           </text>
 
           {/* SEC-C: 风机 */}
@@ -146,29 +146,29 @@ export const CabinTwin: React.FC<CabinTwinProps> = ({ systemState, telemetry }) 
               PWM 循环风机
             </text>
             <text x="500" y="202" fill="#94A3B8" fontSize="9" fontFamily="JetBrains Mono">
-              {isMotor ? `风速: ${windVelocity} m/s` : '待命: 0.0 m/s'}
+              {isMotor ? `排风速: ${windVelocity} m/s` : '风机待命: 0.0 m/s'}
             </text>
           </g>
         </svg>
       </div>
 
-      {/* 3. 底部微气候参数栏 */}
-      <div className="grid grid-cols-4 gap-1 pt-1 border-t border-slate-800/80 shrink-0">
-        <div className="bg-slate-950/60 border border-slate-800 rounded p-1 flex flex-col">
-          <span className="text-[9px] font-mono text-slate-400">循环风速</span>
-          <span className="text-[11px] font-mono font-bold text-cyan-300">{windVelocity} m/s</span>
+      {/* 底部微气候参数栏 */}
+      <div className="grid grid-cols-4 gap-2 pt-1.5 border-t border-slate-800/80 shrink-0">
+        <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-1.5 flex flex-col">
+          <span className="text-[10px] font-mono text-slate-400">循环风速</span>
+          <span className="text-xs font-mono font-bold text-cyan-300">{windVelocity} m/s</span>
         </div>
-        <div className="bg-slate-950/60 border border-slate-800 rounded p-1 flex flex-col">
-          <span className="text-[9px] font-mono text-slate-400">换气流量</span>
-          <span className="text-[11px] font-mono font-bold text-emerald-400">{flowRate} m³/h</span>
+        <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-1.5 flex flex-col">
+          <span className="text-[10px] font-mono text-slate-400">换气流量</span>
+          <span className="text-xs font-mono font-bold text-emerald-400">{flowRate} m³/h</span>
         </div>
-        <div className="bg-slate-950/60 border border-slate-800 rounded p-1 flex flex-col">
-          <span className="text-[9px] font-mono text-slate-400">基准舱压</span>
-          <span className="text-[11px] font-mono font-bold text-blue-300">101.3 kPa</span>
+        <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-1.5 flex flex-col">
+          <span className="text-[10px] font-mono text-slate-400">基准舱压</span>
+          <span className="text-xs font-mono font-bold text-blue-300">101.3 kPa</span>
         </div>
-        <div className="bg-slate-950/60 border border-slate-800 rounded p-1 flex flex-col">
-          <span className="text-[9px] font-mono text-slate-400">HEPA 滤网</span>
-          <span className="text-[11px] font-mono font-bold text-purple-300">99.97%</span>
+        <div className="bg-slate-950/60 border border-slate-800 rounded-lg p-1.5 flex flex-col">
+          <span className="text-[10px] font-mono text-slate-400">HEPA 滤网</span>
+          <span className="text-xs font-mono font-bold text-purple-300">99.97%</span>
         </div>
       </div>
     </div>
