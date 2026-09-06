@@ -138,11 +138,11 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
           <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
             小凌派-RK2206 实物板卡高精度数字孪生
           </span>
-          <span className="text-[10px] font-mono px-2 py-0.5 bg-cyan-950/80 text-cyan-400 border border-cyan-500/40 rounded">
+          <span className="text-xs font-mono px-2 py-0.5 bg-cyan-950/80 text-cyan-400 font-bold border border-cyan-500/40 rounded">
             Cortex-M4F @ 200MHz
           </span>
         </div>
-        <div className="flex items-center gap-3 font-mono text-[10px]">
+        <div className="flex items-center gap-3 font-mono text-xs">
           <span className="flex items-center gap-1 text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             WDT: ALIVE
@@ -170,7 +170,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
           </div>
 
           {/* 丝印文字 */}
-          <div className="flex justify-between items-center text-[10px] font-mono text-cyan-400/70 pb-1 border-b border-cyan-900/40 shrink-0">
+          <div className="flex justify-between items-center text-xs font-mono text-cyan-400/80 pb-1 border-b border-cyan-900/40 shrink-0">
             <span>LOCKZHINER RK2206 OPENHARMONY 3.0 LTS</span>
             <span>LZ_HM_RK2206_BOTTOM V1.4</span>
           </div>
@@ -183,30 +183,30 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               {/* 1. SoC 主控芯片 */}
               <div className="bg-[#050B14] border border-cyan-400/40 rounded-lg p-2 shadow-inner">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold font-mono text-cyan-300">ROCKCHIP RK2206</span>
+                  <span className="text-xs font-bold font-mono text-cyan-300">ROCKCHIP RK2206</span>
                   <Activity className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
                 </div>
-                <div className="mt-1 text-[9px] font-mono text-slate-300 flex flex-col gap-0.5">
+                <div className="mt-1 text-xs font-mono text-slate-200 flex flex-col gap-1">
                   <div className="flex justify-between"><span>CORE: 200MHz M4F</span><span className="text-emerald-400 font-bold">RTOS OK</span></div>
                   <div className="flex justify-between"><span>RAM: 256KB SRAM</span><span>FLASH: 8MB</span></div>
                   {/* CPU 实时模拟负载条 */}
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-slate-400">负载:</span>
-                    <div className="flex-1 bg-slate-900 h-1.5 rounded overflow-hidden">
+                    <span className="text-slate-300 font-medium">CPU负载:</span>
+                    <div className="flex-1 bg-slate-900 h-2 rounded overflow-hidden">
                       <div className="bg-cyan-400 h-full w-[24%]" />
                     </div>
-                    <span className="text-cyan-300 font-bold">24%</span>
+                    <span className="text-cyan-300 font-bold text-xs">24%</span>
                   </div>
                 </div>
               </div>
 
               {/* 2. 电源稳压管理模块 (填补原空白) */}
               <div className="bg-[#050B14] border border-slate-700/60 rounded-lg p-1.5 shadow-inner">
-                <div className="flex items-center justify-between text-[10px] font-mono text-slate-300">
-                  <span className="text-amber-300 font-bold">PMU 电源与时钟</span>
-                  <span className="text-[8px] text-emerald-400">● 3.3V / 1.2V</span>
+                <div className="flex items-center justify-between text-xs font-mono text-slate-200">
+                  <span className="text-amber-300 font-bold">PMU 电源管理与时钟</span>
+                  <span className="text-xs text-emerald-400 font-bold">● 3.3V / 1.2V</span>
                 </div>
-                <div className="text-[9px] font-mono text-slate-400 flex justify-between mt-0.5">
+                <div className="text-xs font-mono text-slate-300 flex justify-between mt-1">
                   <span>RTC: 32.768kHz</span>
                   <span>稳压纹波: &lt;12mV</span>
                 </div>
@@ -214,21 +214,21 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
 
               {/* 3. MPU6050 姿态传感器 */}
               <div className="bg-[#050B14] border border-blue-500/30 rounded-lg p-2 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-[10px] font-mono font-bold text-blue-300">
+                <div className="flex items-center justify-between text-xs font-mono font-bold text-blue-300">
                   <span>MPU6050 6-AXIS IMU</span>
                   <Gauge className="w-3.5 h-3.5 text-blue-400" />
                 </div>
                 <div className="flex items-center justify-around py-0.5 font-mono text-xs">
                   <div className="text-center">
-                    <span className="text-[8px] text-slate-400 block">PITCH</span>
-                    <span className="text-cyan-300 font-bold">{pitch >= 0 ? '+' : ''}{pitch.toFixed(1)}°</span>
+                    <span className="text-[10px] text-slate-300 font-bold block">PITCH 俯仰</span>
+                    <span className="text-cyan-300 font-black text-sm">{pitch >= 0 ? '+' : ''}{pitch.toFixed(1)}°</span>
                   </div>
                   <div className="text-center">
-                    <span className="text-[8px] text-slate-400 block">ROLL</span>
-                    <span className="text-cyan-300 font-bold">{roll >= 0 ? '+' : ''}{roll.toFixed(1)}°</span>
+                    <span className="text-[10px] text-slate-300 font-bold block">ROLL 滚转</span>
+                    <span className="text-cyan-300 font-black text-sm">{roll >= 0 ? '+' : ''}{roll.toFixed(1)}°</span>
                   </div>
                 </div>
-                <div className="w-full h-1 bg-slate-900 rounded-full overflow-hidden flex items-center justify-center relative mt-0.5">
+                <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex items-center justify-center relative mt-0.5">
                   <div 
                     className="w-4 h-full bg-amber-400 rounded-full transition-transform" 
                     style={{ transform: `translateX(${pitch * 1.5}px)` }}
@@ -245,8 +245,8 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                 <div className="flex items-center gap-2">
                   <Volume2 className={`w-4 h-4 ${isAlarmEffective ? 'text-rose-400 animate-bounce' : 'text-slate-500'}`} />
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-mono font-bold text-slate-200">PIEZO BUZZER</span>
-                    <span className="text-[9px] font-mono text-slate-400">
+                    <span className="text-xs font-mono font-bold text-slate-200">PIEZO BUZZER 蜂鸣器</span>
+                    <span className="text-xs font-mono text-slate-300">
                       {isAlarmEffective ? '4kHz PWM 蜂鸣报警' : 'STANDBY (待机)'}
                     </span>
                   </div>
@@ -260,7 +260,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
             {/* 中区：LCD 屏幕实物数字镜面 (四象限数据饱满充实，解决 P2 LCD 内部空白) */}
             <div className="col-span-5 bg-[#000814] border-2 border-cyan-400/60 rounded-xl p-2.5 flex flex-col justify-between shadow-[0_0_20px_rgba(0,240,255,0.2)] relative overflow-hidden h-full">
               {/* LCD 顶栏 */}
-              <div className="bg-[#001F3F] text-xs font-mono font-bold px-2 py-1 rounded flex items-center justify-between text-cyan-200 shrink-0">
+              <div className="bg-[#001F3F] text-xs font-mono font-bold px-2.5 py-1.5 rounded flex items-center justify-between text-cyan-200 shrink-0">
                 <span className="text-amber-300">CSS-01 鸿蒙空间站</span>
                 <span>T:{temp.toFixed(1)}°C H:{humi.toFixed(0)}%</span>
                 <span className="text-emerald-300">WDT:OK *</span>
@@ -284,18 +284,18 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   {/* 象限 1: 环境感知温湿度 (丰富排布) */}
                   <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
-                      <span className="text-[9px] text-cyan-400 font-mono font-bold">● SHT30 温湿感知</span>
-                      <span className="text-[8px] text-slate-400">0x44</span>
+                      <span className="text-xs text-cyan-300 font-mono font-bold">● SHT30 温湿感知</span>
+                      <span className="text-[10px] text-slate-400 font-mono">0x44</span>
                     </div>
                     <div className="my-0.5">
-                      <div className="text-sm font-mono font-bold text-slate-100">
+                      <div className="text-base font-mono font-black text-slate-100">
                         {temp.toFixed(1)} <span className="text-[10px] text-cyan-300 font-normal">°C</span> / {humi.toFixed(0)} <span className="text-[10px] text-blue-300 font-normal">%RH</span>
                       </div>
-                      <div className="text-[9px] text-slate-400 mt-0.5">
+                      <div className="text-xs text-slate-300 mt-0.5">
                         光照: <span className="text-amber-300 font-bold">{Math.round(lux)}lx</span> · 露点: 16.2°C
                       </div>
                     </div>
-                    <div className="text-[8px] font-mono text-emerald-400 flex items-center justify-between border-t border-cyan-950 pt-0.5">
+                    <div className="text-[10px] font-mono text-emerald-400 flex items-center justify-between border-t border-cyan-950/80 pt-0.5 font-medium">
                       <span>环控评级: 适居优</span>
                       <span>采样: 500ms</span>
                     </div>
@@ -304,18 +304,18 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   {/* 象限 2: 六轴姿态与惯导 (丰富排布) */}
                   <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
-                      <span className="text-[9px] text-cyan-400 font-mono font-bold">● MPU6050 姿态仪</span>
-                      <span className="text-[8px] text-slate-400">0x68</span>
+                      <span className="text-xs text-cyan-300 font-mono font-bold">● MPU6050 姿态仪</span>
+                      <span className="text-[10px] text-slate-400 font-mono">0x68</span>
                     </div>
                     <div className="my-0.5">
-                      <div className="text-sm font-mono font-bold text-cyan-300">
+                      <div className="text-base font-mono font-black text-cyan-300">
                         P:{pitch >= 0 ? '+' : ''}{pitch.toFixed(1)}° <span className="text-slate-500">|</span> R:{roll >= 0 ? '+' : ''}{roll.toFixed(1)}°
                       </div>
-                      <div className="text-[9px] text-slate-400 mt-0.5">
+                      <div className="text-xs text-slate-300 mt-0.5">
                         微重力过载: <span className="text-emerald-300 font-bold">{totalG.toFixed(2)}g</span>
                       </div>
                     </div>
-                    <div className="text-[8px] font-mono text-cyan-400 flex items-center justify-between border-t border-cyan-950 pt-0.5">
+                    <div className="text-[10px] font-mono text-cyan-400 flex items-center justify-between border-t border-cyan-950/80 pt-0.5 font-medium">
                       <span>DMP 姿态解算: 锁定</span>
                       <span>航向: 稳定</span>
                     </div>
@@ -324,18 +324,18 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   {/* 象限 3: 环控动力与烟雾毒气 (丰富排布) */}
                   <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
-                      <span className="text-[9px] text-cyan-400 font-mono font-bold">● 环控动力与排风</span>
-                      <span className="text-[8px] text-slate-400">PWM_PB7</span>
+                      <span className="text-xs text-cyan-300 font-mono font-bold">● 环控动力与排风</span>
+                      <span className="text-[10px] text-slate-400 font-mono">PWM_PB7</span>
                     </div>
                     <div className="my-0.5">
-                      <div className="text-sm font-mono font-bold text-emerald-300">
+                      <div className="text-base font-mono font-black text-emerald-300">
                         {fanSpeed === 4 ? 'AUTO' : `L${fanSpeed}`} <span className="text-[10px] text-slate-300 font-normal">({isFanSpinning ? `${fanSpeed * 1500 || 4500}RPM` : '0 RPM'})</span>
                       </div>
-                      <div className="text-[9px] text-slate-400 mt-0.5">
+                      <div className="text-xs text-slate-300 mt-0.5">
                         烟雾浓度: <span className="text-emerald-400 font-bold">{gas.toFixed(1)} PPM</span> (安全)
                       </div>
                     </div>
-                    <div className="text-[8px] font-mono text-slate-400 flex items-center justify-between border-t border-cyan-950 pt-0.5">
+                    <div className="text-[10px] font-mono text-slate-300 flex items-center justify-between border-t border-cyan-950/80 pt-0.5 font-medium">
                       <span>风量: {isFanSpinning ? (fanSpeed * 120 + 180) : 0}m³/h</span>
                       <span className={isFanSpinning ? 'text-emerald-400 font-bold' : ''}>{isFanSpinning ? '运转中' : '待命'}</span>
                     </div>
@@ -344,18 +344,18 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   {/* 象限 4: 物理总线与按键控制 (丰富排布) */}
                   <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
-                      <span className="text-[9px] text-cyan-400 font-mono font-bold">● 总线与实体微动</span>
-                      <span className="text-[8px] text-slate-400">GPIO0_PC7</span>
+                      <span className="text-xs text-cyan-300 font-mono font-bold">● 总线与实体微动</span>
+                      <span className="text-[10px] text-slate-400 font-mono">GPIO0_PC7</span>
                     </div>
                     <div className="my-0.5">
-                      <div className="text-sm font-mono font-bold text-purple-300">
+                      <div className="text-base font-mono font-black text-purple-300">
                         KEY: {lastKey}
                       </div>
-                      <div className="text-[9px] text-slate-400 mt-0.5">
+                      <div className="text-xs text-slate-300 mt-0.5">
                         I2C0 从机: <span className="text-emerald-400 font-bold">4/4 在线响应</span>
                       </div>
                     </div>
-                    <div className="text-[8px] font-mono text-slate-400 flex items-center justify-between border-t border-cyan-950 pt-0.5">
+                    <div className="text-[10px] font-mono text-slate-300 flex items-center justify-between border-t border-cyan-950/80 pt-0.5 font-medium">
                       <span>通信速率: 400kHz</span>
                       <span className="text-emerald-400">ACK 畅通</span>
                     </div>
@@ -364,7 +364,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               )}
 
               {/* LCD 底栏 */}
-              <div className="bg-[#001428] text-[10px] font-mono px-2 py-1 rounded flex items-center justify-between text-slate-300 shrink-0">
+              <div className="bg-[#001428] text-xs font-mono px-2.5 py-1.5 rounded flex items-center justify-between text-slate-300 shrink-0">
                 <span className="text-slate-400">MISSION STATUS:</span>
                 <span className={`font-bold ${isAlarmEffective ? 'text-rose-400 animate-pulse' : 'text-emerald-400'}`}>
                   {isSelfTesting ? '● HARDWARE SELF-TESTING' : (systemState.isAlarmActive ? '● ALARM TRIGGERED' : '● NORMAL AUTONOMOUS MONITOR')}
@@ -377,11 +377,11 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               {/* 电机风扇控制视窗 */}
               <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-2 flex items-center justify-between shadow-inner">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-bold font-mono text-cyan-300">PWM VENT FAN</span>
-                  <span className="text-[9px] font-mono text-slate-300">
+                  <span className="text-xs font-bold font-mono text-cyan-300">PWM VENT FAN 散热排风</span>
+                  <span className="text-xs font-mono text-slate-200">
                     转速: <span className="text-emerald-300 font-bold">{isFanSpinning ? `${fanSpeed * 1500 || 4500} RPM` : '0 RPM (停转)'}</span>
                   </span>
-                  <span className="text-[8px] font-mono text-slate-500">PIN: PD0 / PWM_PB7</span>
+                  <span className="text-[10px] font-mono text-slate-400">PIN: PD0 / PWM_PB7</span>
                 </div>
                 <div className="w-12 h-12 rounded-full border border-cyan-500/50 bg-[#001020] flex items-center justify-center relative overflow-hidden">
                   <svg 
@@ -401,11 +401,11 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               {/* K3 微动开关操作区 (布局紧凑紧密，上下充实) */}
               <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-2.5 flex flex-col justify-between flex-1 shadow-inner">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-xs font-hud text-cyan-300 flex items-center gap-1.5">
+                  <span className="font-bold text-sm font-hud text-cyan-300 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                     KEY K3 复合微动开关
                   </span>
-                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-950/70 text-amber-300 border border-amber-500/40">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-500/40">
                     GPIO0_PC7
                   </span>
                 </div>
@@ -417,16 +417,17 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   onMouseLeave={cancelHold}
                   onTouchStart={startHold}
                   onTouchEnd={endHold}
-                  className={`w-full py-2 px-2.5 rounded-xl border font-mono transition-all flex flex-col items-center justify-center my-1 select-none cursor-pointer ${
+                  className={`w-full py-3 px-3 rounded-xl border font-mono transition-all flex flex-col items-center justify-center my-1.5 select-none cursor-pointer ${
                     isHolding || activeKey === 'K3' || activeKey === 'K4' || activeKey === 'K5' || activeKey === 'K6'
                       ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
                       : 'bg-[#0A1628] border-cyan-500/50 hover:border-cyan-300 text-slate-100'
                   }`}
                 >
-                  <span className="text-xs font-hud font-bold">
+                  <span className="text-sm font-hud font-bold tracking-wide">
                     {isHolding ? `蓄力中 ${(holdMs/1000).toFixed(1)}s` : (actionFeedback || '按住 K3 开关蓄力 (松手触发)')}
                   </span>
-                  <div className="w-full bg-slate-950 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                  <span className="text-[11px] font-mono text-slate-400 mt-0.5">短按调速 / 长按自检重扫</span>
+                  <div className="w-full bg-slate-950 h-2 rounded-full mt-1.5 overflow-hidden">
                     <div 
                       className={`h-full transition-all duration-75 ${
                         holdMs >= 2500 ? 'bg-purple-400' : (holdMs >= 1000 ? 'bg-amber-400' : 'bg-cyan-400')
@@ -446,7 +447,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                       <Zap className="w-3.5 h-3.5 text-cyan-400" />
                       <span className="text-xs font-bold text-cyan-200">短按单击 (&lt;1s)</span>
                     </div>
-                    <span className="text-[11px] font-bold text-cyan-300 bg-cyan-900/80 px-2 py-0.5 rounded">
+                    <span className="text-xs font-bold text-cyan-300 bg-cyan-900/80 px-2 py-0.5 rounded">
                       调速 / 消警
                     </span>
                   </button>
@@ -464,7 +465,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                         <BellRing className={`w-3.5 h-3.5 text-amber-400 ${isSelfTesting ? 'animate-bounce' : ''}`} />
                         {isSelfTesting ? '自检中(3s)' : '长按自检(1.2s)'}
                       </div>
-                      <span className="text-[9px] text-amber-200/80 mt-0.5 font-sans">
+                      <span className="text-xs text-amber-200/90 mt-0.5 font-sans font-medium">
                         声光报警测试
                       </span>
                     </button>
@@ -481,7 +482,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                         <RefreshCw className={`w-3.5 h-3.5 text-purple-400 ${isRescanning ? 'animate-spin' : ''}`} />
                         {isRescanning ? '重扫中(2s)' : '长按重扫(3.0s)'}
                       </div>
-                      <span className="text-[9px] text-purple-200/80 mt-0.5 font-sans">
+                      <span className="text-xs text-purple-200/90 mt-0.5 font-sans font-medium">
                         I2C 传感器重扫
                       </span>
                     </button>
@@ -494,7 +495,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
           </div>
 
           {/* 底部指示灯 */}
-          <div className="flex items-center justify-between pt-1.5 border-t border-cyan-900/40 text-[10px] font-mono text-slate-300 shrink-0">
+          <div className="flex items-center justify-between pt-1.5 border-t border-cyan-900/40 text-xs font-mono text-slate-200 shrink-0">
             <div className="flex items-center gap-5">
               <span className="flex items-center gap-1.5">
                 <span className={`w-2.5 h-2.5 rounded-full ${isAlarmEffective ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E] animate-ping' : 'bg-slate-700'}`} />
@@ -509,7 +510,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                 3.3V 稳压供电
               </span>
             </div>
-            <div className="text-[9px] text-cyan-400/90 font-bold">
+            <div className="text-xs text-cyan-400 font-bold">
               CLICK KEY TO INTERACT
             </div>
           </div>

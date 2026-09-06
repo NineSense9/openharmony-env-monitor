@@ -36,17 +36,17 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
       <div className="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
         <div className="flex items-center gap-2">
           <Compass className="w-4 h-4 text-[#00F0FF] animate-spin" style={{ animationDuration: '12s' }} />
-          <span className="font-hud text-xs font-bold text-slate-100 tracking-wider">
+          <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
             空间姿态与重力矢量 HUD
           </span>
-          <span className="text-[9px] font-mono px-1.5 py-0.2 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded">
+          <span className="text-xs font-mono px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/40 rounded">
             MPU6050
           </span>
         </div>
         
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-mono text-slate-400">ECLSS适居:</span>
-          <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded border ${
+          <span className="text-xs font-mono text-slate-300 font-medium">ECLSS适居:</span>
+          <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded border ${
             habitabilityIndex >= 85
               ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
               : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
@@ -60,9 +60,9 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
       <div className="grid grid-cols-2 gap-2 my-1 flex-1 min-h-0 items-stretch">
         {/* 2.1 航空姿态地平仪 */}
         <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 flex flex-col items-center justify-between relative overflow-hidden">
-          <div className="w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span className="flex items-center gap-1 text-cyan-300">
-              <Crosshair className="w-3 h-3" /> 姿态地平仪
+          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 font-medium">
+            <span className="flex items-center gap-1 text-cyan-300 font-bold">
+              <Crosshair className="w-3.5 h-3.5" /> 姿态地平仪
             </span>
             <span className="text-slate-500">PITCH/ROLL</span>
           </div>
@@ -90,7 +90,7 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
             </div>
           </div>
 
-          <div className="w-full flex items-center justify-between text-[10px] font-mono px-1">
+          <div className="w-full flex items-center justify-between text-xs font-mono px-1 font-bold">
             <span className="text-cyan-300">仰角: {pitch >= 0 ? `+${pitch.toFixed(1)}` : pitch.toFixed(1)}°</span>
             <span className="text-amber-300">滚转: {roll >= 0 ? `+${roll.toFixed(1)}` : roll.toFixed(1)}°</span>
           </div>
@@ -98,9 +98,9 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
 
         {/* 2.2 重力水准仪 */}
         <div className="bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 flex flex-col items-center justify-between">
-          <div className="w-full flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span className="flex items-center gap-1 text-emerald-400">
-              <Activity className="w-3 h-3" /> 重力水准仪
+          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 font-medium">
+            <span className="flex items-center gap-1 text-emerald-400 font-bold">
+              <Activity className="w-3.5 h-3.5" /> 重力水准仪
             </span>
             <span className="text-slate-500">|G|={totalG.toFixed(2)}g</span>
           </div>
@@ -117,7 +117,7 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
             />
           </div>
 
-          <div className="w-full flex items-center justify-between text-[9px] font-mono text-slate-400 px-1">
+          <div className="w-full flex items-center justify-between text-xs font-mono text-slate-300 px-1 font-bold">
             <span className="text-cyan-400">X:{ax.toFixed(2)}</span>
             <span className="text-blue-400">Y:{ay.toFixed(2)}</span>
             <span className="text-purple-400">Z:{az.toFixed(2)}</span>
@@ -127,12 +127,12 @@ export const SpatialAttitudeCard: React.FC<SpatialAttitudeCardProps> = ({ teleme
 
       {/* 3. Bottom Row: I2C0 Bus Matrix */}
       <div className="bg-slate-950/50 border border-slate-800/80 rounded-lg p-2 flex flex-col gap-1 shrink-0">
-        <div className="flex items-center justify-between text-[10px] font-mono">
-          <span className="flex items-center gap-1 text-slate-400">
-            <Layers className="w-3 h-3 text-cyan-400" />
+        <div className="flex items-center justify-between text-xs font-mono font-bold">
+          <span className="flex items-center gap-1.5 text-slate-200">
+            <Layers className="w-3.5 h-3.5 text-cyan-400" />
             I2C0 物理总线外设矩阵
           </span>
-          <span className="text-[9px] text-emerald-400 font-bold flex items-center gap-1">
+          <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             20s WDT: ACTIVE
           </span>

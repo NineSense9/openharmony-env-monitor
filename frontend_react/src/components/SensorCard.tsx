@@ -49,11 +49,11 @@ export const SensorCard: React.FC<SensorCardProps> = ({
 
       {/* Header Info */}
       <div className="flex items-center justify-between pl-1">
-        <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-          <Icon className="w-3.5 h-3.5" style={{ color: isAlarm ? '#F43F5E' : accentColor }} />
+        <span className="text-sm font-semibold text-slate-200 flex items-center gap-1.5">
+          <Icon className="w-4 h-4" style={{ color: isAlarm ? '#F43F5E' : accentColor }} />
           {title}
         </span>
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-code bg-slate-900/90 text-slate-400 border border-slate-700/60">
+        <span className="px-1.5 py-0.5 rounded text-xs font-code bg-slate-900/90 text-slate-300 border border-slate-700/60">
           {hardwareTag}
         </span>
       </div>
@@ -66,7 +66,7 @@ export const SensorCard: React.FC<SensorCardProps> = ({
         >
           {typeof value === 'number' ? value.toFixed(1) : value}
         </span>
-        <span className="text-xs font-medium text-slate-400">{unit}</span>
+        <span className="text-sm font-medium text-slate-400">{unit}</span>
         {isCached && (
           <span className="ml-auto text-[9px] font-code px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40">
             CACHED
@@ -87,7 +87,7 @@ export const SensorCard: React.FC<SensorCardProps> = ({
       </div>
 
       {/* Threshold Annotations */}
-      <div className="flex justify-between items-center text-[10px] font-code text-slate-500 mt-1 pl-1">
+      <div className="flex justify-between items-center text-xs font-code text-slate-400 mt-1 pl-1">
         <span>标称: {nominalRange}</span>
         <span className={isAlarm ? 'text-rose-400 font-bold' : ''}>{alarmNote}</span>
       </div>

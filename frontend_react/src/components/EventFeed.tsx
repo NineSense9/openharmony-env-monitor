@@ -11,11 +11,11 @@ export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
       <div className="flex items-center justify-between pb-2 border-b border-slate-800 shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-[#00F0FF]" />
-          <span className="font-hud text-xs font-bold text-slate-200 tracking-wider">
+          <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
             实时任务与告警流水
           </span>
         </div>
-        <span className="text-[10px] font-code px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+        <span className="text-xs font-code px-2 py-0.5 rounded bg-slate-800 text-slate-300">
           LIVE FEED
         </span>
       </div>
@@ -31,7 +31,7 @@ export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
               key={log.id} 
               className={`p-2 rounded-r border-l-2 flex flex-col gap-0.5 ${borderCol}`}
             >
-              <span className="text-[10px] text-slate-500">[{log.time}]</span>
+              <span className="text-xs text-slate-400 font-medium">[{log.time}]</span>
               <span className="text-slate-200 leading-relaxed">{log.msg}</span>
             </div>
           );

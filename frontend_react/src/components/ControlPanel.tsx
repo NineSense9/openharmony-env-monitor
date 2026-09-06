@@ -135,17 +135,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
         <div className="flex items-center justify-between pb-1.5 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <Cpu className="w-4 h-4 text-[#00F0FF]" />
-            <span className="font-hud text-xs font-bold text-slate-200 tracking-wider">
+            <span className="font-hud text-sm font-bold text-slate-100 tracking-wider">
               执行器与闭环控制台
             </span>
           </div>
           <div>
             {isAuthorized ? (
-              <span className="text-[10px] font-code px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-xs font-code px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
                 <ShieldCheck className="w-3 h-3" /> 已授权
               </span>
             ) : (
-              <span className="text-[10px] font-code px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+              <span className="text-xs font-code px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
                 <Lock className="w-3 h-3" /> PIN保护
               </span>
             )}
@@ -159,7 +159,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
               <Wind className={`w-3.5 h-3.5 ${systemState.isMotorRunning ? 'text-[#00F0FF] animate-spin' : 'text-slate-500'}`} />
               <span className="text-xs font-semibold text-slate-300">舱内排风风机档位 (PWM)</span>
             </div>
-            <span className={`text-[10px] font-code font-bold ${curSpeed === 0 ? 'text-slate-400' : 'text-[#00F0FF]'}`}>
+            <span className={`text-xs font-code font-bold ${curSpeed === 0 ? 'text-slate-400' : 'text-[#00F0FF]'}`}>
               {curSpeed === 4 ? 'AUTO (自动温湿度闭环)' : (curSpeed === 0 ? '停机 (0%)' : `L${curSpeed} (${curSpeed === 1 ? '30%' : curSpeed === 2 ? '65%' : '100%'})`)}
             </span>
           </div>
@@ -176,7 +176,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
                 key={btn.speed}
                 disabled={loadingMotor}
                 onClick={() => requireAuth(() => handleSetFanSpeed(btn.speed))}
-                className={`py-1.5 rounded-lg text-[10px] font-code font-bold transition-all border ${
+                className={`py-1.5 rounded-lg text-xs font-code font-bold transition-all border ${
                   curSpeed === btn.speed
                     ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_10px_rgba(0,240,255,0.3)]'
                     : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
