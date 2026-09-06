@@ -187,7 +187,7 @@ void SmartHome_ResetAlarmState(void)
 }
 
 // 档位定义：0=关(0%), 1=弱(30%), 2=中(65%), 3=强(100%), 4=AUTO(自动温控)
-static int s_fan_speed_level = 4; // 默认 AUTO
+static int s_fan_speed_level = 0; // 默认 0 档 (开机静止不振动)
 static int s_fan_effective_duty = 0;
 
 void SmartHome_SetFanSpeed(int speed_level)
