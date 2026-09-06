@@ -35,7 +35,7 @@ export const SensorCard: React.FC<SensorCardProps> = ({
 
   return (
     <div 
-      className={`relative px-3 py-2 rounded-xl bg-[#080E1E]/85 border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
+      className={`relative px-3.5 py-2.5 rounded-xl bg-[#080E1E]/85 border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
         isAlarm 
           ? 'border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.35)] bg-rose-950/20' 
           : 'border-slate-800/90 hover:border-slate-700'
@@ -53,13 +53,13 @@ export const SensorCard: React.FC<SensorCardProps> = ({
           <Icon className="w-3.5 h-3.5" style={{ color: isAlarm ? '#F43F5E' : accentColor }} />
           {title}
         </span>
-        <span className="px-1.5 py-0.5 rounded text-[10px] font-code bg-slate-900/80 text-slate-400 border border-slate-700/50">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-code bg-slate-900/90 text-slate-400 border border-slate-700/60">
           {hardwareTag}
         </span>
       </div>
 
       {/* Value Display */}
-      <div className="flex items-baseline gap-2 pl-1 my-0.5">
+      <div className="flex items-baseline gap-2 pl-1 my-1">
         <span 
           className="font-hud text-2xl font-black tracking-tight text-slate-100"
           style={{ fontVariantNumeric: 'tabular-nums' }}
