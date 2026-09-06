@@ -31,10 +31,10 @@ export struct ControlSection {
   private fanTimerId: number = -1;
 
   private speedOptions: FanSpeedOption[] = [
-    new FanSpeedOption(0, '0:停机'),
-    new FanSpeedOption(1, '1:30%'),
-    new FanSpeedOption(2, '2:65%'),
-    new FanSpeedOption(3, '3:100%'),
+    new FanSpeedOption(0, '0档'),
+    new FanSpeedOption(1, '1档'),
+    new FanSpeedOption(2, '2档'),
+    new FanSpeedOption(3, '3档'),
     new FanSpeedOption(4, 'AUTO')
   ];
 
@@ -179,12 +179,13 @@ export struct ControlSection {
         .justifyContent(FlexAlign.SpaceBetween)
 
         // 5 档选择胶囊
-        Row({ space: 6 }) {
+        Row({ space: 5 }) {
           ForEach(this.speedOptions, (item: FanSpeedOption) => {
             Button(item.label)
               .layoutWeight(1)
-              .height(28)
-              .fontSize(10)
+              .height(30)
+              .padding({ left: 1, right: 1 })
+              .fontSize(11)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.fanSpeed === item.id ? '#000' : Constants.COLOR_WHITE)
               .backgroundColor(this.fanSpeed === item.id ? Constants.COLOR_CYAN : '#1B2A4A')

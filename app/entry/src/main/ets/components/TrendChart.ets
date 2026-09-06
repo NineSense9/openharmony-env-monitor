@@ -33,6 +33,34 @@ export struct TrendChart {
       ctx.stroke();
     }
 
+    // 计算湿度自适应动态刻度范围
+    let humiMin = 20;
+    let humiMax = 80;
+    if (this.humiData && this.humiData.length > 0) {
+      let minVal = Math.min(...this.humiData);
+      let maxVal = Math.max(...this.humiData);
+      let padding = Math.max(3, (maxVal - minVal) * 0.25);
+      humiMin = Math.max(0, Math.floor(minVal - padding));
+      humiMax = Math.min(100, Math.ceil(maxVal + padding));
+      if (humiMax - humiMin < 8) {
+        humiMax = humiMin + 8;
+      }
+    }
+
+    // 计算温度自适应动态刻度范围
+    let tempMin = 15;
+    let tempMax = 40;
+    if (this.tempData && this.tempData.length > 0) {
+      let minVal = Math.min(...this.tempData);
+      let maxVal = Math.max(...this.tempData);
+      let padding = Math.max(1.5, (maxVal - minVal) * 0.25);
+      tempMin = Math.floor(minVal - padding);
+      tempMax = Math.ceil(maxVal + padding);
+      if (tempMax - tempMin < 5) {
+        tempMax = tempMin + 5;
+      }
+    }
+
     // 2. 绘制湿度曲线（绿色）+ 渐变填充
     if (this.humiData && this.humiData.length > 1) {
       const step = w / (this.humiData.length - 1);
@@ -42,7 +70,7 @@ export struct TrendChart {
       ctx.moveTo(0, h);
       for (let i = 0; i < this.humiData.length; i++) {
         const val = this.humiData[i];
-        const y = h - ((val - 20) / (80 - 20)) * (h - 16) - 8;
+        const y = h - ((val - humiMin) / (humiMax - humiMin)) * (h - 20) - 10;
         ctx.lineTo(i * step, y);
       }
       ctx.lineTo(w, h);
@@ -56,7 +84,7 @@ export struct TrendChart {
       ctx.lineWidth = 1.8;
       for (let i = 0; i < this.humiData.length; i++) {
         const val = this.humiData[i];
-        const y = h - ((val - 20) / (80 - 20)) * (h - 16) - 8;
+        const y = h - ((val - humiMin) / (humiMax - humiMin)) * (h - 20) - 10;
         if (i === 0) {
           ctx.moveTo(0, y);
         } else {
@@ -75,7 +103,7 @@ export struct TrendChart {
       ctx.moveTo(0, h);
       for (let i = 0; i < this.tempData.length; i++) {
         const val = this.tempData[i];
-        const y = h - ((val - 15) / (40 - 15)) * (h - 16) - 8;
+        const y = h - ((val - tempMin) / (tempMax - tempMin)) * (h - 20) - 10;
         ctx.lineTo(i * step, y);
       }
       ctx.lineTo(w, h);
@@ -91,7 +119,7 @@ export struct TrendChart {
       let lastY = 0;
       for (let i = 0; i < this.tempData.length; i++) {
         const val = this.tempData[i];
-        const y = h - ((val - 15) / (40 - 15)) * (h - 16) - 8;
+        const y = h - ((val - tempMin) / (tempMax - tempMin)) * (h - 20) - 10;
         if (i === 0) {
           ctx.moveTo(0, y);
         } else {
@@ -108,10 +136,9 @@ export struct TrendChart {
       ctx.fillStyle = '#FFFFFF';
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(lastX, lastY, 6.5, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#00F2FE88';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      ctx.arc(lastX, lastY, 6, 0, 2 * Math.PI);
+      ctx.fillStyle = '#00F2FE44';
+      ctx.fill();
     }
   }
 
