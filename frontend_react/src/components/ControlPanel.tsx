@@ -49,42 +49,49 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
       }
     } else {
       setPinError(true);
-      addLog('[AUTH FAILED] 指令安全密钥错误，拒绝执行', 'alarm');
+      setPinInput('');
+      addLog('[AUTH FAILED] 控制指令安全密钥错误 (默认: 123456)', 'alarm');
     }
   };
 
-  const executeSetFanSpeed = async (speedLevel: number, actionName: string) => {
-    setLoadingMotor(true);
-    addLog(`[COMMAND] 发送风机档位调节指令 -> ${actionName}`, 'cmd');
+  const handleSetFanSpeed = async (speed: number) => {
+    playClick();
+    const actionMap: Record<number, string> = {
+      0: 'speed_0',
+      1: 'speed_1',
+      2: 'speed_2',
+      3: 'speed_3',
+      4: 'auto'
+    };
 
-    // 立即乐观锁定UI状态，避免300ms轮询拿到旧数据产生“先跳回再跳过去”的视觉抖动
+    const action = actionMap[speed];
+    if (!action) return;
+
     if (setOptimisticFanSpeed) {
-      setOptimisticFanSpeed(speedLevel);
-    } else {
-      setSystemState(prev => ({
-        ...prev,
-        fanSpeed: speedLevel,
-        isMotorRunning: speedLevel > 0
-      }));
+      setOptimisticFanSpeed(speed);
     }
+
+    setLoadingMotor(true);
+    addLog(`[COMMAND PENDING] 下发风机调速 -> ${speed === 4 ? 'AUTO(4)' : `L${speed}`}...`, 'cmd');
 
     const res = await sendRemoteCommand({
       device_id: 'rk2206-station-01',
       target: 'fan',
-      action: actionName as any
+      action: action as any
     });
 
     setLoadingMotor(false);
     if (res.ok) {
-      addLog(`[COMMAND ACK] 风机档位指令已生效 (ID: ${res.id})`, 'cmd');
+      addLog(`[COMMAND ACK] 目标已同步 L${speed} (ID: ${res.id})`, 'cmd');
     } else {
       addLog(`[COMMAND FAIL] 指令发送失败: ${res.msg}`, 'alarm');
     }
   };
 
-  const executeEmergencyMute = async () => {
+  const handleMute = async () => {
+    playClick();
     setLoadingMute(true);
-    addLog(`[COMMAND] 发送应急消警静音指令 (K3 Latch Mute)`, 'cmd');
+    addLog('[COMMAND PENDING] 下发消警复位指令...', 'cmd');
 
     const res = await sendRemoteCommand({
       device_id: 'rk2206-station-01',
@@ -94,16 +101,17 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
 
     setLoadingMute(false);
     if (res.ok) {
-      setSystemState(prev => ({ ...prev, isMuted: true }));
-      addLog(`[COMMAND ACK] 应急消警已生效，系统进入锁存静音`, 'cmd');
+      setSystemState(prev => ({ ...prev, isMuted: true, isAlarmActive: false }));
+      addLog(`[COMMAND ACK] 报警已解除静音 (ID: ${res.id})`, 'cmd');
     } else {
       addLog(`[COMMAND FAIL] 消警指令发送失败: ${res.msg}`, 'alarm');
     }
   };
 
-  const executeRemoteReboot = async () => {
+  const handleReboot = async () => {
+    playClick();
     setLoadingReboot(true);
-    addLog(`[COMMAND] 发送远程系统复位重启指令 (RebootDevice)`, 'cmd');
+    addLog('[COMMAND PENDING] 下发小凌派-RK2206 硬件重启指令...', 'cmd');
 
     const res = await sendRemoteCommand({
       device_id: 'rk2206-station-01',
@@ -113,7 +121,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
 
     setLoadingReboot(false);
     if (res.ok) {
-      addLog(`[COMMAND ACK] 开发板系统重启指令已下发 (ID: ${res.id})，小凌派硬件重启中...`, 'alarm');
+      addLog(`[COMMAND ACK] 系统重启指令已下发 (ID: ${res.id})`, 'alarm');
     } else {
       addLog(`[COMMAND FAIL] 重启指令发送失败: ${res.msg}`, 'alarm');
     }
@@ -123,81 +131,78 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
 
   return (
     <>
-      <div className="glass-panel rounded-xl p-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-[#00F0FF]" />
-            <span className="font-hud text-sm font-bold text-slate-200 tracking-wider">
-              执行器与多档闭环控制台
+      <div className="glass-panel rounded-lg p-2.5 flex flex-col gap-2 shrink-0">
+        <div className="flex items-center justify-between pb-1 border-b border-slate-800">
+          <div className="flex items-center gap-1.5">
+            <Cpu className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <span className="font-hud text-xs font-bold text-slate-200 tracking-wider">
+              执行器与闭环控制台
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div>
             {isAuthorized ? (
-              <span className="text-[10px] font-code px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3" /> 已授权
+              <span className="text-[9px] font-code px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-0.5">
+                <ShieldCheck className="w-2.5 h-2.5" /> 已授权
               </span>
             ) : (
-              <span className="text-[10px] font-code px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-                <Lock className="w-3 h-3" /> PIN 保护
+              <span className="text-[9px] font-code px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-0.5">
+                <Lock className="w-2.5 h-2.5" /> PIN保护
               </span>
             )}
           </div>
         </div>
 
-        {/* 5-Speed Fan Selector */}
-        <div className="flex flex-col gap-2 p-3 rounded-lg bg-[#080E1E] border border-slate-800/80">
+        {/* 1. 多档闭环排风机控制 */}
+        <div className="p-2 rounded-lg bg-[#080E1E]/80 border border-slate-800 flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-              <Wind className="w-4 h-4 text-[#00F0FF]" />
-              舱内排风风机档位 (PWM 硬件调速)
-            </span>
-            <span className="text-[10px] font-code text-cyan-400">
-              {curSpeed === 4 ? 'AUTO 温控' : (curSpeed === 0 ? '停机 (0%)' : `L${curSpeed} 档`)}
+            <div className="flex items-center gap-1.5">
+              <Wind className={`w-3.5 h-3.5 ${systemState.isMotorRunning ? 'text-[#00F0FF] animate-spin' : 'text-slate-500'}`} />
+              <span className="text-[11px] font-semibold text-slate-300">舱内排风风机档位 (PWM)</span>
+            </div>
+            <span className={`text-[10px] font-code font-bold ${curSpeed === 0 ? 'text-slate-400' : 'text-[#00F0FF]'}`}>
+              {curSpeed === 4 ? 'AUTO (自动温湿度闭环)' : (curSpeed === 0 ? '停机 (0%)' : `L${curSpeed} (${curSpeed === 1 ? '30%' : curSpeed === 2 ? '65%' : '100%'})`)}
             </span>
           </div>
 
-          {/* 5 档微调胶囊 */}
-          <div className="grid grid-cols-5 gap-1.5 mt-1">
+          <div className="grid grid-cols-5 gap-1 pt-0.5">
             {[
-              { id: 0, label: '0:停机', action: 'speed_0' },
-              { id: 1, label: '1:30%', action: 'speed_1' },
-              { id: 2, label: '2:65%', action: 'speed_2' },
-              { id: 3, label: '3:100%', action: 'speed_3' },
-              { id: 4, label: 'AUTO', action: 'auto' }
-            ].map(item => (
+              { label: '0:停机', speed: 0 },
+              { label: '1:30%', speed: 1 },
+              { label: '2:65%', speed: 2 },
+              { label: '3:100%', speed: 3 },
+              { label: 'AUTO', speed: 4 }
+            ].map(btn => (
               <button
-                key={item.id}
-                onClick={() => requireAuth(() => executeSetFanSpeed(item.id, item.action))}
+                key={btn.speed}
                 disabled={loadingMotor}
-                className={`py-1.5 px-1 rounded text-center text-xs font-mono font-bold transition-all border ${
-                  curSpeed === item.id
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_8px_rgba(0,240,255,0.3)]'
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                onClick={() => requireAuth(() => handleSetFanSpeed(btn.speed))}
+                className={`py-1 rounded text-[10px] font-code font-bold transition-all border ${
+                  curSpeed === btn.speed
+                    ? 'bg-[#00F0FF]/25 border-[#00F0FF] text-[#00F0FF] shadow-[0_0_8px_rgba(0,240,255,0.3)]'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
                 }`}
               >
-                {item.label}
+                {btn.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* 下排操作按钮：应急消警 + 远程重启 */}
-        <div className="grid grid-cols-2 gap-2">
-          {/* Emergency Mute Button */}
+        {/* 2. 紧急动作按钮组 */}
+        <div className="grid grid-cols-2 gap-1.5">
           <button
-            onClick={() => requireAuth(executeEmergencyMute)}
+            onClick={() => requireAuth(handleMute)}
             disabled={loadingMute}
-            className="py-2.5 px-3 rounded-lg bg-rose-500/15 border border-rose-500/40 hover:bg-rose-500/25 text-rose-400 font-hud text-xs font-bold tracking-wider transition-all shadow-[0_0_12px_rgba(244,63,94,0.15)] flex items-center justify-center gap-1.5"
+            className="py-1.5 px-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 text-rose-300 text-xs font-hud transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
           >
             {loadingMute ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BellOff className="w-3.5 h-3.5" />}
             应急消警 (K3 MUTE)
           </button>
 
-          {/* Remote Reboot Button */}
           <button
-            onClick={() => requireAuth(executeRemoteReboot)}
+            onClick={() => requireAuth(handleReboot)}
             disabled={loadingReboot}
-            className="py-2.5 px-3 rounded-lg bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 text-amber-400 font-hud text-xs font-bold tracking-wider transition-all flex items-center justify-center gap-1.5"
+            className="py-1.5 px-2 rounded-lg bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/40 text-amber-300 text-xs font-hud transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
           >
             {loadingReboot ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
             远程系统重启
@@ -205,64 +210,61 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
         </div>
       </div>
 
-      {/* Security PIN Modal */}
+      {/* PIN Security Modal */}
       {showPinModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm rounded-xl bg-[#080E1E] border border-[#00F0FF]/40 p-5 shadow-[0_0_30px_rgba(0,240,255,0.25)] flex flex-col gap-4 relative">
-            <button 
-              onClick={() => setShowPinModal(false)}
-              className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-200"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[#00F0FF]/15 text-[#00F0FF] border border-[#00F0FF]/30">
-                <Lock className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-xl glass-panel p-5 border border-cyan-500/40 shadow-2xl flex flex-col gap-4 bg-[#0A1628]">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="flex items-center gap-2 text-cyan-300 font-hud text-sm font-bold">
+                <Lock className="w-4 h-4" /> 控制台安全验证
               </div>
-              <div>
-                <h3 className="font-hud text-sm font-bold text-slate-100">指令安全授权验证</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">请输入空间站硬件控制安全 PIN 码 (默认: 123456)</p>
-              </div>
+              <button 
+                onClick={() => setShowPinModal(false)}
+                className="text-slate-400 hover:text-slate-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
+
+            <p className="text-xs text-slate-300">
+              当前为受控操作模式，请输入操作员安全密码（默认 <span className="font-mono text-cyan-300 font-bold">123456</span>）
+            </p>
 
             <form onSubmit={handleVerifyPin} className="flex flex-col gap-3">
               <input
                 type="password"
                 maxLength={6}
-                autoFocus
                 value={pinInput}
                 onChange={e => {
                   setPinInput(e.target.value);
                   setPinError(false);
                 }}
-                placeholder="••••••"
-                className={`w-full px-3.5 py-2.5 rounded-lg bg-slate-900 border font-code text-center text-lg tracking-[0.3em] text-[#00F0FF] focus:outline-none placeholder:tracking-normal placeholder:text-slate-600 ${
-                  pinError 
-                    ? 'border-rose-500 bg-rose-950/20' 
-                    : 'border-slate-700 focus:border-[#00F0FF]'
+                placeholder="请输入 6 位 PIN 码"
+                className={`w-full px-3 py-2 rounded-lg bg-slate-950 border font-mono text-center tracking-widest text-lg focus:outline-none ${
+                  pinError ? 'border-rose-500 text-rose-400' : 'border-slate-700 text-cyan-300 focus:border-cyan-400'
                 }`}
+                autoFocus
               />
 
               {pinError && (
-                <p className="text-xs text-rose-400 font-code text-center">
-                  密钥错误，请重新输入
-                </p>
+                <span className="text-rose-400 text-xs text-center font-mono">
+                  密码错误，请重试
+                </span>
               )}
 
-              <div className="flex gap-2.5 mt-1">
+              <div className="flex gap-2 mt-1">
                 <button
                   type="button"
                   onClick={() => setShowPinModal(false)}
-                  className="flex-1 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-hud text-slate-300"
+                  className="flex-1 py-1.5 rounded-lg border border-slate-700 text-slate-300 text-xs hover:bg-slate-800"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 rounded-lg bg-[#00F0FF]/20 hover:bg-[#00F0FF]/30 border border-[#00F0FF]/50 text-xs font-hud font-bold text-[#00F0FF]"
+                  className="flex-1 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400 text-cyan-300 font-bold text-xs shadow-[0_0_10px_rgba(0,240,255,0.3)]"
                 >
-                  验证并执行
+                  确认授权
                 </button>
               </div>
             </form>

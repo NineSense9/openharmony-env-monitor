@@ -7,20 +7,20 @@ interface EventFeedProps {
 
 export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
   return (
-    <div className="glass-panel rounded-xl p-4 flex flex-col flex-1 min-h-[300px] bg-[#060D1A]/90 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,240,255,0.06)]">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-        <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-[#00F0FF]" />
-          <span className="font-hud text-sm font-bold text-slate-200 tracking-wider">
+    <div className="glass-panel rounded-lg p-2.5 flex flex-col flex-1 min-h-0 overflow-hidden bg-[#060D1A]/90 border border-cyan-500/30">
+      <div className="flex items-center justify-between pb-1 border-b border-slate-800 shrink-0">
+        <div className="flex items-center gap-1.5">
+          <Terminal className="w-3.5 h-3.5 text-[#00F0FF]" />
+          <span className="font-hud text-xs font-bold text-slate-200 tracking-wider">
             实时任务与告警流水
           </span>
         </div>
-        <span className="text-[10px] font-code px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+        <span className="text-[9px] font-code px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
           LIVE FEED
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto mt-2 space-y-1.5 pr-1 max-h-[460px]">
+      <div className="flex-1 overflow-y-auto mt-1 space-y-1 pr-1 text-[11px] font-code">
         {logs.map(log => {
           let borderCol = 'border-l-[#00F0FF] bg-slate-900/30';
           if (log.type === 'alarm') borderCol = 'border-l-rose-500 bg-rose-950/20 text-rose-300';
@@ -29,10 +29,10 @@ export const EventFeed: React.FC<EventFeedProps> = ({ logs }) => {
           return (
             <div 
               key={log.id} 
-              className={`p-2 rounded-r border-l-2 font-code text-xs flex flex-col gap-0.5 ${borderCol}`}
+              className={`p-1.5 rounded-r border-l-2 flex flex-col gap-0.5 ${borderCol}`}
             >
-              <span className="text-[10px] text-slate-500">[{log.time}]</span>
-              <span className="text-slate-200">{log.msg}</span>
+              <span className="text-[9px] text-slate-500">[{log.time}]</span>
+              <span className="text-slate-200 leading-snug">{log.msg}</span>
             </div>
           );
         })}
