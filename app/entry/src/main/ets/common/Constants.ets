@@ -40,7 +40,9 @@ export class AppTheme {
   public static readonly TEXT_WHITE: string = Constants.COLOR_WHITE;
   public static readonly TEXT_MUTED: string = Constants.COLOR_MUTED;
   public static readonly ACCENT_CYAN: string = Constants.COLOR_CYAN;
+  public static readonly ACCENT_BLUE: string = Constants.COLOR_BLUE;
   public static readonly ACCENT_GREEN: string = Constants.COLOR_GREEN;
   public static readonly ACCENT_YELLOW: string = Constants.COLOR_YELLOW;
   public static readonly ACCENT_RED: string = Constants.COLOR_RED;
+  public static readonly COLOR_WHITE: string = Constants.COLOR_WHITE;
 }

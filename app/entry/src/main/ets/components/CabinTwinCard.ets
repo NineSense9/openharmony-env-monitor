@@ -137,7 +137,7 @@ export struct CabinTwinCard {
               Text(`湿: ${this.telemetry.humidity.toFixed(0)}%`)
                 .fontSize(9.5)
                 .fontWeight(FontWeight.Bold)
-                .fontColor(AppTheme.ACCENT_BLUE)
+                .fontColor(Constants.COLOR_BLUE)
                 .fontFamily('monospace')
               Text('● 适居标称')
                 .fontSize(7.5)
@@ -257,7 +257,7 @@ export struct CabinTwinCard {
               }
               .rotate({ angle: this.fanRotation })
 
-              Circle({ width: 5, height: 5 }).fill(AppTheme.COLOR_WHITE)
+              Circle({ width: 5, height: 5 }).fill(Constants.COLOR_WHITE)
             }
             .width(30)
             .height(30)
@@ -340,7 +340,7 @@ export struct CabinTwinCard {
           Text('101.3 kPa')
             .fontSize(10)
             .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.ACCENT_BLUE)
+            .fontColor(Constants.COLOR_BLUE)
             .fontFamily('monospace')
         }
         .layoutWeight(1)
