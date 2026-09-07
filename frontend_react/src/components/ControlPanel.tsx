@@ -139,8 +139,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
       playClick();
       setSystemState(prev => ({
         ...prev,
-        isLedOn: turnOn,
-        isAlarmActive: turnOn ? true : prev.isAlarmActive
+        isLedOn: turnOn
       }));
       addLog(`[COMMAND ACK] 舱内照明与 PA5 告警灯已执行: ${turnOn ? '点亮 (ON)' : '熄灭 (OFF)'}`, 'cmd');
     } catch {

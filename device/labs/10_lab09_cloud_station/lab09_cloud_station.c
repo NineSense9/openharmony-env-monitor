@@ -41,6 +41,7 @@ static int g_manual_fan_speed = 0; // 默认 0 档 (开机静止不振动)
 static bool g_remote_override = false;
 static int g_remote_fan_speed = 0;
 static bool g_alarm_test_active = false;
+static bool g_remote_led_on = false;
 static char g_action_banner_text[64] = "";
 static int g_action_banner_ticks = 0;
 
@@ -141,12 +142,13 @@ static void *SensorTask(void *arg)
 
         // 计算有效报警状态 (综合环境越限、自检模式与本地静音锁存)
         bool effective_alarm = (g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch;
+        bool should_light_led = effective_alarm || g_remote_led_on;
 
         // 执行器闭环逻辑
         if (g_remote_override) {
             // 云端远程调速优先
             SmartHome_SetFanSpeed(g_remote_fan_speed);
-            SmartHome_SetAlarmLight(effective_alarm);
+            SmartHome_SetAlarmLight(should_light_led);
             SmartHome_UpdateAlarmSound(effective_alarm);
         } else {
             // 本地自主运行模式
@@ -158,7 +160,7 @@ static void *SensorTask(void *arg)
             } else {
                 // 正常状态：执行用户选定档位 (0/1/2/3/AUTO)
                 SmartHome_SetFanSpeed(g_manual_fan_speed);
-                SmartHome_SetAlarmLight(false);
+                SmartHome_SetAlarmLight(should_light_led);
                 SmartHome_UpdateAlarmSound(false);
             }
         }
@@ -437,7 +439,7 @@ static void *TelemetryTask(void *arg)
 
     while (1) {
         bool real_motor_on = (SmartHome_GetFanDuty() > 0);
-        bool real_alarm_on = (g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch;
+        bool real_alarm_on = ((g_report.alarm_active || g_alarm_test_active) && !g_k3_muted_latch) || g_remote_led_on;
 
         TelemetryData telem;
         memset(&telem, 0, sizeof(telem));
@@ -524,6 +526,16 @@ static void *CommandTask(void *arg)
                 g_alarm_test_active = false;
                 SmartHome_ResetAlarmState();
                 snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] ALARM MUTED");
+                g_action_banner_ticks = 30;
+            } else if (strcmp(cmd.target, "led") == 0) {
+                if (strcmp(cmd.action, "on") == 0) {
+                    g_remote_led_on = true;
+                    SmartHome_SetAlarmLight(true);
+                } else if (strcmp(cmd.action, "off") == 0) {
+                    g_remote_led_on = false;
+                    SmartHome_SetAlarmLight(false);
+                }
+                snprintf(g_action_banner_text, sizeof(g_action_banner_text), "[REMOTE] LED -> %s", cmd.action);
                 g_action_banner_ticks = 30;
             } else if (strcmp(cmd.target, "system") == 0 && strcmp(cmd.action, "reboot") == 0) {
                 HttpClient_AckCommand(cmd.command_id, "done", "system reboot acknowledged");

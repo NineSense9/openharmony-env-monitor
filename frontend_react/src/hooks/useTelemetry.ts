@@ -70,12 +70,20 @@ export function useTelemetry() {
       if (!isMounted) return;
 
       if (data && data.created_at) {
-        const dataTime = new Date(data.created_at.endsWith('Z') ? data.created_at : data.created_at + 'Z').getTime();
+        const parseIsoTimestamp = (ts: string): number => {
+          if (!ts) return NaN;
+          if (ts.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(ts)) {
+            return new Date(ts).getTime();
+          }
+          return new Date(ts + 'Z').getTime();
+        };
+
+        const dataTime = parseIsoTimestamp(data.created_at);
         const nowTime = Date.now();
         // 允许时区偏移计算：如果最新报文距今超过 6 秒，判定为硬件离线 (开发板每 500ms 上传一次)
-        const ageSec = Math.abs(nowTime - dataTime) / 1000;
+        const ageSec = !isNaN(dataTime) ? Math.abs(nowTime - dataTime) / 1000 : 999;
         
-        const syncTimeStr = new Date(dataTime).toTimeString().split(' ')[0] || '--:--:--';
+        const syncTimeStr = !isNaN(dataTime) ? (new Date(dataTime).toTimeString().split(' ')[0] || '--:--:--') : '--:--:--';
         const isOnline = (ageSec <= 6);
 
         // 告警阈值判定
@@ -135,7 +143,7 @@ export function useTelemetry() {
             wdtAlive: data.wdt_alive ?? true,
             i2cDevices: data.i2c_devices ?? prev.i2cDevices ?? 'SHT30,BH1750,MPU6050',
             lastKey: data.last_key ?? prev.lastKey ?? 'NONE',
-            isLedOn: data.alarm_on !== undefined ? Boolean(data.alarm_on) : prev.isLedOn
+            isLedOn: (data as any).led_on !== undefined ? Boolean((data as any).led_on) : prev.isLedOn
           };
         });
       } else {

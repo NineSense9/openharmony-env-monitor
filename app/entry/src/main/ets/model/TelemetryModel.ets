@@ -10,6 +10,7 @@ export class TelemetryData {
   public gas_ppm: number = 8.0;
   public motor_on: boolean = false;
   public alarm_on: boolean = false;
+  public led_on: boolean = false;
   public accel_x: number = 0.0;
   public accel_y: number = 0.0;
   public accel_z: number = 1.0;

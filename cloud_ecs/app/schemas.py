@@ -33,6 +33,7 @@ class TelemetryRead(TelemetryCreate):
 
     id: int
     created_at: datetime
+    led_on: bool | None = False
 
     @field_serializer("created_at")
     def serialize_created_at(self, dt: datetime, _info) -> str:

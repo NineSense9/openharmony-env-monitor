@@ -50,20 +50,29 @@ export class StationViewModel {
     if (data && data.temperature !== undefined) {
       this.telemetry = data;
       this.isConnected = true;
-      this.isLedOn = Boolean(data.alarm_on);
+      if (data.led_on !== undefined) {
+        this.isLedOn = Boolean(data.led_on);
+      }
 
       // 检查创建时间戳与当前系统时间差，判定硬件是否在线
       if (data.created_at) {
-        const dateStr = data.created_at.endsWith('Z') ? data.created_at : data.created_at + 'Z';
-        const createdDate = new Date(dateStr);
+        let createdTime: number;
+        if (data.created_at.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(data.created_at)) {
+          createdTime = new Date(data.created_at).getTime();
+        } else {
+          createdTime = new Date(data.created_at + 'Z').getTime();
+        }
         const now = new Date();
-        const diffSec = Math.abs((now.getTime() - createdDate.getTime()) / 1000);
+        const diffSec = !isNaN(createdTime) ? Math.abs((now.getTime() - createdTime) / 1000) : 999;
         this.isCached = diffSec > Constants.OFFLINE_TIMEOUT_SEC;
         
-        const hh = String(createdDate.getHours()).padStart(2, '0');
-        const mm = String(createdDate.getMinutes()).padStart(2, '0');
-        const ss = String(createdDate.getSeconds()).padStart(2, '0');
-        this.lastSyncTime = `${hh}:${mm}:${ss}`;
+        if (!isNaN(createdTime)) {
+          const createdDate = new Date(createdTime);
+          const hh = String(createdDate.getHours()).padStart(2, '0');
+          const mm = String(createdDate.getMinutes()).padStart(2, '0');
+          const ss = String(createdDate.getSeconds()).padStart(2, '0');
+          this.lastSyncTime = `${hh}:${mm}:${ss}`;
+        }
       } else {
         this.isCached = false;
       }

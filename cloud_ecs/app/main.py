@@ -55,6 +55,9 @@ def _validate_command(target: str, action: str) -> None:
         raise HTTPException(status_code=400, detail="invalid action")
 
 
+_latest_led_state: dict[str, bool] = {}
+
+
 def create_app(database_url: str | None = None) -> FastAPI:
     db_url = database_url or default_database_url()
     if db_url.startswith("sqlite"):
@@ -115,7 +118,13 @@ def create_app(database_url: str | None = None) -> FastAPI:
         query = select(Telemetry).order_by(desc(Telemetry.id))
         if device_id:
             query = query.where(Telemetry.device_id == device_id)
-        return db.execute(query.limit(1)).scalar_one_or_none()
+        row = db.execute(query.limit(1)).scalar_one_or_none()
+        if row:
+            result = TelemetryRead.model_validate(row)
+            led_state = _latest_led_state.get(row.device_id, False)
+            result.led_on = led_state or bool(row.alarm_on)
+            return result
+        return None
 
     @app.get("/api/telemetry/history", response_model=list[TelemetryRead])
     def get_history(
@@ -160,6 +169,8 @@ def create_app(database_url: str | None = None) -> FastAPI:
     @app.post("/api/command", response_model=CommandRead)
     def post_command(payload: CommandCreate, db: Session = Depends(db_dep)):
         _validate_command(payload.target, payload.action)
+        if payload.target == "led":
+            _latest_led_state[payload.device_id] = (payload.action == "on")
         try:
             row = Command(**payload.model_dump(), status="pending")
             db.add(row)
