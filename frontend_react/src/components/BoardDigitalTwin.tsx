@@ -498,8 +498,8 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
           <div className="flex items-center justify-between pt-1.5 border-t border-cyan-900/40 text-xs font-mono text-slate-200 shrink-0">
             <div className="flex items-center gap-5">
               <span className="flex items-center gap-1.5">
-                <span className={`w-2.5 h-2.5 rounded-full ${isAlarmEffective ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E] animate-ping' : 'bg-slate-700'}`} />
-                PA5 告警灯 (D1)
+                <span className={`w-2.5 h-2.5 rounded-full ${isAlarmEffective || systemState.isLedOn ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E] animate-ping' : 'bg-slate-700'}`} />
+                PA5 照明/告警 (D1)
               </span>
               <span className="flex items-center gap-1.5">
                 <span className={`w-2.5 h-2.5 rounded-full ${isFanSpinning ? 'bg-cyan-400 shadow-[0_0_8px_#00F0FF]' : 'bg-slate-700'}`} />

@@ -28,7 +28,8 @@ export function useTelemetry() {
     totalPackets: 0,
     isAlarmActive: false,
     isMuted: false,
-    isMotorRunning: false
+    isMotorRunning: false,
+    isLedOn: false
   });
 
   const { playAlarm } = useAudioFeedback();
@@ -133,7 +134,8 @@ export function useTelemetry() {
             accelZ: data.accel_z ?? prev.accelZ ?? 1,
             wdtAlive: data.wdt_alive ?? true,
             i2cDevices: data.i2c_devices ?? prev.i2cDevices ?? 'SHT30,BH1750,MPU6050',
-            lastKey: data.last_key ?? prev.lastKey ?? 'NONE'
+            lastKey: data.last_key ?? prev.lastKey ?? 'NONE',
+            isLedOn: data.alarm_on !== undefined ? Boolean(data.alarm_on) : prev.isLedOn
           };
         });
       } else {

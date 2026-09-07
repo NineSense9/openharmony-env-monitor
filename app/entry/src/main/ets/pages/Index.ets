@@ -157,12 +157,16 @@ struct Index {
                 ControlSection({
                   isMotorRunning: this.viewModel.telemetry.motor_on,
                   isAlarmOn: this.viewModel.telemetry.alarm_on,
+                  isLedOn: this.viewModel.isLedOn,
                   fanSpeed: this.viewModel.telemetry.fan_speed,
                   onToggleMotor: (turnOn: boolean) => {
                     this.viewModel.sendMotorCommand(turnOn);
                   },
                   onSetFanSpeed: (speed: number) => {
                     this.viewModel.sendFanSpeedCommand(speed);
+                  },
+                  onToggleLed: (turnOn: boolean) => {
+                    this.viewModel.sendLedCommand(turnOn);
                   },
                   onMuteAlarm: () => {
                     this.viewModel.sendMuteCommand();

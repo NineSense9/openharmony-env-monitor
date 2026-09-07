@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Wind, BellOff, Loader2, ShieldCheck, Lock, X, RefreshCw } from 'lucide-react';
+import { Cpu, Wind, BellOff, Loader2, ShieldCheck, Lock, X, RefreshCw, Lightbulb } from 'lucide-react';
 import { sendRemoteCommand } from '../services/api';
 import { SystemState } from '../types/telemetry';
 import { useAudioFeedback } from '../hooks/useAudioFeedback';
@@ -15,6 +15,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
   const [loadingMotor, setLoadingMotor] = useState(false);
   const [loadingMute, setLoadingMute] = useState(false);
   const [loadingReboot, setLoadingReboot] = useState(false);
+  const [loadingLed, setLoadingLed] = useState(false);
   
   // Security Modal State
   const [showPinModal, setShowPinModal] = useState(false);
@@ -127,6 +128,28 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
     }
   };
 
+  const handleToggleLed = async (turnOn: boolean) => {
+    setLoadingLed(true);
+    try {
+      await sendRemoteCommand({
+        device_id: 'rk2206-station-01',
+        target: 'led',
+        action: turnOn ? 'on' : 'off'
+      });
+      playClick();
+      setSystemState(prev => ({
+        ...prev,
+        isLedOn: turnOn,
+        isAlarmActive: turnOn ? true : prev.isAlarmActive
+      }));
+      addLog(`[COMMAND ACK] 舱内照明与 PA5 告警灯已执行: ${turnOn ? '点亮 (ON)' : '熄灭 (OFF)'}`, 'cmd');
+    } catch {
+      addLog('[COMMAND FAILED] 舱内照明控制指令发送失败', 'alarm');
+    } finally {
+      setLoadingLed(false);
+    }
+  };
+
   const curSpeed = systemState.fanSpeed ?? (systemState.isMotorRunning ? 3 : 0);
 
   return (
@@ -188,7 +211,48 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ systemState, setSyst
           </div>
         </div>
 
-        {/* 2. 紧急动作按钮组 */}
+        {/* 2. 舱内照明与 PA5 警示灯控制 */}
+        <div className="p-2.5 rounded-lg bg-[#080E1E]/80 border border-slate-800 flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Lightbulb className={`w-3.5 h-3.5 ${systemState.isLedOn ? 'text-amber-300 drop-shadow-[0_0_6px_#F59E0B]' : 'text-slate-500'}`} />
+              <span className="text-xs font-semibold text-slate-300">舱内照明与 PA5 警示灯 (GPIO0_PA5)</span>
+            </div>
+            <span className={`text-xs font-code font-bold ${systemState.isLedOn ? 'text-amber-300' : 'text-slate-400'}`}>
+              {systemState.isLedOn ? '● 已点亮 (ON)' : '○ 已熄灭 (OFF)'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 pt-0.5">
+            <button
+              disabled={loadingLed}
+              onClick={() => requireAuth(() => handleToggleLed(true))}
+              className={`py-1.5 px-3 rounded-lg text-xs font-hud font-bold transition-all border flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 ${
+                systemState.isLedOn
+                  ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                  : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-amber-500/50 hover:text-amber-300'
+              }`}
+            >
+              {loadingLed ? <Loader2 className="w-3 h-3 animate-spin" /> : <Lightbulb className="w-3 h-3 text-amber-400" />}
+              点亮照明 (ON)
+            </button>
+
+            <button
+              disabled={loadingLed}
+              onClick={() => requireAuth(() => handleToggleLed(false))}
+              className={`py-1.5 px-3 rounded-lg text-xs font-hud font-bold transition-all border flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 ${
+                !systemState.isLedOn
+                  ? 'bg-slate-800/80 border-slate-600 text-slate-200'
+                  : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+              }`}
+            >
+              {loadingLed ? <Loader2 className="w-3 h-3 animate-spin" /> : <span className="w-2 h-2 rounded-full bg-slate-600" />}
+              熄灭照明 (OFF)
+            </button>
+          </div>
+        </div>
+
+        {/* 3. 紧急动作按钮组 */}
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => requireAuth(handleMute)}

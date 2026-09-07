@@ -9,6 +9,7 @@ export class StationViewModel {
   public telemetry: TelemetryData = new TelemetryData();
   public isConnected: boolean = false;
   public isCached: boolean = false;
+  public isLedOn: boolean = false;
   public lastSyncTime: string = '--:--:--';
   public currentTimeStr: string = '00:00:00';
   public eventLogs: EventLogItem[] = [];
@@ -49,6 +50,7 @@ export class StationViewModel {
     if (data && data.temperature !== undefined) {
       this.telemetry = data;
       this.isConnected = true;
+      this.isLedOn = Boolean(data.alarm_on);
 
       // 检查创建时间戳与当前系统时间差，判定硬件是否在线
       if (data.created_at) {
@@ -105,6 +107,18 @@ export class StationViewModel {
       this.addLog(`风机调速指令下发: 档位 ${speed} (${action})`, 'info');
     } else {
       this.addLog(`风机调速指令下发失败`, 'alarm');
+    }
+    return ok;
+  }
+
+  public async sendLedCommand(turnOn: boolean): Promise<boolean> {
+    const ok = await HttpUtil.sendCommand('led', turnOn ? 'on' : 'off');
+    if (ok) {
+      this.isLedOn = turnOn;
+      this.telemetry.alarm_on = turnOn;
+      this.addLog(`远程指令下发: ${turnOn ? '点亮 PA5 照明/告警灯' : '熄灭 PA5 照明/告警灯'}`, 'info');
+    } else {
+      this.addLog(`远程指令下发失败: LED 照明控制`, 'alarm');
     }
     return ok;
   }

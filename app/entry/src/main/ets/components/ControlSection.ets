@@ -17,9 +17,11 @@ export class FanSpeedOption {
 export struct ControlSection {
   @Prop isMotorRunning: boolean;
   @Prop isAlarmOn: boolean;
+  @Prop isLedOn: boolean = false;
   @Prop fanSpeed: number = 4; // 0=关, 1=弱, 2=中, 3=强, 4=AUTO
   public onToggleMotor: (turnOn: boolean) => void = () => {};
   public onSetFanSpeed: (speed: number) => void = () => {};
+  public onToggleLed: (turnOn: boolean) => void = () => {};
   public onMuteAlarm: () => void = () => {};
   public onRebootSystem: () => void = () => {};
 
@@ -81,6 +83,10 @@ export struct ControlSection {
       this.onMuteAlarm();
     } else if (this.pendingActionType === 'set_speed') {
       this.onSetFanSpeed(this.targetSpeed);
+    } else if (this.pendingActionType === 'led_on') {
+      this.onToggleLed(true);
+    } else if (this.pendingActionType === 'led_off') {
+      this.onToggleLed(false);
     } else if (this.pendingActionType === 'reboot') {
       this.onRebootSystem();
     }
@@ -195,6 +201,63 @@ export struct ControlSection {
                 this.requestAction('set_speed', `切换风机档位至 ${item.label}`, item.id);
               })
           })
+        }
+        .width('100%')
+      }
+      .width('100%')
+      .padding(10)
+      .backgroundColor('#0A1122')
+      .borderRadius(6)
+      .border({ width: 1, color: '#1B2A4A' })
+
+      // 舱内照明与 PA5 警示灯控制
+      Column({ space: 6 }) {
+        Row() {
+          Row({ space: 6 }) {
+            Circle({ width: 9, height: 9 })
+              .fill(this.isLedOn ? Constants.COLOR_YELLOW : Constants.COLOR_MUTED)
+
+            Text('舱内照明与 PA5 警示灯 (GPIO0_PA5)')
+              .fontSize(12)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(Constants.COLOR_WHITE)
+          }
+
+          Text(this.isLedOn ? '● 已点亮 (ON)' : '○ 已熄灭 (OFF)')
+            .fontSize(10)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.isLedOn ? Constants.COLOR_YELLOW : Constants.COLOR_MUTED)
+            .fontFamily('monospace')
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+
+        Row({ space: 8 }) {
+          Button('点亮照明灯 (ON)')
+            .layoutWeight(1)
+            .height(32)
+            .fontSize(11)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.isLedOn ? '#000' : Constants.COLOR_YELLOW)
+            .backgroundColor(this.isLedOn ? Constants.COLOR_YELLOW : '#78350F33')
+            .borderRadius(4)
+            .border({ width: 1, color: '#D97706' })
+            .onClick(() => {
+              this.requestAction('led_on', '点亮舱内照明与 PA5 警示灯');
+            })
+
+          Button('熄灭照明灯 (OFF)')
+            .layoutWeight(1)
+            .height(32)
+            .fontSize(11)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Constants.COLOR_WHITE)
+            .backgroundColor('#1E293B')
+            .borderRadius(4)
+            .border({ width: 1, color: '#334155' })
+            .onClick(() => {
+              this.requestAction('led_off', '熄灭舱内照明与 PA5 警示灯');
+            })
         }
         .width('100%')
       }

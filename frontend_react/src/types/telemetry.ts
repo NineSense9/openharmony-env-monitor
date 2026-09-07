@@ -66,4 +66,5 @@ export interface SystemState {
   wdtAlive?: boolean;
   i2cDevices?: string;
   lastKey?: string;
+  isLedOn?: boolean;
 }
