@@ -6,6 +6,7 @@ import { AttitudeCard } from '../components/AttitudeCard';
 import { BoardDisplayCard } from '../components/BoardDisplayCard';
 import { ControlSection } from '../components/ControlSection';
 import { TrendChart } from '../components/TrendChart';
+import { AtmospherePieChart } from '../components/AtmospherePieChart';
 import { EventLogView } from '../components/EventLogView';
 import { SplashScreen } from '../components/SplashScreen';
 import { Constants } from '../common/Constants';
@@ -210,6 +211,10 @@ struct Index {
                 TrendChart({
                   tempData: this.viewModel.tempHistory,
                   humiData: this.viewModel.humiHistory
+                })
+
+                AtmospherePieChart({
+                  telemetry: this.viewModel.telemetry
                 })
 
                 EventLogView({

@@ -75,6 +75,11 @@ def create_app(database_url: str | None = None) -> FastAPI:
     @app.get("/")
     def root():
         return RedirectResponse(url="/dashboard/")
+
+    @app.get("/favicon.ico")
+    @app.get("/favicon.png")
+    def favicon():
+        return RedirectResponse(url="/dashboard/favicon.png")
     engine = build_engine(db_url)
     session_factory = build_session_factory(engine)
     create_schema(engine)
@@ -212,6 +217,9 @@ def create_app(database_url: str | None = None) -> FastAPI:
         static_dir = Path("/opt/openharmony-env-monitor/cloud_ecs/static")
     if static_dir.exists():
         app.mount("/dashboard", StaticFiles(directory=str(static_dir), html=True), name="dashboard")
+        assets_dir = static_dir / "assets"
+        if assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
     return app
 
 

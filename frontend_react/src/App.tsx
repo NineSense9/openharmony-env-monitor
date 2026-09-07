@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTelemetry } from './hooks/useTelemetry';
 import { useAudioFeedback } from './hooks/useAudioFeedback';
 import { HudHeader } from './components/HudHeader';
@@ -16,6 +16,24 @@ export function App() {
   const { telemetry, history, systemState, setSystemState, setOptimisticFanSpeed, logs, addLog } = useTelemetry();
   const [activeCenterTab, setActiveCenterTab] = useState<'board' | 'cabin'>('board');
   const { playAlarm, playScan } = useAudioFeedback();
+
+  // 🚀 DataV 智能屏幕自适应引擎：以 1920x960 为标准设计基准，自动计算等比缩放
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const DESIGN_WIDTH = 1920;
+      const DESIGN_HEIGHT = 960;
+      const scaleX = window.innerWidth / DESIGN_WIDTH;
+      const scaleY = window.innerHeight / DESIGN_HEIGHT;
+      const s = Math.min(scaleX, scaleY);
+      setScale(s);
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
 
   const handleBoardKeyTrigger = async (key: 'K3' | 'K4' | 'K5' | 'K6') => {
     if (key === 'K3') {
@@ -88,11 +106,23 @@ export function App() {
   };
 
   return (
-    <div className={`h-screen w-screen p-3 max-w-[1920px] mx-auto flex flex-col gap-3 overflow-hidden transition-all duration-300 ${
-      systemState.isAlarmActive ? 'border-rose-500/50 shadow-[inset_0_0_80px_rgba(244,63,94,0.15)]' : ''
-    }`}>
-      {/* 1. Top HUD Header */}
-      <HudHeader systemState={systemState} />
+    <div className="w-screen h-screen overflow-hidden bg-[#030712] relative select-none flex items-center justify-center">
+      <div
+        style={{
+          width: '1920px',
+          height: '960px',
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: `translate(-50%, -50%) scale(${scale})`,
+          transformOrigin: 'center center',
+        }}
+        className={`p-3 flex flex-col gap-3 overflow-hidden transition-all duration-300 ${
+          systemState.isAlarmActive ? 'border-rose-500/50 shadow-[inset_0_0_80px_rgba(244,63,94,0.15)]' : ''
+        }`}
+      >
+        {/* 1. Top HUD Header */}
+        <HudHeader systemState={systemState} />
 
       {/* 2. Main 3-Column Dashboard Grid (完美铺满整个屏幕，三列底线完全对齐) */}
       <main className="grid grid-cols-1 lg:grid-cols-[360px_1fr_360px] gap-3 flex-1 min-h-0">
@@ -173,6 +203,7 @@ export function App() {
 
       </main>
     </div>
+  </div>
   );
 }
 

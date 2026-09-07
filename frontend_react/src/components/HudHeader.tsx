@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Satellite, Radio, WifiOff, Clock } from 'lucide-react';
+import { Satellite, Radio, WifiOff, Clock, Maximize2, Minimize2 } from 'lucide-react';
 import { SystemState } from '../types/telemetry';
 
 interface HudHeaderProps {
@@ -9,6 +9,23 @@ interface HudHeaderProps {
 export const HudHeader: React.FC<HudHeaderProps> = ({ systemState }) => {
   const [bjtTime, setBjtTime] = useState('--:--:--');
   const [utcTime, setUtcTime] = useState('--:--:--');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -77,8 +94,17 @@ export const HudHeader: React.FC<HudHeaderProps> = ({ systemState }) => {
         </div>
       </div>
 
-      {/* Connection Status Badge */}
-      <div className="flex items-center gap-2">
+      {/* Connection Status Badge & Fullscreen Toggle */}
+      <div className="flex items-center gap-2.5">
+        <button
+          onClick={toggleFullscreen}
+          title={isFullscreen ? '退出全屏 (Esc)' : '进入大屏全屏模式 (F11)'}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 text-xs font-mono transition-all active:scale-95 shadow-sm"
+        >
+          {isFullscreen ? <Minimize2 className="w-3.5 h-3.5 text-cyan-400" /> : <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />}
+          <span>{isFullscreen ? '退出全屏' : '大屏全屏'}</span>
+        </button>
+
         {systemState.isConnected ? (
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.25)]">
             <Radio className="w-3.5 h-3.5 animate-pulse text-emerald-400" />

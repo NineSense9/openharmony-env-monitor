@@ -181,18 +181,18 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
             {/* 左区：4 大硬件组件完全填满 (解决 P2 左侧大空白) */}
             <div className="col-span-3 flex flex-col justify-between gap-1.5 h-full">
               {/* 1. SoC 主控芯片 */}
-              <div className="bg-[#050B14] border border-cyan-400/40 rounded-lg p-2 shadow-inner">
+              <div className="bg-[#050B14] border border-cyan-400/40 rounded-lg p-1.5 shadow-inner">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold font-mono text-cyan-300">ROCKCHIP RK2206</span>
                   <Activity className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
                 </div>
-                <div className="mt-1 text-xs font-mono text-slate-200 flex flex-col gap-1">
+                <div className="mt-0.5 text-xs font-mono text-slate-200 flex flex-col gap-0.5">
                   <div className="flex justify-between"><span>CORE: 200MHz M4F</span><span className="text-emerald-400 font-bold">RTOS OK</span></div>
                   <div className="flex justify-between"><span>RAM: 256KB SRAM</span><span>FLASH: 8MB</span></div>
                   {/* CPU 实时模拟负载条 */}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-slate-300 font-medium">CPU负载:</span>
-                    <div className="flex-1 bg-slate-900 h-2 rounded overflow-hidden">
+                    <div className="flex-1 bg-slate-900 h-1.5 rounded overflow-hidden">
                       <div className="bg-cyan-400 h-full w-[24%]" />
                     </div>
                     <span className="text-cyan-300 font-bold text-xs">24%</span>
@@ -201,19 +201,19 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               </div>
 
               {/* 2. 电源稳压管理模块 (填补原空白) */}
-              <div className="bg-[#050B14] border border-slate-700/60 rounded-lg p-1.5 shadow-inner">
+              <div className="bg-[#050B14] border border-slate-700/60 rounded-lg p-1 shadow-inner">
                 <div className="flex items-center justify-between text-xs font-mono text-slate-200">
                   <span className="text-amber-300 font-bold">PMU 电源管理与时钟</span>
                   <span className="text-xs text-emerald-400 font-bold">● 3.3V / 1.2V</span>
                 </div>
-                <div className="text-xs font-mono text-slate-300 flex justify-between mt-1">
+                <div className="text-xs font-mono text-slate-300 flex justify-between mt-0.5">
                   <span>RTC: 32.768kHz</span>
                   <span>稳压纹波: &lt;12mV</span>
                 </div>
               </div>
 
               {/* 3. MPU6050 姿态传感器 */}
-              <div className="bg-[#050B14] border border-blue-500/30 rounded-lg p-2 flex flex-col justify-between">
+              <div className="bg-[#050B14] border border-blue-500/30 rounded-lg p-1.5 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-xs font-mono font-bold text-blue-300">
                   <span>MPU6050 6-AXIS IMU</span>
                   <Gauge className="w-3.5 h-3.5 text-blue-400" />
@@ -228,7 +228,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                     <span className="text-cyan-300 font-black text-sm">{roll >= 0 ? '+' : ''}{roll.toFixed(1)}°</span>
                   </div>
                 </div>
-                <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden flex items-center justify-center relative mt-0.5">
+                <div className="w-full h-1 bg-slate-900 rounded-full overflow-hidden flex items-center justify-center relative mt-0.5">
                   <div 
                     className="w-4 h-full bg-amber-400 rounded-full transition-transform" 
                     style={{ transform: `translateX(${pitch * 1.5}px)` }}
@@ -237,7 +237,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               </div>
 
               {/* 4. 压电蜂鸣器与驱动输出 */}
-              <div className={`border rounded-lg p-2 flex items-center justify-between transition-all ${
+              <div className={`border rounded-lg p-1.5 flex items-center justify-between transition-all ${
                 isAlarmEffective 
                   ? 'bg-rose-950/60 border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.5)] animate-pulse' 
                   : 'bg-[#050B14] border-slate-800'
@@ -280,9 +280,9 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   <span className="text-[10px] text-purple-200 mt-1">总线拓扑扫描完毕：4 枚从设备在线响应</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 my-1 flex-1">
+                <div className="grid grid-cols-2 gap-1.5 my-1 flex-1">
                   {/* 象限 1: 环境感知温湿度 (丰富排布) */}
-                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
+                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-1.5 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-cyan-300 font-mono font-bold">● SHT30 温湿感知</span>
                       <span className="text-[10px] text-slate-400 font-mono">0x44</span>
@@ -302,7 +302,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   </div>
 
                   {/* 象限 2: 六轴姿态与惯导 (丰富排布) */}
-                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
+                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-1.5 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-cyan-300 font-mono font-bold">● MPU6050 姿态仪</span>
                       <span className="text-[10px] text-slate-400 font-mono">0x68</span>
@@ -322,7 +322,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   </div>
 
                   {/* 象限 3: 环控动力与烟雾毒气 (丰富排布) */}
-                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
+                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-1.5 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-cyan-300 font-mono font-bold">● 环控动力与排风</span>
                       <span className="text-[10px] text-slate-400 font-mono">PWM_PB7</span>
@@ -342,7 +342,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   </div>
 
                   {/* 象限 4: 物理总线与按键控制 (丰富排布) */}
-                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-2 flex flex-col justify-between">
+                  <div className="bg-[#001020] border border-cyan-900/60 rounded-lg p-1.5 flex flex-col justify-between">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-cyan-300 font-mono font-bold">● 总线与实体微动</span>
                       <span className="text-[10px] text-slate-400 font-mono">GPIO0_PC7</span>
@@ -375,7 +375,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
             {/* 右区：电机风扇 + KEY K3 微动开关 (消除 P2 圈出的空白) */}
             <div className="col-span-4 flex flex-col justify-between gap-1.5 h-full">
               {/* 电机风扇控制视窗 */}
-              <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-2 flex items-center justify-between shadow-inner">
+              <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-1.5 flex items-center justify-between shadow-inner">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-xs font-bold font-mono text-cyan-300">PWM VENT FAN 散热排风</span>
                   <span className="text-xs font-mono text-slate-200">
@@ -383,9 +383,9 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">PIN: PD0 / PWM_PB7</span>
                 </div>
-                <div className="w-12 h-12 rounded-full border border-cyan-500/50 bg-[#001020] flex items-center justify-center relative overflow-hidden">
+                <div className="w-10 h-10 rounded-full border border-cyan-500/50 bg-[#001020] flex items-center justify-center relative overflow-hidden shrink-0">
                   <svg 
-                    className="w-10 h-10" 
+                    className="w-9 h-9" 
                     viewBox="0 0 100 100" 
                     style={{ transform: `rotate(${fanAngle}deg)` }}
                   >
@@ -399,7 +399,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
               </div>
 
               {/* K3 微动开关操作区 (布局紧凑紧密，上下充实) */}
-              <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-2.5 flex flex-col justify-between flex-1 shadow-inner">
+              <div className="bg-[#050B14] border border-cyan-500/40 rounded-lg p-2 flex flex-col justify-between flex-1 shadow-inner">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-sm font-hud text-cyan-300 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
@@ -417,7 +417,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                   onMouseLeave={cancelHold}
                   onTouchStart={startHold}
                   onTouchEnd={endHold}
-                  className={`w-full py-3 px-3 rounded-xl border font-mono transition-all flex flex-col items-center justify-center my-1.5 select-none cursor-pointer ${
+                  className={`w-full py-2 px-3 rounded-xl border font-mono transition-all flex flex-col items-center justify-center my-1 select-none cursor-pointer ${
                     isHolding || activeKey === 'K3' || activeKey === 'K4' || activeKey === 'K5' || activeKey === 'K6'
                       ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
                       : 'bg-[#0A1628] border-cyan-500/50 hover:border-cyan-300 text-slate-100'
@@ -427,7 +427,7 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                     {isHolding ? `蓄力中 ${(holdMs/1000).toFixed(1)}s` : (actionFeedback || '按住 K3 开关蓄力 (松手触发)')}
                   </span>
                   <span className="text-[11px] font-mono text-slate-400 mt-0.5">短按调速 / 长按自检重扫</span>
-                  <div className="w-full bg-slate-950 h-2 rounded-full mt-1.5 overflow-hidden">
+                  <div className="w-full bg-slate-950 h-1.5 rounded-full mt-1 overflow-hidden">
                     <div 
                       className={`h-full transition-all duration-75 ${
                         holdMs >= 2500 ? 'bg-purple-400' : (holdMs >= 1000 ? 'bg-amber-400' : 'bg-cyan-400')
@@ -438,10 +438,10 @@ export const BoardDigitalTwin: React.FC<BoardDigitalTwinProps> = ({
                 </button>
 
                 {/* 快捷手势点选区 (短按调速消警、长按自检、长按重扫) */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <button
                     onClick={() => triggerGesture('tap')}
-                    className="w-full py-1.5 px-2.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/60 rounded-lg flex items-center justify-between font-mono transition-all active:scale-95"
+                    className="w-full py-1 px-2.5 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/60 rounded-lg flex items-center justify-between font-mono transition-all active:scale-95"
                   >
                     <div className="flex items-center gap-1.5">
                       <Zap className="w-3.5 h-3.5 text-cyan-400" />
