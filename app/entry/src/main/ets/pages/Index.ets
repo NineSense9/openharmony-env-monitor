@@ -214,7 +214,9 @@ struct Index {
                 })
 
                 AtmospherePieChart({
-                  telemetry: this.viewModel.telemetry
+                  gasPpm: this.viewModel.telemetry.gas_ppm,
+                  fanSpeed: this.viewModel.telemetry.fan_speed,
+                  motorOn: this.viewModel.telemetry.motor_on
                 })
 
                 EventLogView({

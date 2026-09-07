@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 
 class HealthResponse(BaseModel):
@@ -34,6 +34,12 @@ class TelemetryRead(TelemetryCreate):
     id: int
     created_at: datetime
 
+    @field_serializer("created_at")
+    def serialize_created_at(self, dt: datetime, _info) -> str:
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.isoformat()
+
 
 class AlertRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -43,6 +49,12 @@ class AlertRead(BaseModel):
     level: str
     message: str
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, dt: datetime, _info) -> str:
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.isoformat()
 
 
 class CommandCreate(BaseModel):

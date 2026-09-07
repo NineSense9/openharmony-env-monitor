@@ -52,11 +52,16 @@ export class StationViewModel {
 
       // 检查创建时间戳与当前系统时间差，判定硬件是否在线
       if (data.created_at) {
-        const createdDate = new Date(data.created_at);
+        const dateStr = data.created_at.endsWith('Z') ? data.created_at : data.created_at + 'Z';
+        const createdDate = new Date(dateStr);
         const now = new Date();
         const diffSec = Math.abs((now.getTime() - createdDate.getTime()) / 1000);
         this.isCached = diffSec > Constants.OFFLINE_TIMEOUT_SEC;
-        this.lastSyncTime = createdDate.toTimeString().substring(0, 8);
+        
+        const hh = String(createdDate.getHours()).padStart(2, '0');
+        const mm = String(createdDate.getMinutes()).padStart(2, '0');
+        const ss = String(createdDate.getSeconds()).padStart(2, '0');
+        this.lastSyncTime = `${hh}:${mm}:${ss}`;
       } else {
         this.isCached = false;
       }
